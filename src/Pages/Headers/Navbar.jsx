@@ -760,6 +760,7 @@ export default function Navbar() {
     ],
     Admin: [
       { name: "Main", path: "/dashboard" },
+      {Name : "University ",path : "/universityManagement"},
       { name: "Dashboard", path: "/dashboardAdmin" },
       { name: "Manage Users", path: "/manage-users" },
       { name: "Updates", path: "/admin/updates" },

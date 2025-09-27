@@ -63,85 +63,103 @@ import AnalyticsDashboard from './Pages/Admin/Analytics/AnalyticsDashboard';
 import UpdatesPage from './Pages/updates/UpdatesPage';
 import AdminUpdatesPage from './Pages/updates/AdminUpdatesPage';
 
+import AdminUniversityManagement from './Pages/University/AdminUniversityManagement';
+import UniAdminPortal from './Pages/University/UniAdminPortal';
+import TeacherDashboard from './Pages/University/TeacherDashboard';
+
+import { AuthProvider } from './utils/axiosConfig';
+
 function App() {
   return (
     <>
-      <CoolNavbar />
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/signup" element={<SignupForm />} />
-        <Route path="/recommendation" element={<Recommendation />} />
-        <Route path="/job-details/:jobTitle" element={<JobDetails />} />
-        <Route path='/Learn' element={<VideoForm/>}/>
-        <Route path ="/learnlist" element={<VideoList/>}/>
-        <Route path="/mentorship" element={<MentorList />} />
-        <Route path='/question' element={<CareerRecommendationForm/>}/>
-        <Route path='/button' element={<Button/>}/>   
-        <Route path='/workshopAdd'element={<AddWorkshop/>}/> {/*Admin*/}
-        <Route path="/workshops"element={<AvailableWorkshops/>}/>
-        <Route path='/dashboardAdmin' element={<AdminDashboard/>}/>   {/*Admin*/}
-        <Route path="/addResources" element={<AddResourcePage/>}/>    {/*Admin*/}
-        <Route path ="/view-books" element={<ViewBooksPage/>}/>
-        <Route path="/userFeedback" element={<MentorFeedback/>}/>    {/*Admin*/}
-        <Route path="/community" element={<ModernCommunityPage/>}/>
-        <Route path="/roadmap" element={<FrontendRoadmap/>}/>
-        <Route path="/mentorDashboard" element={<CoachProfile/>}/>      {/*Mentor*/}
-        <Route path='/schedulementor'element={<ScheduleSession/>}/>
-        <Route path ="/mentor" element={<MentoHome/>}/>
-        <Route path="/softwareengineer" element={<FrontendRoadmap/>}/>
-        <Route path="/careerquiz" element={<CareerQuiz/>}/>
-        <Route path="/combinedquiz" element={<CombinedCareerAdvisor/>}/>
-        <Route path='/profile' element={<Profile/>}/>
-        <Route path='/jobtitleall' element={<RecommendationJobTitlesSearch/>}/>
-        <Route path="/job-info" element={<JobInfo/>}/>
-        <Route path="/dummyinfo" element={<DummyJobInfo/>}/>
-        <Route path ="/mentorHome" element={<MentorshipPage/>}/>
-        <Route path='/careerPaths' element={<TechCareerPathsHub/>}/>
-        <Route path="/datascientist" element={<DetailedDataScientistRoadmap/>}/>
-        
-        {/* Updates Routes */}
-        <Route path="/updates" element={<UpdatesPage />} />
-        
-        {/* User protected routes */}
-        <Route element={<ProtectedRoute allowedRoles={['User', 'Mentor', 'Admin']} />}>
-          <Route path="/careerform" element={<CareerForm />} />
-          <Route path="/application" element={<CreativeApplicationForm />} />
-          <Route path="/tracker" element={<ApplicationTracker />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/my-applications" element={<UserAppointments />} />
-        </Route>
+      <AuthProvider>
+        <CoolNavbar />
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/signup" element={<SignupForm />} />
+          <Route path="/recommendation" element={<Recommendation />} />
+          <Route path="/job-details/:jobTitle" element={<JobDetails />} />
+          <Route path='/Learn' element={<VideoForm />} />
+          <Route path="/learnlist" element={<VideoList />} />
+          <Route path="/mentorship" element={<MentorList />} />
+          <Route path='/question' element={<CareerRecommendationForm />} />
+          <Route path='/button' element={<Button />} />
+          <Route path='/workshopAdd' element={<AddWorkshop />} /> {/*Admin*/}
+          <Route path="/workshops" element={<AvailableWorkshops />} />
+          <Route path='/dashboardAdmin' element={<AdminDashboard />} />   {/*Admin*/}
+          <Route path="/addResources" element={<AddResourcePage />} />    {/*Admin*/}
+          <Route path="/view-books" element={<ViewBooksPage />} />
+          <Route path="/userFeedback" element={<MentorFeedback />} />    {/*Admin*/}
+          <Route path="/community" element={<ModernCommunityPage />} />
+          <Route path="/roadmap" element={<FrontendRoadmap />} />
+          <Route path="/mentorDashboard" element={<CoachProfile />} />      {/*Mentor*/}
+          <Route path='/schedulementor' element={<ScheduleSession />} />
+          <Route path="/mentor" element={<MentoHome />} />
+          <Route path="/softwareengineer" element={<FrontendRoadmap />} />
+          <Route path="/careerquiz" element={<CareerQuiz />} />
+          <Route path="/combinedquiz" element={<CombinedCareerAdvisor />} />
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/jobtitleall' element={<RecommendationJobTitlesSearch />} />
+          <Route path="/job-info" element={<JobInfo />} />
+          <Route path="/dummyinfo" element={<DummyJobInfo />} />
+          <Route path="/mentorHome" element={<MentorshipPage />} />
+          <Route path='/careerPaths' element={<TechCareerPathsHub />} />
+          <Route path="/datascientist" element={<DetailedDataScientistRoadmap />} />
 
-        {/* Mentor protected routes */}
-        <Route element={<ProtectedRoute allowedRoles={['Mentor', 'Admin']} />}>
-          <Route path="/my-sessions" element={<MentorAppointments />} />
-          <Route path="/interestForm" element={<InterestManagement/>}/>
-          <Route path='/StrengthForm' element={<StrengthManagement/>}/>
-          <Route path='/amdashboard'element={<AMDashboard/>}/>
-          <Route path='/skillform' element={<SkillsManagement/>}/>
-          <Route path='/collegeform'element={<CollegesManagement/>}/>
-          <Route path ="/recommendationForm"element={<RecommendationForm/>}/>
-        </Route>
+          {/* Updates Routes */}
+          <Route path="/updates" element={<UpdatesPage />} />
 
-        {/* Admin protected routes */}
-        <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
-          <Route path="/JobForm" element={<JobTitlesManagement />} />
-          <Route path="/Companyform" element={<CompaniesManagement />} />
-          <Route path="/mentoapplication" element={<AdminApplicationsPage />} />
-          <Route path="/analytics" element={<AnalyticsDashboard />} />
-          <Route path="/addmentor" element={<MentorRegistrationForm />} />
-          
-          {/* Admin Updates Management */}
-          <Route path="/admin/updates" element={<AdminUpdatesPage />} />
-        </Route>
+          {/* User protected routes */}
+          <Route element={<ProtectedRoute allowedRoles={['User', 'Mentor', 'Admin']} />}>
+            <Route path="/careerform" element={<CareerForm />} />
+            <Route path="/application" element={<CreativeApplicationForm />} />
+            <Route path="/tracker" element={<ApplicationTracker />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/my-applications" element={<UserAppointments />} />
+          </Route>
 
-        {/* Catch-all route for 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      {/* <ChatBot/> */}
-      <ChatBot/>
-      <Footer/>
+          {/* Mentor protected routes */}
+          <Route element={<ProtectedRoute allowedRoles={['Mentor', 'Admin']} />}>
+            <Route path="/my-sessions" element={<MentorAppointments />} />
+            <Route path="/interestForm" element={<InterestManagement />} />
+            <Route path='/StrengthForm' element={<StrengthManagement />} />
+            <Route path='/amdashboard' element={<AMDashboard />} />
+            <Route path='/skillform' element={<SkillsManagement />} />
+            <Route path='/collegeform' element={<CollegesManagement />} />
+            <Route path="/recommendationForm" element={<RecommendationForm />} />
+          </Route>
+
+          {/* Admin protected routes */}
+          <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
+            <Route path="/JobForm" element={<JobTitlesManagement />} />
+            <Route path="/universityManagement" element={<AdminUniversityManagement />} />
+
+            <Route path="/Companyform" element={<CompaniesManagement />} />
+            <Route path="/mentoapplication" element={<AdminApplicationsPage />} />
+            <Route path="/analytics" element={<AnalyticsDashboard />} />
+            <Route path="/addmentor" element={<MentorRegistrationForm />} />
+
+            {/* Admin Updates Management */}
+            <Route path="/admin/updates" element={<AdminUpdatesPage />} />
+          </Route>
+
+
+          <Route element={<ProtectedRoute allowedRoles={['UniAdmin']} />}>
+            <Route path="/uniAdminPortal" element={<UniAdminPortal />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={['UniTeach']} />}>
+            <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+          </Route>
+          {/* Catch-all route for 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        {/* <ChatBot/> */}
+        <ChatBot />
+        <Footer />
+      </AuthProvider>
     </>
   );
 }
