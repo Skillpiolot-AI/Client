@@ -175,7 +175,7 @@
 //         >
 //           <Sparkles className="w-4 h-4" />
 //         </motion.div>
-        
+
 //         {/* Pulse effect */}
 //         <motion.div
 //           className="absolute inset-0 w-4 h-4 bg-purple-400 rounded-full opacity-20"
@@ -624,11 +624,10 @@ const ServerStatusIndicator = ({ isOnline, isChecking, onRefresh }) => {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onRefresh}
-      className={`group flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border ${
-        isOnline
+      className={`group flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border ${isOnline
           ? "bg-success/10 text-success border-success/20 hover:bg-success/20"
           : "bg-error/10 text-error border-error/20 hover:bg-error/20"
-      }`}
+        }`}
     >
       <div className="relative flex items-center justify-center">
         <motion.div
@@ -760,13 +759,19 @@ export default function Navbar() {
     ],
     Admin: [
       { name: "Main", path: "/dashboard" },
-      {Name : "University ",path : "/universityManagement"},
+      { name: "University", path: "/universityManagement" },
       { name: "Dashboard", path: "/dashboardAdmin" },
       { name: "Manage Users", path: "/manage-users" },
       { name: "Updates", path: "/admin/updates" },
       { name: "Reports", path: "/reports" },
       { name: "Feedback", path: "/userFeedback" },
     ],
+    UniTeach : [
+      { name: "Dashboard", path: "/teacher/dashboard" },
+    ],
+    UniAdmin :[
+      { name: "Dashboard", path: "/uniAdminPortal" },
+    ]
   }
 
   return (
