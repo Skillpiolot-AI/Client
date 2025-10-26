@@ -300,6 +300,9 @@ import Button from './Pages/Button';
 import CollegeList from './Pages/Colleges/CollegeList';
 import AIlandingpage from "./AILandingpage/AILandingPage"
 import Forgotpassword from "./Pages/User/ForgotPassword"
+import VerifyEmail from './Pages/User/VerifyEmail';
+import VerifyLogin from './Pages/User/VerifyLogin';
+
 
 import Navbar from "./homepage/landing/Navbar"
 function App() {
@@ -363,6 +366,10 @@ function App() {
           <Route path="/updates" element={<UpdatesPage />} /> //Good to go 
           <Route path="/colleges" element={<CollegeList />} /> //good to go
           <Route path ="/forgot-password" element ={<Forgotpassword/>}/>
+           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/verify-login" element={<VerifyLogin />} />
+
+          
           {/* 👤 User Protected Routes */}
           <Route element={<ProtectedRoute allowedRoles={['User', 'Mentor', 'Admin']} />}>
             <Route path="/careerform" element={<CareerForm />} /> //Issue not reuqired
