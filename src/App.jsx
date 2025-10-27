@@ -303,7 +303,8 @@ import Forgotpassword from "./Pages/User/ForgotPassword"
 import VerifyEmail from './Pages/User/VerifyEmail';
 import VerifyLogin from './Pages/User/VerifyLogin';
 
-
+import AdminUserManagement from './Pages/Admin/AdminUserManagement';
+import UserManagementDashboard from './Pages/Admin/UserManagementDashboard';
 import Navbar from "./homepage/landing/Navbar"
 function App() {
   // Assessment flow state
@@ -369,7 +370,7 @@ function App() {
            <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/verify-login" element={<VerifyLogin />} />
 
-          
+
           {/* 👤 User Protected Routes */}
           <Route element={<ProtectedRoute allowedRoles={['User', 'Mentor', 'Admin']} />}>
             <Route path="/careerform" element={<CareerForm />} /> //Issue not reuqired
@@ -399,6 +400,8 @@ function App() {
             <Route path="/addmentor" element={<MentorRegistrationForm />} />
             <Route path="/universityManagement" element={<AdminUniversityManagement />} />
             <Route path="/admin/updates" element={<AdminUpdatesPage />} />
+            <Route path="/admin/user-management" element={<AdminUserManagement />} />
+            <Route path="/admin/userData" element={<UserManagementDashboard />} />
           </Route>
 
           {/* 🏫 University Admin Routes */}
