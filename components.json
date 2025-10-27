@@ -10,11 +10,24 @@
     "cssVariables": true,
     "prefix": ""
   },
+<<<<<<< HEAD
+=======
+  "iconLibrary": "radix",
+>>>>>>> backup-feature-update
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
     "ui": "@/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
+<<<<<<< HEAD
   }
 }
+=======
+  },
+  "registries": {
+    "@aceternity": "https://ui.aceternity.com/registry/{name}.json",
+    "@magicui": "https://magicui.design/r/{name}.json"
+  }
+}
+>>>>>>> backup-feature-update

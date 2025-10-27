@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import { useState, useRef, useEffect } from "react"
 // import { useAuth } from "../../AuthContext"
 // import { motion, AnimatePresence } from "framer-motion"
@@ -542,6 +543,8 @@
 //   )
 // }
 
+=======
+>>>>>>> backup-feature-update
 
 "use client"
 

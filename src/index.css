@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+<<<<<<< HEAD
 
 
 @layer base {
@@ -94,3 +95,5 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--color-muted-foreground));
 }
+=======
+>>>>>>> backup-feature-update

@@ -1,5 +1,9 @@
 {
     "compilerOptions": {
+<<<<<<< HEAD
+=======
+      "jsx": "react",
+>>>>>>> backup-feature-update
       // ...
       "baseUrl": ".",
       "paths": {

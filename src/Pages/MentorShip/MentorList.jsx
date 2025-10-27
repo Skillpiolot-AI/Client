@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import React, { useState, useEffect } from 'react';
 // import axios from 'axios';
 // import { useNavigate } from 'react-router-dom';
@@ -501,6 +502,8 @@
 // // export default MentorList;
 
 
+=======
+>>>>>>> backup-feature-update
 "use client"
 
 import { useState, useEffect } from "react"
@@ -625,6 +628,10 @@ const MentorList = () => {
     setFilteredMentors(filtered)
   }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> backup-feature-update
   const handleBookAppointment = async (mentorId) => {
     if (!user) {
       navigate("/login", { state: { from: "/mentor-list" } })
@@ -632,12 +639,36 @@ const MentorList = () => {
     }
 
     try {
+<<<<<<< HEAD
       const date = new Date(new Date().getTime() + 12 * 60 * 60 * 1000).toISOString()
       await axios.post(
         `${config.API_BASE_URL}/book-appointment`,
         {
           mentorId,
           userId: user._id,
+=======
+      console.log('Booking appointment with:', {
+        mentorId,
+        userId: user._id || user.id,
+        userObject: user
+      });
+
+      // Use user.id or user._id, whichever exists
+      const userId = user._id || user.id;
+
+      if (!userId) {
+        toast.error('User ID not found. Please login again.');
+        return;
+      }
+
+      const date = new Date(new Date().getTime() + 12 * 60 * 60 * 1000).toISOString()
+
+      const response = await axios.post(
+        `${config.API_BASE_URL}/book-appointment`,
+        {
+          mentorId,
+          userId: userId,
+>>>>>>> backup-feature-update
           date,
         },
         {
@@ -647,10 +678,18 @@ const MentorList = () => {
         },
       )
 
+<<<<<<< HEAD
       toast.success("Appointment booked successfully!")
     } catch (error) {
       console.error("Error booking appointment:", error)
       toast.error("Failed to book appointment. Please try again.")
+=======
+      console.log('Booking response:', response.data);
+      toast.success("Appointment booked successfully!")
+    } catch (error) {
+      console.error("Error booking appointment:", error.response?.data || error)
+      toast.error(error.response?.data?.message || "Failed to book appointment. Please try again.")
+>>>>>>> backup-feature-update
     }
   }
 

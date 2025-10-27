@@ -211,6 +211,10 @@
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './assesment/styles/global.css';
+<<<<<<< HEAD
+=======
+import Landingpage from "./homepage/pages/LandingPage"
+>>>>>>> backup-feature-update
 
 import AssessmentApp from './Assesment/AssessmentApp';
 // 🌐 Layout Components
@@ -297,7 +301,18 @@ import ResultsPage from './Assesment/components/Results/ResultsPage';
 import { AuthProvider } from './utils/axiosConfig';
 import Button from './Pages/Button';
 import CollegeList from './Pages/Colleges/CollegeList';
+<<<<<<< HEAD
 
+=======
+import AIlandingpage from "./AILandingpage/AILandingPage"
+import Forgotpassword from "./Pages/User/ForgotPassword"
+import VerifyEmail from './Pages/User/VerifyEmail';
+import VerifyLogin from './Pages/User/VerifyLogin';
+
+import AdminUserManagement from './Pages/Admin/AdminUserManagement';
+import UserManagementDashboard from './Pages/Admin/UserManagementDashboard';
+import Navbar from "./homepage/landing/Navbar"
+>>>>>>> backup-feature-update
 function App() {
   // Assessment flow state
   const [currentPage, setCurrentPage] = useState('home');
@@ -320,6 +335,7 @@ function App() {
   return (
     <>
       <AuthProvider>
+<<<<<<< HEAD
         <CoolNavbar />
 
         <Routes>
@@ -365,6 +381,58 @@ function App() {
             <Route path="/tracker" element={<ApplicationTracker />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/my-applications" element={<UserAppointments />} />
+=======
+        {/* <CoolNavbar /> */}
+        <Navbar/>
+
+        <Routes>
+          {/* 🌍 Public Routes */}
+          <Route path="/" element={<Landingpage />} />
+          <Route path="/Assesmentinfo" element={<AIlandingpage/>}/>
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/signup" element={<SignupForm />} />
+          <Route path="/recommendation" element={<Recommendation />} /> //not working useless not required
+          <Route path="/job-details/:jobTitle" element={<JobDetails />} />
+          <Route path="/learn" element={<VideoForm />} /> //A form for mentor to learn how to connect with the students
+          <Route path="/learnlist" element={<VideoList />} /> //Learning list for mentors not working
+          <Route path="/mentorship" element={<MentorList />} /> //Book appointment with mentor  - Not working for now 
+          <Route path="/question" element={<CareerRecommendationForm />} /> //No use 
+          <Route path="/workshopAdd" element={<AddWorkshop />} /> {/* Admin */} //For the admin to add workshops data
+          <Route path="/workshops" element={<AvailableWorkshops />} /> //Available workshops for users
+          <Route path="/dashboardAdmin" element={<AdminDashboard />} /> {/* Admin */} //Useless 
+          <Route path="/addResources" element={<AddResourcePage />} /> {/* Admin */} //Add books page for admin
+          <Route path="/view-books" element={<ViewBooksPage />} /> //View books page for users
+          <Route path="/userFeedback" element={<MentorFeedback />} /> {/* Admin */} //Mentor feedback page for admin
+          <Route path="/community" element={<ModernCommunityPage />} />
+          <Route path="/roadmap" element={<FrontendRoadmap />} /> //Useless
+          <Route path="/mentorDashboard" element={<CoachProfile />} /> {/* Mentor */} //Mentor profile dashboard Most important issue [priotrity]
+          <Route path="/schedulementor" element={<ScheduleSession />} />. //Use less
+          <Route path="/mentor" element={<MentoHome />} /> //Useless
+          <Route path="/softwareengineer" element={<FrontendRoadmap />} /> //useless
+          <Route path="/careerquiz" element={<CareerQuiz />} /> //useless
+          <Route path="/combinedquiz" element={<CombinedCareerAdvisor />} />. //Testing purpose side
+          <Route path="/profile" element={<Profile />} /> //Profile page need to be fixed
+          <Route path="/jobtitleall" element={<RecommendationJobTitlesSearch />} /> // not required
+          <Route path="/job-info" element={<JobInfo />} />  //Not required
+          <Route path="/dummyinfo" element={<DummyJobInfo />} /> //not required
+          <Route path="/mentorHome" element={<MentorshipPage />} /> //Issue
+          <Route path="/careerPaths" element={<TechCareerPathsHub />} />. //Need to be improveed
+          <Route path="/datascientist" element={<DetailedDataScientistRoadmap />} />
+          <Route path="/updates" element={<UpdatesPage />} /> //Good to go 
+          <Route path="/colleges" element={<CollegeList />} /> //good to go
+          <Route path ="/forgot-password" element ={<Forgotpassword/>}/>
+           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/verify-login" element={<VerifyLogin />} />
+
+
+          {/* 👤 User Protected Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['User', 'Mentor', 'Admin']} />}>
+            <Route path="/careerform" element={<CareerForm />} /> //Issue not reuqired
+            <Route path="/application" element={<CreativeApplicationForm />} /> // application for the mentorship in website need to be fixed ui
+            <Route path="/tracker" element={<ApplicationTracker />} /> //Tracker for mentorship application 
+            <Route path="/dashboard" element={<Dashboard />} /> //Admin dashboard need to be fixed
+            <Route path="/my-applications" element={<UserAppointments />} />. //Issue this is for the mentor appointments
+>>>>>>> backup-feature-update
           </Route>
 
           {/* 🎓 Mentor Protected Routes */}
@@ -387,6 +455,11 @@ function App() {
             <Route path="/addmentor" element={<MentorRegistrationForm />} />
             <Route path="/universityManagement" element={<AdminUniversityManagement />} />
             <Route path="/admin/updates" element={<AdminUpdatesPage />} />
+<<<<<<< HEAD
+=======
+            <Route path="/admin/user-management" element={<AdminUserManagement />} />
+            <Route path="/admin/userData" element={<UserManagementDashboard />} />
+>>>>>>> backup-feature-update
           </Route>
 
           {/* 🏫 University Admin Routes */}
@@ -409,7 +482,11 @@ function App() {
 
         {/* 💬 Chatbot & Footer */}
         <ChatBot />
+<<<<<<< HEAD
         <Footer />
+=======
+        {/* <Footer /> */}
+>>>>>>> backup-feature-update
       </AuthProvider>
     </>
   );
