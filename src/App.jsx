@@ -299,17 +299,12 @@ import { AuthProvider } from './utils/axiosConfig';
 import Button from './Pages/Button';
 import CollegeList from './Pages/Colleges/CollegeList';
 import AIlandingpage from "./AILandingpage/AILandingPage"
-<<<<<<< HEAD
-
-
-=======
 import Forgotpassword from "./Pages/User/ForgotPassword"
 import VerifyEmail from './Pages/User/VerifyEmail';
 import VerifyLogin from './Pages/User/VerifyLogin';
 
 import AdminUserManagement from './Pages/Admin/AdminUserManagement';
 import UserManagementDashboard from './Pages/Admin/UserManagementDashboard';
->>>>>>> backup-feature-update
 import Navbar from "./homepage/landing/Navbar"
 function App() {
   // Assessment flow state
@@ -371,13 +366,10 @@ function App() {
           <Route path="/datascientist" element={<DetailedDataScientistRoadmap />} />
           <Route path="/updates" element={<UpdatesPage />} /> //Good to go 
           <Route path="/colleges" element={<CollegeList />} /> //good to go
-<<<<<<< HEAD
-=======
           <Route path ="/forgot-password" element ={<Forgotpassword/>}/>
            <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/verify-login" element={<VerifyLogin />} />
 
->>>>>>> backup-feature-update
 
           {/* 👤 User Protected Routes */}
           <Route element={<ProtectedRoute allowedRoles={['User', 'Mentor', 'Admin']} />}>
@@ -408,11 +400,8 @@ function App() {
             <Route path="/addmentor" element={<MentorRegistrationForm />} />
             <Route path="/universityManagement" element={<AdminUniversityManagement />} />
             <Route path="/admin/updates" element={<AdminUpdatesPage />} />
-<<<<<<< HEAD
-=======
             <Route path="/admin/user-management" element={<AdminUserManagement />} />
             <Route path="/admin/userData" element={<UserManagementDashboard />} />
->>>>>>> backup-feature-update
           </Route>
 
           {/* 🏫 University Admin Routes */}
