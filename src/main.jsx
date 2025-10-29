@@ -10,9 +10,10 @@ import './index.css';
 import { NextUIProvider } from '@nextui-org/react';
 
 import { ChakraProvider } from '@chakra-ui/react'
-
+import { GoogleOAuthProvider } from '@react-oauth/google';
 ReactDOM.render(
   <BrowserRouter>
+  <GoogleOAuthProvider clientId="860946075972-h9p02v2019ad2n7rfco6dkil6resstqk.apps.googleusercontent.com">
   <ChakraProvider>
     <NextUIProvider>
       <AuthProvider>
@@ -20,6 +21,7 @@ ReactDOM.render(
       </AuthProvider>
     </NextUIProvider>
   </ChakraProvider>
+  </GoogleOAuthProvider>
   </BrowserRouter>,
   document.getElementById('root')
 );
