@@ -1408,14 +1408,7 @@ export default function LoginPage() {
       {/* Left side - Brand section */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ backgroundColor: "#3F3FF3" }}>
         <div className="relative z-10 flex flex-col justify-between w-full px-12 py-12">
-          <div>
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                <div className="w-6 h-6 bg-[#3F3FF3] rounded"></div>
-              </div>
-              <span className="text-2xl font-bold text-white">Spark</span>
-            </div>
-          </div>
+
 
           <div className="flex-1 flex flex-col justify-center">
             <h2 className="text-4xl text-white mb-6 leading-tight font-bold">
@@ -1427,7 +1420,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex justify-between items-center text-white/70 text-sm">
-            <span>Copyright © 2025 Spark Career Guidance</span>
+            <span>Copyright © 2025 Skill pilot Career Guidance</span>
             <span className="cursor-pointer hover:text-white/90 transition-colors">
               Privacy Policy
             </span>
