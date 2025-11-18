@@ -306,6 +306,8 @@ import VerifyLogin from './Pages/User/VerifyLogin';
 import AdminUserManagement from './Pages/Admin/AdminUserManagement';
 import UserManagementDashboard from './Pages/Admin/UserManagementDashboard';
 import Navbar from "./homepage/landing/Navbar"
+import GoogleProfileCompletion from './Pages/User/GoogleProfileCompletion';
+
 function App() {
   // Assessment flow state
   const [currentPage, setCurrentPage] = useState('home');
@@ -369,6 +371,7 @@ function App() {
           <Route path ="/forgot-password" element ={<Forgotpassword/>}/>
            <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/verify-login" element={<VerifyLogin />} />
+          <Route path="/complete-profile" element={<GoogleProfileCompletion />} />
 
 
           {/* 👤 User Protected Routes */}

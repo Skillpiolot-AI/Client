@@ -4,6 +4,8 @@ import {
   XCircle, Send, Eye, EyeOff, AlertCircle, Loader2 
 } from 'lucide-react';
 
+import config from "../../config"
+
 const AdminUserManagement = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -76,7 +78,7 @@ const AdminUserManagement = () => {
     setLoading(true);
     try {
       // Replace with your actual API endpoint
-      const response = await fetch('http://localhost:3001/api/auth/admin/create-user', {
+      const response = await fetch(`${config.API_BASE_URL}/auth/admin/create-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +117,7 @@ const AdminUserManagement = () => {
   const handleTestEmail = async () => {
     setTestEmailLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/auth/admin/test-email', {
+      const response = await fetch(`${config.API_BASE_URL}/auth/admin/test-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

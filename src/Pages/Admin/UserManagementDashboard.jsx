@@ -5,6 +5,7 @@ import {
   RefreshCw, Download, Upload, Lock, Eye, ChevronLeft, ChevronRight,
   Loader2, Check, X, UserCheck, UserX
 } from 'lucide-react';
+import config from '../../config';
 
 const UserManagementDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -59,7 +60,7 @@ const UserManagementDashboard = () => {
         ...(filters.isSuspended && { isSuspended: filters.isSuspended })
       });
 
-      const response = await fetch(`http://localhost:3001/api/user-data/users?${queryParams}`, {
+      const response = await fetch(`${config.API_BASE_URL}/user-data/users?${queryParams}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -83,7 +84,7 @@ const UserManagementDashboard = () => {
 
   const fetchStatistics = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/user-data/statistics', {
+      const response = await fetch(`${config.API_BASE_URL}/user-data/statistics`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -122,7 +123,7 @@ const UserManagementDashboard = () => {
   const handleUpdateUser = async () => {
     setActionLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/user-data/users/${editingUser._id}`, {
+      const response = await fetch(`${config.API_BASE_URL}/user-data/users/${editingUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -156,7 +157,7 @@ const UserManagementDashboard = () => {
   const confirmDelete = async () => {
     setActionLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/user-data/users/${deletingUser._id}`, {
+      const response = await fetch(`${config.API_BASE_URL}/user-data/users/${deletingUser._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -193,7 +194,7 @@ const UserManagementDashboard = () => {
 
     setActionLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/user-data/users/bulk-delete', {
+      const response = await fetch(`${config.API_BASE_URL}/user-data/users/bulk-delete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -223,7 +224,7 @@ const UserManagementDashboard = () => {
   const handleToggleStatus = async (userId, currentStatus) => {
     setActionLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/user-data/users/${userId}/toggle-status`, {
+      const response = await fetch(`${config.API_BASE_URL}/user-data/users/${userId}/toggle-status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -257,7 +258,7 @@ const UserManagementDashboard = () => {
 
     setActionLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/user-data/users/${userId}/reset-password`, {
+      const response = await fetch(`${config.API_BASE_URL}/user-data/users/${userId}/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -291,6 +292,22 @@ const UserManagementDashboard = () => {
       Student: 'bg-cyan-500'
     };
     return colors[role] || 'bg-gray-500';
+  };
+
+  const safeString = (value, fallback = '') => {
+    if (value === null || value === undefined) return fallback;
+    try {
+      return String(value);
+    } catch (e) {
+      return fallback;
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '—';
+    const d = new Date(dateString);
+    if (isNaN(d)) return '—';
+    return d.toLocaleDateString();
   };
 
   return (
@@ -482,18 +499,18 @@ const UserManagementDashboard = () => {
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                              {user.name.charAt(0).toUpperCase()}
+                              {safeString(user.name).charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <p className="text-white font-medium">{user.name}</p>
-                              <p className="text-purple-300 text-sm">@{user.username}</p>
+                                <p className="text-white font-medium">{safeString(user.name) || 'Unknown User'}</p>
+                                <p className="text-purple-300 text-sm">@{safeString(user.username)}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-2">
                             <Mail className="w-4 h-4 text-purple-300" />
-                            <span className="text-white">{user.email}</span>
+                              <span className="text-white">{safeString(user.email)}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -528,7 +545,7 @@ const UserManagementDashboard = () => {
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-2 text-purple-300">
                             <Calendar className="w-4 h-4" />
-                            <span className="text-sm">{new Date(user.createdAt).toLocaleDateString()}</span>
+                            <span className="text-sm">{formatDate(user.createdAt)}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -726,8 +743,8 @@ const UserManagementDashboard = () => {
                 <AlertCircle className="w-8 h-8 text-red-400" />
               </div>
               <h2 className="text-2xl font-bold text-white text-center mb-2">Delete User?</h2>
-              <p className="text-purple-300 text-center mb-6">
-                Are you sure you want to delete <strong className="text-white">{deletingUser.name}</strong>? This action cannot be undone.
+                <p className="text-purple-300 text-center mb-6">
+                Are you sure you want to delete <strong className="text-white">{safeString(deletingUser.name) || 'this user'}</strong>? This action cannot be undone.
               </p>
               <div className="flex space-x-4">
                 <button

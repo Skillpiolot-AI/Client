@@ -139,6 +139,15 @@ export default function UserAnalytics({ timeframe }) {
     }));
   };
 
+  const safeString = (value, fallback = '') => {
+    if (value === null || value === undefined) return fallback;
+    try {
+      return String(value);
+    } catch (e) {
+      return fallback;
+    }
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -345,15 +354,19 @@ export default function UserAnalytics({ timeframe }) {
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>
-                      {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      {safeString(user.name)
+                        .split(' ')
+                        .map(n => (n && n[0]) || '')
+                        .join('')
+                        .toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
-                      {user.name}
+                      {safeString(user.name) || 'Unknown User'}
                     </p>
                     <p className="text-xs text-gray-500 truncate">
-                      {user.email}
+                      {safeString(user.email)}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -361,7 +374,7 @@ export default function UserAnalytics({ timeframe }) {
                       {user.role}
                     </Badge>
                     <span className="text-xs text-gray-500">
-                      {formatDate(user.createdAt)}
+                      {user.createdAt ? formatDate(user.createdAt) : '—'}
                     </span>
                   </div>
                 </motion.div>
@@ -395,12 +408,16 @@ export default function UserAnalytics({ timeframe }) {
                   </div>
                   <Avatar className="h-10 w-10">
                     <AvatarFallback>
-                      {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        {safeString(user.name)
+                          .split(' ')
+                          .map(n => (n && n[0]) || '')
+                          .join('')
+                          .toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium">{user.name}</p>
-                    <p className="text-sm text-gray-600">{user.email}</p>
+                      <p className="font-medium">{safeString(user.name) || 'Unknown User'}</p>
+                      <p className="text-sm text-gray-600">{safeString(user.email)}</p>
                   </div>
                 </div>
                 <div className="text-right">

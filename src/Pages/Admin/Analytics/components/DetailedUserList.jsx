@@ -68,6 +68,17 @@ export default function DetailedUserList({ timeframe }) {
     });
   };
 
+  const safeString = (value, fallback = '') => {
+    if (value === null || value === undefined) return fallback;
+    try {
+      return String(value);
+    } catch (e) {
+      return fallback;
+    }
+  };
+
+  const safeLower = (value) => safeString(value).toLowerCase();
+
   const getRoleColor = (role) => {
     switch (role) {
       case 'Admin': return 'bg-red-100 text-red-800';
@@ -77,11 +88,15 @@ export default function DetailedUserList({ timeframe }) {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.username.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const normalizedSearch = (searchTerm || '').toLowerCase().trim();
+  const filteredUsers = users.filter(user => {
+    if (!normalizedSearch) return true;
+    return (
+      safeLower(user.name).includes(normalizedSearch) ||
+      safeLower(user.email).includes(normalizedSearch) ||
+      safeLower(user.username).includes(normalizedSearch)
+    );
+  });
 
   const UserActivityModal = ({ user, onClose }) => {
     const [activities, setActivities] = useState([]);
@@ -117,7 +132,7 @@ export default function DetailedUserList({ timeframe }) {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-semibold">User Activity Details</h3>
-                <p className="text-gray-600">{user.name} ({user.email})</p>
+                <p className="text-gray-600">{safeString(user.name)} ({safeString(user.email)})</p>
               </div>
               <Button onClick={onClose} variant="outline">
                 Close
@@ -135,7 +150,7 @@ export default function DetailedUserList({ timeframe }) {
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="font-medium capitalize">
-                          {activity.activityType.replace('_', ' ')}
+                          {activity.activityType ? activity.activityType.replace('_', ' ') : 'Activity'}
                         </p>
                         <p className="text-sm text-gray-600">
                           {activity.page && `Page: ${activity.page}`}
@@ -225,13 +240,17 @@ export default function DetailedUserList({ timeframe }) {
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback>
-                            {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            {safeString(user.name)
+                              .split(' ')
+                              .map(n => (n && n[0]) || '')
+                              .join('')
+                              .toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-sm text-gray-600">{user.email}</p>
-                          <p className="text-xs text-gray-500">@{user.username}</p>
+                          <p className="font-medium">{safeString(user.name) || 'Unknown User'}</p>
+                          <p className="text-sm text-gray-600">{safeString(user.email)}</p>
+                          <p className="text-xs text-gray-500">@{safeString(user.username)}</p>
                         </div>
                       </div>
                     </td>
