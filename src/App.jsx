@@ -29,7 +29,7 @@ import CareerForm from './Pages/Forms/CareerForm';
 import CareerRecommendationForm from './Pages/Forms/Questions';
 import RecommendationForm from './Pages/Forms/Recommendation';
 import CreativeApplicationForm from './Pages/MentorShip/Form';
-import AdminApplicationsPage from './Pages/MentorShip/List';
+import AdminApplicationsPage from './Pages/MentorShip/MentorApplication';
 import ApplicationTracker from './Pages/MentorShip/Tracker';
 import MentorRegistrationForm from './Pages/MentorShip/Registor';
 import MentorList from './Pages/MentorShip/MentorList';
@@ -42,10 +42,13 @@ import MentoHome from './Pages/MentoHome';
 import CoachProfile from './Pages/DashBoard/MentorDashBoard';
 import AMDashboard from './Pages/DashBoard/AdminMento';
 import Profile from './Pages/Profile/Profile'
+import MyBookings from './Pages/MentorShip/Bookings/MyBookings';
+import MentorSessions from './Pages/MentorShip/Bookings/MentorSessions';
 
 // 🏫 Admin & University Management
 import AdminDashboard from './Pages/Admin/DashBoard';
 import AnalyticsDashboard from './Pages/Admin/Analytics/AnalyticsDashboard';
+import SystemSettings from './Pages/Admin/SystemSettings';
 import AdminUniversityManagement from './Pages/University/AdminUniversityManagement';
 import UniAdminPortal from './Pages/University/UniAdminPortal';
 import TeacherDashboard from './Pages/University/TeacherDashboard';
@@ -125,24 +128,24 @@ function App() {
     <>
       <AuthProvider>
         {/* <CoolNavbar /> */}
-        <Navbar/>
-        
+        <Navbar />
+
 
         <Routes>
           {/* 🌍 Public Routes */}
           <Route path="/" element={<Landingpage />} />
-          <Route path="/Assesmentinfo" element={<AIlandingpage/>}/>
+          <Route path="/Assesmentinfo" element={<AIlandingpage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/recommendation" element={<Recommendation />} /> //not working useless not required
           <Route path="/job-details/:jobTitle" element={<JobDetails />} />
           <Route path="/learn" element={<VideoForm />} /> //A form for mentor to learn how to connect with the students
           <Route path="/learnlist" element={<VideoList />} /> //Learning list for mentors not working
-          <Route path="/mentorship" element={<MentorList />} /> //Book appointment with mentor  - Not working for now 
-          <Route path="/question" element={<CareerRecommendationForm />} /> //No use 
+          <Route path="/mentorship" element={<MentorList />} /> //Book appointment with mentor  - Not working for now
+          <Route path="/question" element={<CareerRecommendationForm />} /> //No use
           <Route path="/workshopAdd" element={<AddWorkshop />} /> {/* Admin */} //For the admin to add workshops data
           <Route path="/workshops" element={<AvailableWorkshops />} /> //Available workshops for users
-          <Route path="/dashboardAdmin" element={<AdminDashboard />} /> {/* Admin */} //Useless 
+          <Route path="/dashboardAdmin" element={<AdminDashboard />} /> {/* Admin */} //Useless
           <Route path="/addResources" element={<AddResourcePage />} /> {/* Admin */} //Add books page for admin
           <Route path="/view-books" element={<ViewBooksPage />} /> //View books page for users
           <Route path="/userFeedback" element={<MentorFeedback />} /> {/* Admin */} //Mentor feedback page for admin
@@ -161,26 +164,28 @@ function App() {
           <Route path="/mentorHome" element={<MentorshipPage />} /> //Issue
           <Route path="/careerPaths" element={<TechCareerPathsHub />} />. //Need to be improveed
           <Route path="/datascientist" element={<DetailedDataScientistRoadmap />} />
-          <Route path="/updates" element={<UpdatesPage />} /> //Good to go 
+          <Route path="/updates" element={<UpdatesPage />} /> //Good to go
           <Route path="/colleges" element={<CollegeList />} /> //good to go
-          <Route path ="/forgot-password" element ={<Forgotpassword/>}/>
-           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<Forgotpassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/verify-login" element={<VerifyLogin />} />
           <Route path="/complete-profile" element={<GoogleProfileCompletion />} />
 
 
           {/* 👤 User Protected Routes */}
           <Route element={<ProtectedRoute allowedRoles={['User', 'Mentor', 'Admin']} />}>
-            <Route path="/careerform" element={<CareerForm />} /> //Issue not reuqired
-            <Route path="/application" element={<CreativeApplicationForm />} /> // application for the mentorship in website need to be fixed ui
-            <Route path="/tracker" element={<ApplicationTracker />} /> //Tracker for mentorship application 
-            <Route path="/dashboard" element={<Dashboard />} /> //Admin dashboard need to be fixed
-            <Route path="/my-applications" element={<UserAppointments />} />. //Issue this is for the mentor appointments
+            <Route path="/careerform" element={<CareerForm />} />
+            <Route path="/application" element={<CreativeApplicationForm />} />
+            <Route path="/tracker" element={<ApplicationTracker />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/my-applications" element={<UserAppointments />} />
+            <Route path="/my-bookings" element={<MyBookings />} />
           </Route>
 
           {/* 🎓 Mentor Protected Routes */}
           <Route element={<ProtectedRoute allowedRoles={['Mentor', 'Admin']} />}>
             <Route path="/my-sessions" element={<MentorAppointments />} />
+            <Route path="/mentor-sessions" element={<MentorSessions />} />
             <Route path="/interestForm" element={<InterestManagement />} />
             <Route path="/StrengthForm" element={<StrengthManagement />} />
             <Route path="/amdashboard" element={<AMDashboard />} />
@@ -200,6 +205,7 @@ function App() {
             <Route path="/admin/updates" element={<AdminUpdatesPage />} />
             <Route path="/admin/user-management" element={<AdminUserManagement />} />
             <Route path="/admin/userData" element={<UserManagementDashboard />} />
+            <Route path="/admin/system-settings" element={<SystemSettings />} />
           </Route>
 
           {/* 🏫 University Admin Routes */}
@@ -218,7 +224,7 @@ function App() {
         </Routes>
 
         {/* 🧠 Assessment Route */}
-       
+
 
         {/* 💬 Chatbot & Footer */}
         <ChatBot1 />

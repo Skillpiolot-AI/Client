@@ -43,19 +43,23 @@ export default function Navbar() {
     const dropdownItems = {
         User: [
             { name: "Profile", path: "/profile" },
+            { name: "My Bookings", path: "/my-bookings" },
             { name: "My Applications", path: "/my-applications" },
             { name: "Resources", path: "/view-books" },
             { name: "Workshops", path: "/workshops" },
         ],
         Mentor: [
             { name: "Profile", path: "/mentorDashboard" },
-            { name: "My Sessions", path: "/my-sessions" },
+            { name: "My Sessions", path: "/mentor-sessions" },
+            { name: "My Bookings", path: "/my-bookings" },
             { name: "Resources", path: "/view-books" },
             { name: "Mentor Training", path: "/learnlist" },
             { name: "Dashboard", path: "/amdashboard" },
         ],
         Admin: [
             { name: "Main", path: "/dashboard" },
+            { name: "System Settings", path: "/admin/system-settings" },
+            { name: "Mentor Sessions", path: "/mentor-sessions" },
             { name: "University", path: "/universityManagement" },
             { name: "Dashboard", path: "/dashboardAdmin" },
             { name: "Manage Users", path: "/manage-users" },
@@ -109,8 +113,8 @@ export default function Navbar() {
                                         setActiveTab(item.name)
                                     }}
                                     className={`text-sm font-medium transition-colors ${activeTab === item.name
-                                            ? "text-[#2F3037]"
-                                            : "text-[rgba(49,45,43,0.80)] hover:text-[#2F3037]"
+                                        ? "text-[#2F3037]"
+                                        : "text-[rgba(49,45,43,0.80)] hover:text-[#2F3037]"
                                         }`}
                                 >
                                     {item.name}
@@ -137,8 +141,8 @@ export default function Navbar() {
                                     <button
                                         onClick={checkServerStatus}
                                         className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full shadow-sm text-xs font-medium transition-all ${isOnline
-                                                ? "bg-white text-green-700"
-                                                : "bg-white text-red-700"
+                                            ? "bg-white text-green-700"
+                                            : "bg-white text-red-700"
                                             }`}
                                     >
                                         <motion.div
