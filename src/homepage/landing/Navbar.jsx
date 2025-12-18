@@ -3,13 +3,52 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, Activity, ChevronDown, Menu, X } from "lucide-react"
 import { useAuth } from "../../AuthContext"
 import { useNavigate } from "react-router-dom"
+import config from "../../config"
 
-// Server status hook (keep this if you have it elsewhere, or implement it)
-const useServerStatus = () => ({
-    isOnline: true,
-    isChecking: false,
-    checkServerStatus: () => console.log('Checking server'),
-});
+// Server Status Hook
+const useServerStatus = () => {
+    const [isOnline, setIsOnline] = useState(false)
+    const [isChecking, setIsChecking] = useState(false)
+    const [lastChecked, setLastChecked] = useState(null)
+
+    const checkServerStatus = async () => {
+        setIsChecking(true)
+        try {
+            const controller = new AbortController()
+            const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+            const response = await fetch(`${config.API_BASE_URL1}/health`, {
+                method: "GET",
+                signal: controller.signal,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+
+            clearTimeout(timeoutId)
+
+            if (response.ok) {
+                setIsOnline(true)
+            } else {
+                setIsOnline(false)
+            }
+        } catch (error) {
+            console.log("Server status check failed:", error.message)
+            setIsOnline(false)
+        } finally {
+            setIsChecking(false)
+            setLastChecked(new Date())
+        }
+    }
+
+    useEffect(() => {
+        checkServerStatus()
+        const interval = setInterval(checkServerStatus, 30000)
+        return () => clearInterval(interval)
+    }, [])
+
+    return { isOnline, isChecking, lastChecked, checkServerStatus }
+}
 
 export default function Navbar() {
     const { user, logout, isAuthenticated } = useAuth()
@@ -269,8 +308,22 @@ export default function Navbar() {
                 </AnimatePresence>
             </nav>
 
+            {/* Offline Status Banner */}
+            {!isOnline && !isChecking && (
+                <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    className="fixed top-16 left-0 right-0 z-40 bg-red-600 text-white py-2 text-center text-xs font-semibold shadow-lg"
+                >
+                    <div className="flex items-center justify-center space-x-2">
+                        <Activity className="w-3 h-3 animate-pulse" />
+                        <span>Server is offline. You are viewing the static page.</span>
+                    </div>
+                </motion.div>
+            )}
+
             {/* Spacer to prevent content from going under fixed navbar */}
-            <div className="h-16"></div>
+            <div className={!isOnline && !isChecking ? "h-24" : "h-16"}></div>
         </>
     )
 }
