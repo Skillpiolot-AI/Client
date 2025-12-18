@@ -1,17 +1,15 @@
-
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import config from './config';
 
 const AuthContext = createContext();
 
-// Setup axios interceptors globally
+// Setup axios interceptors globally to add token and handle 401s
 let isInterceptorSetup = false;
 
 const setupAxiosInterceptors = (clearAuthCallback) => {
   if (isInterceptorSetup) return;
-  
+
   // Request interceptor to add auth token
   axios.interceptors.request.use(
     (axiosConfig) => {
@@ -21,17 +19,15 @@ const setupAxiosInterceptors = (clearAuthCallback) => {
       }
       return axiosConfig;
     },
-    (error) => {
-      return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
   );
 
   // Response interceptor to handle auth errors globally
   axios.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        console.log('Authentication error detected, clearing auth data');
+      if (error.response?.status === 401) {
+        console.log('Session expired or unauthorized, clearing auth data');
         clearAuthCallback();
       }
       return Promise.reject(error);
@@ -53,13 +49,11 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    // Setup axios interceptors with clearAuth callback
+    // Setup axios interceptors once
     setupAxiosInterceptors(clearAuth);
 
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
-
-    console.log('AuthProvider initializing - Token exists:', !!token, 'Role:', role);
 
     if (token && role) {
       verifyToken(token);
@@ -70,38 +64,24 @@ export function AuthProvider({ children }) {
 
   const verifyToken = async (token) => {
     try {
-      console.log('Verifying token...');
-      const response = await axios.get(`${config.API_BASE_URL}/auth/me`, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      console.log('Token verification response:', response.data);
-      
+      const response = await axios.get(`${config.API_BASE_URL}/auth/me`);
+
       if (response.data) {
-        // Ensure both id and _id are set
         const userObj = {
-          ...response.data, 
+          ...response.data,
           _id: response.data._id || response.data.id,
           id: response.data._id || response.data.id,
-          token, 
-          role: localStorage.getItem('role') 
+          token,
+          role: localStorage.getItem('role') || response.data.role
         };
-        
+
         setUser(userObj);
-        
-        // Store userId in localStorage for backup
         localStorage.setItem('userId', userObj._id);
-        
-        console.log('User authenticated successfully:', userObj.username, userObj.role, 'ID:', userObj._id);
       } else {
-        console.log('Invalid response from /auth/me');
         clearAuth();
       }
     } catch (error) {
-      console.error('Token verification failed:', error.response?.status, error.response?.data);
+      console.error('Token verification failed:', error.response?.status);
       clearAuth();
     } finally {
       setLoading(false);
@@ -109,53 +89,40 @@ export function AuthProvider({ children }) {
   };
 
   const login = (userData) => {
-    console.log('Login data received:', userData);
-
-    // Ensure we have both id and _id for compatibility
     const userObj = {
-      ...userData.user,
-      _id: userData.user._id || userData.user.id,
-      id: userData.user._id || userData.user.id,
+      ...(userData.user || userData),
+      _id: (userData.user?._id || userData.user?.id) || (userData._id || userData.id),
+      id: (userData.user?._id || userData.user?.id) || (userData._id || userData.id),
       token: userData.token,
-      role: userData.role
+      role: userData.role || (userData.user?.role)
     };
 
-    console.log('Processed user object:', userObj);
-
     setUser(userObj);
-
     localStorage.setItem('token', userData.token);
-    localStorage.setItem('role', userData.role);
+    localStorage.setItem('role', userObj.role);
     localStorage.setItem('userId', userObj._id);
-
-    console.log('User logged in and stored:', userObj.username, userObj.role, 'ID:', userObj._id);
   };
 
   const logout = () => {
-    console.log('Logging out user...');
     clearAuth();
-    // Redirect to login page
     window.location.href = '/login';
   };
 
-  const isAuthenticated = () => {
-    const hasUser = !!user;
-    const hasToken = !!localStorage.getItem('token');
-    return hasUser && hasToken;
-  };
+  const isAuthenticated = () => !!user && !!localStorage.getItem('token');
 
   const hasRole = (requiredRole) => {
-    const userRole = user?.role;
-    const hasRequiredRole = userRole === requiredRole;
-    return hasRequiredRole;
+    if (Array.isArray(requiredRole)) {
+      return requiredRole.includes(user?.role);
+    }
+    return user?.role === requiredRole;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#F9F8F7]">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-500 font-medium animate-pulse">Synchronizing Session...</p>
         </div>
       </div>
     );
