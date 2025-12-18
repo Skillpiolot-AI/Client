@@ -1,5 +1,5 @@
 import React from 'react';
-import { Share2, Download, Home } from 'lucide-react';
+import { Share2, Download, Home, CheckCircle } from 'lucide-react';
 import ChartsSection from './ChartsSection';
 import CareerRecommendations from './CareerRecommendations';
 import DomainInsights from './DomainInsights';
@@ -8,23 +8,12 @@ import '../../styles/results.css';
 const ResultsPage = ({ assessmentData, onStartNew }) => {
   // Extract data from the backend response
   const rawResults = assessmentData?.data?.results || assessmentData?.results || {};
-  
+
   const domainScores = rawResults.domainScores || {};
   const percentages = rawResults.percentages || {};
   const hollandCode = rawResults.hollandCode || 'N/A';
-  let recommendedCareers = rawResults.recommendedCareers || [];
-
-  // Recalculate match scores if they're all the same (bug fix)
-//   if (recommendedCareers.length > 0) {
-//     const uniqueScores = new Set(recommendedCareers.map(c => c.matchScore));
-//     if (uniqueScores.size === 1 && uniqueScores.has(80)) {
-//       // Recalculate match scores
-//       recommendedCareers = recommendedCareers.map(career => {
-//         const matchScore = calculateMatchScore(hollandCode, career.holland_codes || []);
-//         return { ...career, matchScore };
-//       }).sort((a, b) => b.matchScore - a.matchScore);
-//     }
-//   }
+  const recommendedCareers = rawResults.recommendedCareers || [];
+  const improvement = assessmentData?.data?.improvement || null;
 
   // Convert percentages to sorted array format expected by child components
   const sorted = Object.entries(percentages)
@@ -41,37 +30,9 @@ const ResultsPage = ({ assessmentData, onStartNew }) => {
     topThreeDomains: sorted.slice(0, 3).map(item => item.domain)
   };
 
-  // Helper function to calculate match score
-//   function calculateMatchScore(userHollandCode, careerHollandCodes) {
-//     if (!careerHollandCodes || careerHollandCodes.length === 0) return 0;
-    
-//     const userCodes = userHollandCode.split('');
-//     let score = 0;
-//     let matchCount = 0;
-    
-//     userCodes.forEach((code, index) => {
-//       if (careerHollandCodes.includes(code)) {
-//         matchCount++;
-//         // Weight: first code = 50 points, second = 30 points, third = 20 points
-//         if (index === 0) score += 50;
-//         else if (index === 1) score += 30;
-//         else if (index === 2) score += 20;
-//       }
-//     });
-    
-//     // Bonus points for exact matches in same position
-//     careerHollandCodes.forEach((code, index) => {
-//       if (index < userCodes.length && userCodes[index] === code) {
-//         score += 10;
-//       }
-//     });
-    
-//     return Math.min(Math.round(score), 100);
-//   }
-
   const handleShare = async () => {
-    const text = `My Holland Code is ${results.hollandCode}! I just discovered my ideal career path. 🎯`;
-    
+    const text = `My Holland Code is ${results.hollandCode}! I just discovered my ideal career path.`;
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -92,14 +53,14 @@ const ResultsPage = ({ assessmentData, onStartNew }) => {
   const fallbackShare = (text) => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(`${text}\n${window.location.href}`);
-      alert('Link copied to clipboard! 📋');
+      alert('Link copied to clipboard!');
     } else {
       alert(text);
     }
   };
 
   const handleDownload = () => {
-    alert('PDF download feature coming soon! 📄');
+    alert('PDF download feature coming soon!');
   };
 
   // Check if we have valid data
@@ -126,31 +87,38 @@ const ResultsPage = ({ assessmentData, onStartNew }) => {
         {/* Header */}
         <div className="results-header">
           <div className="completion-badge">
-            <span className="badge-icon">✓</span>
-            Assessment Complete!
+            <CheckCircle size={16} />
+            <span>Assessment Complete</span>
           </div>
           <h1 className="results-title">Your Career Profile</h1>
           <p className="results-subtitle">
             Based on your responses, here's your personalized career guidance
           </p>
-          <div className="holland-code-display">
+
+          {/* Holland Code Display */}
+          <div className="holland-code-box">
             <span className="holland-label">Holland Code:</span>
             <span className="holland-code">{results.hollandCode}</span>
+            {improvement && improvement.hasImproved !== null && (
+              <span className={`improvement-badge ${improvement.hasImproved ? 'positive' : 'negative'}`}>
+                {improvement.hasImproved ? '+' : ''}{improvement.percentageChange}% from last assessment
+              </span>
+            )}
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="action-buttons">
           <button onClick={handleShare} className="btn-secondary">
-            <Share2 size={18} />
+            <Share2 size={16} />
             <span>Share Results</span>
           </button>
           <button onClick={handleDownload} className="btn-secondary">
-            <Download size={18} />
+            <Download size={16} />
             <span>Download PDF</span>
           </button>
           <button onClick={onStartNew} className="btn-primary">
-            <Home size={18} />
+            <Home size={16} />
             <span>Start New</span>
           </button>
         </div>
@@ -166,6 +134,167 @@ const ResultsPage = ({ assessmentData, onStartNew }) => {
           <CareerRecommendations careers={results.recommendedCareers} />
         )}
       </div>
+
+      <style>{`
+        .results-page {
+          min-height: 100vh;
+          background: #f8fafc;
+          padding: 80px 24px 40px;
+        }
+
+        .results-container {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .results-header {
+          text-align: center;
+          margin-bottom: 28px;
+        }
+
+        .completion-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #dcfce7;
+          color: #166534;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 13px;
+          font-weight: 500;
+          margin-bottom: 16px;
+        }
+
+        .results-title {
+          font-size: 28px;
+          font-weight: 700;
+          color: #111827;
+          margin: 0 0 8px 0;
+        }
+
+        .results-subtitle {
+          font-size: 15px;
+          color: #6b7280;
+          margin: 0 0 20px 0;
+        }
+
+        .holland-code-box {
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          background: white;
+          border: 1px solid #e5e7eb;
+          padding: 12px 24px;
+          border-radius: 12px;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .holland-label {
+          font-size: 14px;
+          color: #6b7280;
+        }
+
+        .holland-code {
+          font-size: 22px;
+          font-weight: 700;
+          color: #166534;
+          background: #dcfce7;
+          padding: 6px 16px;
+          border-radius: 8px;
+          letter-spacing: 3px;
+        }
+
+        .improvement-badge {
+          font-size: 12px;
+          padding: 5px 10px;
+          border-radius: 16px;
+          font-weight: 500;
+        }
+
+        .improvement-badge.positive {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        .improvement-badge.negative {
+          background: #fef2f2;
+          color: #991b1b;
+        }
+
+        .action-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-bottom: 28px;
+          flex-wrap: wrap;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 18px;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          border: none;
+          transition: all 0.2s;
+        }
+
+        .btn-primary {
+          background: #166534;
+          color: white;
+        }
+
+        .btn-primary:hover {
+          background: #14532d;
+        }
+
+        .btn-secondary {
+          background: white;
+          color: #374151;
+          border: 1px solid #e5e7eb;
+        }
+
+        .btn-secondary:hover {
+          background: #f9fafb;
+        }
+
+        .error-state {
+          text-align: center;
+          padding: 60px 20px;
+          background: white;
+          border-radius: 12px;
+          border: 1px solid #e5e7eb;
+        }
+
+        .error-state h2 {
+          color: #111827;
+          margin-bottom: 8px;
+        }
+
+        .error-state p {
+          color: #6b7280;
+          margin-bottom: 20px;
+        }
+
+        @media (max-width: 640px) {
+          .results-page {
+            padding: 70px 16px 30px;
+          }
+
+          .results-title {
+            font-size: 24px;
+          }
+
+          .holland-code {
+            font-size: 18px;
+          }
+        }
+      `}</style>
     </div>
   );
 };
