@@ -1,0 +1,1 @@
+import{i as u,j as e,N as r,O as o}from"./index-BAlrBGp4.js";const i=({allowedRoles:s})=>{const{user:t}=u();return t?s.includes(t.role)?e.jsx(o,{}):e.jsx(r,{to:"/",replace:!0}):e.jsx(r,{to:"/",replace:!0})};export{i as default};

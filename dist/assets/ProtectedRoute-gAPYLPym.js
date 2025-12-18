@@ -1,1 +1,0 @@
-import{f as u,j as e,N as r,O as o}from"./index-CWmCkts8.js";const l=({allowedRoles:s})=>{const{user:t}=u();return t?s.includes(t.role)?e.jsx(o,{}):e.jsx(r,{to:"/",replace:!0}):e.jsx(r,{to:"/",replace:!0})};export{l as default};

@@ -1,9 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, Send, User, Bot, Loader2, CheckCircle } from 'lucide-react';
+import { MessageCircle, X, Send, User, Bot, Loader2, CheckCircle, Copy, Check, Briefcase, FileText, Users, BookOpen, RotateCcw, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import config from '../config';
 
 // ==================== CONFIGURATION ====================
-const API_BASE_URL = 'http://localhost:3001/api';
-const GEMINI_API_KEY = 'AIzaSyAbuB4tWH0u3wFSjDM4VeXAt1qX24mtglQ';
+const API_BASE_URL = config.API_BASE_URL;
+
+// Chat modes for specialized assistance
+const CHAT_MODES = [
+  { id: 'general', label: 'General', icon: Sparkles, color: 'from-blue-600 to-indigo-600' },
+  { id: 'career', label: 'Career', icon: Briefcase, color: 'from-green-600 to-emerald-600' },
+  { id: 'resume', label: 'Resume', icon: FileText, color: 'from-purple-600 to-violet-600' },
+  { id: 'interview', label: 'Interview', icon: Users, color: 'from-orange-600 to-amber-600' },
+  { id: 'skills', label: 'Skills', icon: BookOpen, color: 'from-pink-600 to-rose-600' },
+];
 
 // ==================== MAIN CHATBOT COMPONENT ====================
 const ChatBot = () => {
@@ -14,7 +24,11 @@ const ChatBot = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasAssessment, setHasAssessment] = useState(false);
+  const [chatMode, setChatMode] = useState('general');
+  const [suggestions, setSuggestions] = useState([]);
+  const [copiedId, setCopiedId] = useState(null);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -30,8 +44,52 @@ const ChatBot = () => {
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       initializeChat();
+      loadSuggestions();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    loadSuggestions();
+  }, [chatMode]);
+
+  // Load saved chat from localStorage
+  useEffect(() => {
+    const savedChat = localStorage.getItem('skillpilot_chat');
+    if (savedChat) {
+      try {
+        const parsed = JSON.parse(savedChat);
+        if (parsed.messages && parsed.messages.length > 0) {
+          setMessages(parsed.messages);
+        }
+      } catch (e) {
+        console.error('Failed to load chat history');
+      }
+    }
+  }, []);
+
+  // Save chat to localStorage
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('skillpilot_chat', JSON.stringify({ messages, timestamp: Date.now() }));
+    }
+  }, [messages]);
+
+  const loadSuggestions = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/chatbot/suggestions?context=${chatMode}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSuggestions(data.suggestions || []);
+      }
+    } catch (error) {
+      setSuggestions([
+        'What career suits my skills?',
+        'How to improve my resume?',
+        'Interview tips',
+        'Learning roadmap'
+      ]);
+    }
+  };
 
   const loadUserProfile = async () => {
     try {
@@ -86,12 +144,28 @@ const ChatBot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const clearChat = () => {
+    setMessages([]);
+    localStorage.removeItem('skillpilot_chat');
+    initializeChat();
+  };
+
+  const copyToClipboard = async (text, id) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy');
+    }
+  };
+
   const initializeChat = () => {
     const token = localStorage.getItem('token');
     
     if (!token) {
       addBotMessage({
-        text: `👋 Welcome to Skill-Pilot! I'm your AI Career Guide.\n\nPlease login to access personalized career guidance, assessments, and mentor connections.`,
+        text: `**Welcome to Skill Pilot!** I'm your AI Career Guide.\n\nPlease login to access personalized career guidance, assessments, and mentor connections.`,
         quickActions: [
           { id: 'login', label: 'Login', icon: '🔐' },
           { id: 'signup', label: 'Sign Up', icon: '📝' },
@@ -103,15 +177,15 @@ const ChatBot = () => {
 
     if (!hasAssessment && userProfile) {
       addBotMessage({
-        text: `Hi ${userProfile.name}! 👋\n\nI noticed you haven't completed your **Holland Career Assessment** yet. This helps us understand your interests and recommend the best career paths.\n\nWould you like to take it now? It only takes 5-10 minutes!`,
+        text: `Hi **${userProfile.name}**!\n\nI noticed you haven't completed your **Holland Career Assessment** yet. This helps us understand your interests and recommend the best career paths.\n\nWould you like to take it now? It only takes 5-10 minutes!`,
         quickActions: [
-          { id: 'take-assessment', label: '✨ Take Assessment', icon: '🧠' },
+          { id: 'take-assessment', label: 'Take Assessment', icon: '🧠' },
           { id: 'skip', label: 'Skip & Browse', icon: '⏭️' }
         ]
       }, 500);
     } else if (userProfile) {
       addBotMessage({
-        text: `Welcome back, ${userProfile.name}! 🎉\n\nYour Holland Code: **${userProfile.hollandCode}**\n\nHow can I help you today?`,
+        text: `Welcome back, **${userProfile.name}**!\n\nYour Holland Code: **${userProfile.hollandCode}**\n\nHow can I help you today? You can also switch modes above for specialized assistance.`,
         quickActions: [
           { id: 'view-careers', label: 'Career Matches', icon: '💼' },
           { id: 'find-mentors', label: 'Find Mentors', icon: '👨‍🏫' },
@@ -122,7 +196,7 @@ const ChatBot = () => {
     }
   };
 
-  const addBotMessage = (message, delay = 1000) => {
+  const addBotMessage = (message, delay = 800) => {
     setIsTyping(true);
     setTimeout(() => {
       setMessages(prev => [...prev, {
@@ -179,9 +253,6 @@ const ChatBot = () => {
       case 'filter-colleges':
         showCollegeFilters();
         break;
-      case 'apply-filters':
-        await applyCollegeFilters(data);
-        break;
       case 'book-mentor':
         await bookMentorSession(data);
         break;
@@ -210,7 +281,7 @@ const ChatBot = () => {
 
   const showFeatures = () => {
     addBotMessage({
-      text: `🌟 **Skill-Pilot Features**\n\n✅ Career Assessment\n✅ Personalized Recommendations\n✅ Expert Mentors\n✅ College Information\n✅ Workshops & Resources\n✅ Career Roadmaps`,
+      text: `**Skill Pilot Features**\n\n- Career Assessment\n- Personalized Recommendations\n- Expert Mentors\n- College Information\n- Workshops & Resources\n- Career Roadmaps`,
       quickActions: [
         { id: 'signup', label: 'Get Started', icon: '🚀' }
       ]
@@ -245,7 +316,7 @@ const ChatBot = () => {
         ).join('\n\n');
 
         addBotMessage({
-          text: `🎯 **Top Career Matches** for your Holland Code (${userProfile.hollandCode}):\n\n${careerList}`,
+          text: `**Top Career Matches** for ${userProfile.hollandCode}:\n\n${careerList}`,
           quickActions: [
             { id: 'find-mentors', label: 'Find Mentors', icon: '👨‍🏫' },
             { id: 'explore-colleges', label: 'Explore Colleges', icon: '🎓' }
@@ -254,7 +325,7 @@ const ChatBot = () => {
       }
     } catch (error) {
       addBotMessage({
-        text: `Oops! I had trouble fetching careers. Please try again.`,
+        text: `I had trouble fetching careers. Please try again.`,
         quickActions: [{ id: 'view-careers', label: 'Retry', icon: '🔄' }]
       }, 0);
     }
@@ -271,7 +342,7 @@ const ChatBot = () => {
 
       if (topMentors.length > 0) {
         addBotMessage({
-          text: `👨‍🏫 **Available Mentors**\n\nClick any mentor to book a session:`,
+          text: `**Available Mentors**\n\nClick any mentor to book a session:`,
           quickActions: topMentors.map(m => ({
             id: 'book-mentor',
             label: `${m.name} - ${m.jobTitle}`,
@@ -320,7 +391,7 @@ const ChatBot = () => {
       if (!res.ok) throw new Error('Booking failed');
 
       addBotMessage({
-        text: `✅ **Session Booked Successfully!**\n\nMentor: ${mentor.name}\nRole: ${mentor.jobTitle}\n\nYou'll receive a confirmation email shortly. The mentor will schedule the meeting and send you the link.`,
+        text: `**Session Booked Successfully!**\n\n- **Mentor:** ${mentor.name}\n- **Role:** ${mentor.jobTitle}\n\nYou'll receive a confirmation email shortly.`,
         quickActions: [
           { id: 'find-mentors', label: 'Book Another', icon: '📅' },
           { id: 'view-careers', label: 'Explore Careers', icon: '💼' }
@@ -345,11 +416,11 @@ const ChatBot = () => {
 
       if (colleges && colleges.length > 0) {
         const collegeList = colleges.map((c, i) => 
-          `${i + 1}. **${c.name}**\n   ${c.displayLocationString}\n   Rating: ${c.averageCourseRating?.toFixed(1) || 'N/A'}⭐`
+          `${i + 1}. **${c.name}**\n   ${c.displayLocationString}\n   Rating: ${c.averageCourseRating?.toFixed(1) || 'N/A'}/5`
         ).join('\n\n');
 
         addBotMessage({
-          text: `🎓 **Top Colleges**:\n\n${collegeList}`,
+          text: `**Top Colleges**:\n\n${collegeList}`,
           quickActions: [
             { id: 'filter-colleges', label: 'Filter Colleges', icon: '🔍' }
           ]
@@ -366,7 +437,7 @@ const ChatBot = () => {
 
   const showCollegeFilters = () => {
     addBotMessage({
-      text: `🔍 **Filter Colleges**\n\nWhat would you like to filter by?`,
+      text: `**Filter Colleges**\n\nWhat would you like to filter by?`,
       quickActions: [
         { id: 'filter-by-location', label: 'By Location', icon: '📍' },
         { id: 'filter-by-fees', label: 'By Fees', icon: '💰' },
@@ -390,7 +461,7 @@ const ChatBot = () => {
         ).join('\n\n');
 
         addBotMessage({
-          text: `📚 **Upcoming Workshops**:\n\n${workshopList}`,
+          text: `**Upcoming Workshops**:\n\n${workshopList}`,
           quickActions: [
             { id: 'main-menu', label: 'Main Menu', icon: '🏠' }
           ]
@@ -411,6 +482,7 @@ const ChatBot = () => {
     try {
       const lowerQuery = query.toLowerCase();
       
+      // Check for specific commands
       if (lowerQuery.includes('college') || lowerQuery.includes('university')) {
         await fetchColleges();
         return;
@@ -421,7 +493,7 @@ const ChatBot = () => {
         return;
       }
       
-      if (lowerQuery.includes('career') || lowerQuery.includes('job')) {
+      if (lowerQuery.includes('career') && (lowerQuery.includes('match') || lowerQuery.includes('recommend'))) {
         if (hasAssessment) {
           await fetchCareerMatches();
         } else {
@@ -440,15 +512,36 @@ const ChatBot = () => {
         return;
       }
 
-      const context = `User: ${userProfile?.name || 'Guest'}, Has Assessment: ${hasAssessment}, Holland Code: ${userProfile?.hollandCode || 'None'}`;
-      const aiResponse = await generateAIResponse(query, context);
-      
-      addBotMessage({
-        text: aiResponse,
-        quickActions: [
-          { id: 'main-menu', label: 'Main Menu', icon: '🏠' }
-        ]
-      }, 0);
+      // Use backend AI for general queries
+      const conversationHistory = messages.slice(-10).map(m => ({
+        sender: m.type,
+        text: m.text
+      }));
+      conversationHistory.push({ sender: 'user', text: query });
+
+      const res = await fetch(`${API_BASE_URL}/chatbot/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        },
+        body: JSON.stringify({
+          messages: conversationHistory,
+          mode: chatMode
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        addBotMessage({
+          text: data.message,
+          quickActions: [
+            { id: 'main-menu', label: 'Main Menu', icon: '🏠' }
+          ]
+        }, 0);
+      } else {
+        throw new Error('API failed');
+      }
       
     } catch (error) {
       addBotMessage({
@@ -462,31 +555,6 @@ const ChatBot = () => {
     setIsTyping(false);
   };
 
-  const generateAIResponse = async (query, context) => {
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `You are an AI career guidance assistant for Skill-Pilot website. Context: ${context}\n\nUser Query: ${query}\n\nProvide a helpful, concise response (max 100 words) based on the website's features: assessments, mentors, careers, colleges, workshops, resources. Be friendly and guide users to relevant features.`
-              }]
-            }]
-          })
-        }
-      );
-
-      const data = await response.json();
-      return data.candidates[0]?.content?.parts[0]?.text || "I'm here to help! Could you provide more details?";
-    } catch (error) {
-      console.error('AI Error:', error);
-      return "I'm having trouble processing that. Let me help you navigate our features instead!";
-    }
-  };
-
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
@@ -497,6 +565,13 @@ const ChatBot = () => {
     await handleCustomQuery(userMessage);
   };
 
+  const handleSuggestionClick = (suggestion) => {
+    setInputValue(suggestion);
+    inputRef.current?.focus();
+  };
+
+  const currentMode = CHAT_MODES.find(m => m.id === chatMode);
+
   return (
     <div className="fixed bottom-6 right-6 z-50 font-sans">
       {!isOpen ? (
@@ -505,35 +580,59 @@ const ChatBot = () => {
           className="group relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full p-4 shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300"
         >
           <MessageCircle className="w-6 h-6" />
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
-            AI
+          <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <Sparkles className="w-3 h-3" />
           </span>
         </button>
       ) : (
-        <div className="w-[95vw] max-w-[420px] h-[80vh] max-h-[650px] rounded-2xl shadow-2xl flex flex-col overflow-hidden bg-white border border-gray-200">
+        <div className="w-[95vw] max-w-[440px] h-[85vh] max-h-[700px] rounded-2xl shadow-2xl flex flex-col overflow-hidden bg-white border border-gray-200">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex items-center justify-between flex-shrink-0">
+          <div className={`bg-gradient-to-r ${currentMode?.color || 'from-blue-600 to-indigo-600'} text-white p-4 flex items-center justify-between flex-shrink-0`}>
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
-                  <Bot className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600" />
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg">
+                  <Bot className="w-6 h-6 text-blue-600" />
                 </div>
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
               </div>
               <div>
-                <h3 className="font-bold text-base sm:text-lg">AI Career Guide</h3>
-                <p className="text-xs opacity-90 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                  Online
-                </p>
+                <h3 className="font-bold text-base">Skill Pilot AI</h3>
+                <p className="text-xs opacity-90">{currentMode?.label || 'General'} Mode</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-2 hover:bg-white/20 rounded-lg transition"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={clearChat}
+                className="p-2 hover:bg-white/20 rounded-lg transition"
+                title="Clear chat"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-2 hover:bg-white/20 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Mode Selector */}
+          <div className="bg-gray-50 border-b border-gray-200 px-3 py-2 flex gap-1 overflow-x-auto flex-shrink-0">
+            {CHAT_MODES.map((mode) => (
+              <button
+                key={mode.id}
+                onClick={() => setChatMode(mode.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap ${
+                  chatMode === mode.id
+                    ? `bg-gradient-to-r ${mode.color} text-white shadow-md`
+                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <mode.icon className="w-3.5 h-3.5" />
+                {mode.label}
+              </button>
+            ))}
           </div>
 
           {/* Status Bar */}
@@ -546,7 +645,7 @@ const ChatBot = () => {
               {hasAssessment && (
                 <div className="flex items-center gap-1 text-green-600">
                   <CheckCircle className="w-4 h-4" />
-                  <span className="text-xs font-medium hidden sm:inline">Assessment Done</span>
+                  <span className="text-xs font-medium">{userProfile.hollandCode}</span>
                 </div>
               )}
             </div>
@@ -559,6 +658,8 @@ const ChatBot = () => {
                 key={message.id} 
                 message={message}
                 onAction={handleQuickAction}
+                onCopy={copyToClipboard}
+                copiedId={copiedId}
               />
             ))}
             
@@ -567,27 +668,46 @@ const ChatBot = () => {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Suggestions */}
+          {suggestions.length > 0 && messages.length < 3 && (
+            <div className="px-4 py-2 bg-white border-t border-gray-100 flex-shrink-0">
+              <p className="text-xs text-gray-500 mb-2">Try asking:</p>
+              <div className="flex flex-wrap gap-2">
+                {suggestions.slice(0, 3).map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleSuggestionClick(s)}
+                    className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Input Area */}
           <div className="p-4 bg-white border-t border-gray-200 flex-shrink-0">
             <div className="flex gap-2">
               <input
+                ref={inputRef}
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Ask me anything..."
+                placeholder={`Ask about ${currentMode?.label.toLowerCase() || 'anything'}...`}
                 className="flex-1 px-4 py-3 rounded-xl border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!inputValue.trim()}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-xl hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                disabled={!inputValue.trim() || isTyping}
+                className={`bg-gradient-to-r ${currentMode?.color || 'from-blue-600 to-indigo-600'} text-white p-3 rounded-xl hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0`}
               >
-                <Send className="w-5 h-5" />
+                {isTyping ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2 text-center">
-              Powered by Gemini AI
+            <p className="text-xs text-gray-400 mt-2 text-center">
+              Powered by Skill Pilot AI
             </p>
           </div>
         </div>
@@ -597,11 +717,11 @@ const ChatBot = () => {
 };
 
 // ==================== MESSAGE BUBBLE ====================
-const MessageBubble = ({ message, onAction }) => {
+const MessageBubble = ({ message, onAction, onCopy, copiedId }) => {
   if (message.type === 'user') {
     return (
       <div className="flex justify-end items-start gap-2 animate-fadeIn">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-[75%] shadow-lg">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-[80%] shadow-lg">
           <p className="text-sm leading-relaxed break-words">{message.text}</p>
         </div>
         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow">
@@ -617,8 +737,21 @@ const MessageBubble = ({ message, onAction }) => {
         <Bot className="w-4 h-4 text-white" />
       </div>
       <div className="flex-1">
-        <div className="bg-white text-gray-900 rounded-2xl rounded-tl-none p-4 shadow-md max-w-[85%] border border-gray-100">
-          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
+        <div className="relative bg-white text-gray-900 rounded-2xl rounded-tl-none p-4 shadow-md max-w-[90%] border border-gray-100 group">
+          <div className="text-sm leading-relaxed prose prose-sm max-w-none">
+            <ReactMarkdown>{message.text}</ReactMarkdown>
+          </div>
+          <button
+            onClick={() => onCopy(message.text, message.id)}
+            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-gray-100 rounded-lg transition"
+            title="Copy"
+          >
+            {copiedId === message.id ? (
+              <Check className="w-3.5 h-3.5 text-green-600" />
+            ) : (
+              <Copy className="w-3.5 h-3.5 text-gray-400" />
+            )}
+          </button>
         </div>
         
         {message.quickActions && (
@@ -627,7 +760,7 @@ const MessageBubble = ({ message, onAction }) => {
               <button
                 key={idx}
                 onClick={() => onAction(action.id, action.data)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 shadow-sm hover:shadow"
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 shadow-sm hover:shadow"
               >
                 <span>{action.icon}</span>
                 <span className="truncate max-w-[150px]">{action.label}</span>
