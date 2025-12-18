@@ -1,0 +1,181 @@
+/* SearchBar.css - Premium Orb Design */
+.search-bar-redesign {
+    background: #fff;
+    border-radius: 100px;
+    padding: 8px 12px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    max-width: 100%;
+    transition: all 0.3s ease;
+}
+
+.search-bar-redesign:focus-within {
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Animated Orb */
+.search-orb-wrapper {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.search-orb {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4ade80, #166534);
+    box-shadow:
+        0 0 20px rgba(74, 222, 128, 0.4),
+        inset -4px -4px 8px rgba(0, 0, 0, 0.2),
+        inset 4px 4px 8px rgba(255, 255, 255, 0.4);
+    position: relative;
+    animation: orbColorShift 9s infinite alternate;
+}
+
+/* Orb Sparkles */
+.search-orb::before,
+.search-orb::after {
+    content: '';
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    filter: blur(1px);
+}
+
+.search-orb::before {
+    width: 3px;
+    height: 3px;
+    top: 20%;
+    left: 20%;
+    box-shadow: 0 0 4px #fff;
+}
+
+.search-orb::after {
+    width: 2px;
+    height: 2px;
+    bottom: 30%;
+    right: 30%;
+    opacity: 0.6;
+}
+
+@keyframes orbColorShift {
+    0% {
+        background: linear-gradient(135deg, #4ade80, #166534);
+        box-shadow: 0 0 25px rgba(74, 222, 128, 0.5);
+    }
+
+    33% {
+        background: linear-gradient(135deg, #60a5fa, #1e40af);
+        box-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
+    }
+
+    66% {
+        background: linear-gradient(135deg, #a78bfa, #5b21b6);
+        box-shadow: 0 0 25px rgba(167, 139, 250, 0.5);
+    }
+
+    100% {
+        background: linear-gradient(135deg, #f472b6, #9d174d);
+        box-shadow: 0 0 25px rgba(244, 114, 182, 0.5);
+    }
+}
+
+/* Input & Placeholder Animation */
+.search-input-container {
+    flex: 1;
+    position: relative;
+    height: 48px;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-field {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    font-weight: 500;
+    color: #1f2937;
+    z-index: 2;
+    padding: 0;
+}
+
+.placeholder-animation-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+.placeholder-text {
+    font-size: 18px;
+    color: #94a3b8;
+    position: absolute;
+    width: 100%;
+    transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.2s ease;
+}
+
+.placeholder-text.exit {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.placeholder-text.enter {
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+.placeholder-text.active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Sort Select Styling (Integration) */
+.search-bar-redesign .sort-wrapper {
+    margin-right: 12px;
+    padding-left: 16px;
+    border-left: 1px solid #f1f5f9;
+}
+
+.search-bar-redesign .sort-select {
+    border: none;
+    background-color: transparent;
+    font-size: 14px;
+    padding-right: 24px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+@media (max-width: 768px) {
+    .search-bar-redesign {
+        border-radius: 20px;
+        padding: 8px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .search-bar-redesign .sort-wrapper {
+        border-left: none;
+        border-top: 1px solid #f1f5f9;
+        padding: 12px 0 4px;
+        justify-content: space-between;
+    }
+}

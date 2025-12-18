@@ -24,10 +24,10 @@ const FilterSidebar = ({
     ];
 
     const menteeTypes = [
-        'Freshers',
-        'Working Professionals',
-        'Students',
-        'Career Switchers'
+        'Fresher',
+        'Working Professional',
+        'Student',
+        'Career Switch'
     ];
 
     return (
@@ -41,12 +41,13 @@ const FilterSidebar = ({
             <aside className={`filter-sidebar ${isOpen ? 'mobile-open' : ''}`}>
                 <div className="filter-header">
                     <h3 className="filter-title">Filter By</h3>
-                    {(selectedDomains.length > 0 || priceRange[1] < 40000 || experienceRange[0] > 0) && (
+                    {(selectedDomains.length > 0 || menteeType || priceRange[1] < 40000 || experienceRange[0] > 0) && (
                         <button
                             className="clear-filters"
                             onClick={() => {
                                 onClearDomains();
-                                onPriceChange([5000, 40000]);
+                                onMenteeTypeChange('');
+                                onPriceChange([0, 40000]);
                                 onExperienceChange([0, 15]);
                             }}
                         >
@@ -110,31 +111,31 @@ const FilterSidebar = ({
 
                 {/* Pricing Range */}
                 <div className="filter-section">
-                    <h4 className="filter-section-title">Pricing</h4>
+                    <h4 className="filter-section-title">Max Pricing (per month)</h4>
                     <div className="range-slider-container">
                         <div className="range-values">
-                            <span>₹{priceRange[0].toLocaleString()}</span>
-                            <span>₹{priceRange[1].toLocaleString()}</span>
+                            <span>₹0</span>
+                            <span>₹{priceRange[1].toLocaleString()}{priceRange[1] === 40000 ? '+' : ''}</span>
                         </div>
                         <input
                             type="range"
                             className="range-slider"
-                            min="5000"
+                            min="0"
                             max="40000"
                             step="1000"
                             value={priceRange[1]}
-                            onChange={(e) => onPriceChange([priceRange[0], parseInt(e.target.value)])}
+                            onChange={(e) => onPriceChange([0, parseInt(e.target.value)])}
                         />
                     </div>
                 </div>
 
                 {/* Experience Range */}
                 <div className="filter-section">
-                    <h4 className="filter-section-title">Experience</h4>
+                    <h4 className="filter-section-title">Max Experience</h4>
                     <div className="range-slider-container">
                         <div className="range-values">
-                            <span>{experienceRange[0]} years</span>
-                            <span>{experienceRange[1]}+ years</span>
+                            <span>0 years</span>
+                            <span>{experienceRange[1]}{experienceRange[1] === 15 ? '+' : ''} years</span>
                         </div>
                         <input
                             type="range"
@@ -143,7 +144,7 @@ const FilterSidebar = ({
                             max="15"
                             step="1"
                             value={experienceRange[1]}
-                            onChange={(e) => onExperienceChange([experienceRange[0], parseInt(e.target.value)])}
+                            onChange={(e) => onExperienceChange([0, parseInt(e.target.value)])}
                         />
                     </div>
                 </div>

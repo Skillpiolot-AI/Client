@@ -14,6 +14,7 @@ import SearchBar from './SearchBar';
 import FilterSidebar from './FilterSidebar';
 import MentorCard from './MentorCard';
 import BookingModal from '../Bookings/BookingModal';
+import CampaignBanner from './CampaignBanner';
 import './styles.css';
 
 /**
@@ -24,6 +25,7 @@ const MentorList = () => {
     const [filteredMentors, setFilteredMentors] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [campaign, setCampaign] = useState(null);
 
     // Search & Sort
     const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +34,7 @@ const MentorList = () => {
     // Filters
     const [selectedDomains, setSelectedDomains] = useState([]);
     const [menteeType, setMenteeType] = useState('');
-    const [priceRange, setPriceRange] = useState([5000, 40000]);
+    const [priceRange, setPriceRange] = useState([0, 40000]);
     const [experienceRange, setExperienceRange] = useState([0, 15]);
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -76,24 +78,25 @@ const MentorList = () => {
         };
     }, [isBooking]);
 
-// In MentorList.jsx - Line ~78
-const fetchMentors = async () => {
-    try {
-        setIsLoading(true);
-        // ✅ Change from /mentors to /all-mentors
-        const response = await axios.get(`${config.API_BASE_URL}/all-mentors`);
+    // In MentorList.jsx - Line ~78
+    const fetchMentors = async () => {
+        try {
+            setIsLoading(true);
+            // ✅ Change from /mentors to /all-mentors
+            const response = await axios.get(`${config.API_BASE_URL}/all-mentors`);
 
-        // Handle the new API response structure
-        const mentorData = response.data.mentors || response.data;
-        setMentors(Array.isArray(mentorData) ? mentorData : []);
-        setError(null);
-    } catch (error) {
-        console.error('Error fetching mentors:', error);
-        setError('Failed to fetch mentors. Please try again later.');
-    } finally {
-        setIsLoading(false);
-    }
-};
+            // Handle the new API response structure
+            const mentorData = response.data.mentors || response.data;
+            setMentors(Array.isArray(mentorData) ? mentorData : []);
+            setCampaign(response.data.campaign || null);
+            setError(null);
+        } catch (error) {
+            console.error('Error fetching mentors:', error);
+            setError('Failed to fetch mentors. Please try again later.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const filterMentors = () => {
         let filtered = [...mentors];
@@ -116,33 +119,54 @@ const fetchMentors = async () => {
         // Domain filter
         if (selectedDomains.length > 0) {
             filtered = filtered.filter(mentor => {
-                const mentorDomains = mentor.targetingDomains || [];
-                return selectedDomains.some(domain =>
-                    mentorDomains.some(d => d.toLowerCase().includes(domain.toLowerCase()))
-                );
+                const mentorDomains = (mentor.targetingDomains || []).map(d => d.toLowerCase());
+                return selectedDomains.some(domain => {
+                    const searchDomain = domain.toLowerCase();
+                    // Match if backend domain contains search term OR search term contains backend domain
+                    // This handles categories like "DevOps / SRE / Cloud"
+                    return mentorDomains.some(d =>
+                        d.includes(searchDomain) || searchDomain.includes(d)
+                    );
+                });
             });
         }
 
         // Mentee type filter
         if (menteeType) {
             filtered = filtered.filter(mentor => {
-                const types = mentor.preferredMenteeType || [];
-                return types.some(t => t.toLowerCase().includes(menteeType.toLowerCase()));
+                const types = (mentor.preferredMenteeType || []).map(t => t.toLowerCase());
+                const searchType = menteeType.toLowerCase();
+                // Match if any mentor type is included in search term OR search term included in type
+                return types.some(t => t.includes(searchType) || searchType.includes(t));
             });
         }
 
         // Price filter (check for free mentorship or price range)
         filtered = filtered.filter(mentor => {
             if (mentor.isFree) return true;
-            const monthlyPrice = mentor.pricingPlans?.[0]?.price ||
-                mentor.pricing?.monthlyPrice ||
-                15000;
-            return monthlyPrice >= priceRange[0] && monthlyPrice <= priceRange[1];
+
+            // Calculate best monthly rate from plans
+            const monthlyRates = (mentor.pricingPlans || []).map(p => {
+                const months = p.duration === '6 Months' ? 6 : p.duration === '3 Months' ? 3 : 1;
+                return p.price / months;
+            }).filter(p => p > 0);
+
+            const basePrice = mentor.pricing?.monthlyPrice || (monthlyRates.length > 0 ? Math.min(...monthlyRates) : 0);
+
+            // If priceRange is [0, 40000], we interpret 40000 as "40000+"
+            if (priceRange[1] === 40000) {
+                return basePrice >= priceRange[0];
+            }
+            return basePrice >= priceRange[0] && basePrice <= priceRange[1];
         });
 
         // Experience filter
         filtered = filtered.filter(mentor => {
-            const exp = mentor.experience || 0;
+            const exp = parseInt(mentor.experience) || 0;
+            // Handle "15+" case
+            if (experienceRange[1] === 15) {
+                return exp >= experienceRange[0];
+            }
             return exp >= experienceRange[0] && exp <= experienceRange[1];
         });
 
@@ -294,6 +318,9 @@ const fetchMentors = async () => {
             )}
 
             <div className="mentor-list-content">
+                {/* Campaign Banner */}
+                <CampaignBanner campaign={campaign} />
+
                 {/* Search Bar */}
                 <SearchBar
                     searchTerm={searchTerm}

@@ -1,0 +1,118 @@
+/* Campaign Banner Styles */
+.campaign-banner {
+    margin-bottom: 24px;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.campaign-card {
+    position: relative;
+    padding: 32px 40px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #fff;
+    overflow: hidden;
+}
+
+.campaign-bg {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    right: 0;
+    height: 250px;
+    background: radial-gradient(circle at bottom,
+            rgba(34, 197, 94, 0.3) 0%,
+            rgba(234, 179, 8, 0.2) 30%,
+            rgba(239, 68, 68, 0.05) 60%,
+            rgba(255, 255, 255, 0) 100%);
+    filter: blur(40px);
+    z-index: 1;
+    transform: scale(1.5);
+}
+
+.campaign-rays {
+    position: absolute;
+    bottom: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: repeating-conic-gradient(from 0deg,
+            rgba(0, 0, 0, 0) 0deg,
+            rgba(0, 0, 0, 0.02) 1deg,
+            rgba(0, 0, 0, 0) 2deg);
+    z-index: 2;
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
+}
+
+.campaign-content {
+    position: relative;
+    z-index: 10;
+    max-width: 700px;
+}
+
+.campaign-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #dcfce7;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.campaign-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.campaign-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #111827;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.campaign-description {
+    font-size: 16px;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0;
+    font-weight: 500;
+}
+
+@media (max-width: 1024px) {
+    .campaign-banner {
+        border-radius: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .campaign-card {
+        padding: 24px 20px;
+        min-height: 160px;
+    }
+
+    .campaign-title {
+        font-size: 22px;
+    }
+
+    .campaign-description {
+        font-size: 14px;
+    }
+}
