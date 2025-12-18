@@ -36,7 +36,7 @@ const MentorshipPage = lazy(() => import('./Pages/Mentor Home/HomePage'));
 const MentoHome = lazy(() => import('./Pages/MentoHome'));
 const CoachProfile = lazy(() => import('./Pages/DashBoard/MentorDashBoard'));
 const AMDashboard = lazy(() => import('./Pages/DashBoard/AdminMento'));
-const Profile = lazy(() => import('./Pages/Profile/Profile'));
+const Profile = lazy(() => import('./Pages/Profile'));
 const MyBookings = lazy(() => import('./Pages/MentorShip/Bookings/MyBookings'));
 const MentorSessions = lazy(() => import('./Pages/MentorShip/Bookings/MentorSessions'));
 
