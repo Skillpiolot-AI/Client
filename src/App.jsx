@@ -86,6 +86,7 @@ const AdminUpdatesPage = lazy(() => import('./Pages/updates/AdminUpdatesPage'));
 // 🎓 Other
 const CollegeList = lazy(() => import('./Pages/Colleges/CollegeList'));
 const AIlandingpage = lazy(() => import("./AILandingpage/AILandingPage"));
+const DocsPage = lazy(() => import('./Pages/Docs/DocsPage'));
 
 // 🌐 Global Components
 import Navbar from "./homepage/landing/Navbar"
@@ -161,6 +162,7 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/verify-login" element={<VerifyLogin />} />
           <Route path="/complete-profile" element={<GoogleProfileCompletion />} />
+          <Route path="/docs" element={<DocsPage />} />
 
 
           {/* 👤 User Protected Routes */}
