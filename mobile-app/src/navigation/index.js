@@ -17,6 +17,7 @@ import { MentorListScreen, BookSessionScreen, MyBookingsScreen } from '../screen
 import { ProfileScreen } from '../screens/profile';
 import { CareerQuizScreen, RecommendationsScreen } from '../screens/career';
 import { AssessmentScreen, AssessmentQuizScreen } from '../screens/assessment';
+import NotificationsScreen from '../screens/notifications/NotificationsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -68,6 +69,7 @@ const CareerStack = () => (
 const ProfileStack = () => (
     <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
     </Stack.Navigator>
 );
 

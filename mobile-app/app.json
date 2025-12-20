@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile-app",
-    "slug": "mobile-app",
+    "name": "SkillPilot",
+    "slug": "skill-pilot",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,14 +23,27 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.skillpilot.mobileapp",
-      "hermesEnabled": true
+      "package": "com.skillpilot.mobileapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-web-browser"
-    ]
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/bell.png",
+          "color": "#FF6B35"
+        }
+      ],
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "01641d3e-2391-4b39-ba0f-fe7e598cad40"
+      }
+    },
+    "owner": "ujjwal.jha"
   }
 }

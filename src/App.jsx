@@ -39,6 +39,7 @@ const AMDashboard = lazy(() => import('./Pages/DashBoard/AdminMento'));
 const Profile = lazy(() => import('./Pages/Profile'));
 const MyBookings = lazy(() => import('./Pages/MentorShip/Bookings/MyBookings'));
 const MentorSessions = lazy(() => import('./Pages/MentorShip/Bookings/MentorSessions'));
+const RateSession = lazy(() => import('./Pages/MentorShip/RateSession'));
 
 // 🏫 Admin & University Management
 const AdminDashboard = lazy(() => import('./Pages/Admin/DashBoard'));
@@ -50,6 +51,7 @@ const TeacherDashboard = lazy(() => import('./Pages/University/TeacherDashboard'
 const AdminUserManagement = lazy(() => import('./Pages/Admin/AdminUserManagement'));
 const UserManagementDashboard = lazy(() => import('./Pages/Admin/UserManagementDashboard'));
 const ServerLogs = lazy(() => import('./Pages/Admin/ServerLogs'));
+const AnnouncementsDashboard = lazy(() => import('./Pages/Admin/Announcements'));
 
 // 🧾 Forms Management
 const JobTitlesManagement = lazy(() => import('./Pages/Forms/JobTitles'));
@@ -164,6 +166,7 @@ function App() {
           <Route path="/verify-login" element={<VerifyLogin />} />
           <Route path="/complete-profile" element={<GoogleProfileCompletion />} />
           <Route path="/docs" element={<DocsPage />} />
+          <Route path="/rate-session/:bookingId" element={<RateSession />} />
 
 
           {/* 👤 User Protected Routes */}
@@ -201,6 +204,7 @@ function App() {
             <Route path="/admin/userData" element={<UserManagementDashboard />} />
             <Route path="/admin/system-settings" element={<SystemSettings />} />
             <Route path="/admin/server-logs" element={<ServerLogs />} />
+            <Route path="/admin/announcements" element={<AnnouncementsDashboard />} />
           </Route>
 
           {/* 🏫 University Admin Routes */}

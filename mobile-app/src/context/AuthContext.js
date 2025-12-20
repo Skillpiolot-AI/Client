@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import authAPI from '../services/authAPI';
+import { initializePushNotifications } from '../services/notificationService';
 
 const AuthContext = createContext(null);
 
@@ -31,6 +32,8 @@ export const AuthProvider = ({ children }) => {
             if (token && userData) {
                 setUser(JSON.parse(userData));
                 setIsAuthenticated(true);
+                // Register push token on app startup if authenticated
+                initializePushNotifications().catch(err => console.log('Push init error:', err));
             }
         } catch (error) {
             console.log('Auth check error:', error);
@@ -44,6 +47,8 @@ export const AuthProvider = ({ children }) => {
             const response = await authAPI.login(email, password);
             setUser(response.user);
             setIsAuthenticated(true);
+            // Register push token after login
+            initializePushNotifications().catch(err => console.log('Push init error:', err));
             return { success: true, data: response };
         } catch (error) {
             return {
