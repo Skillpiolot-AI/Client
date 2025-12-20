@@ -174,7 +174,6 @@ function App() {
             <Route path="/careerform" element={<CareerForm />} />
             <Route path="/application" element={<CreativeApplicationForm />} />
             <Route path="/tracker" element={<ApplicationTracker />} />
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/my-applications" element={<UserAppointments />} />
             <Route path="/my-bookings" element={<MyBookings />} />
           </Route>
@@ -193,6 +192,7 @@ function App() {
 
           {/* 🛠️ Admin Protected Routes */}
           <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/JobForm" element={<JobTitlesManagement />} />
             <Route path="/Companyform" element={<CompaniesManagement />} />
             <Route path="/mentoapplication" element={<AdminApplicationsPage />} />

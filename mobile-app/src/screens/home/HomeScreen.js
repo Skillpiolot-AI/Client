@@ -51,6 +51,14 @@ const HomeScreen = ({ navigation }) => {
                 end={{ x: 1, y: 1 }}
                 style={styles.hero}
             >
+                {/* Notification Bell Icon */}
+                <TouchableOpacity
+                    style={styles.notificationBell}
+                    onPress={() => navigation.navigate('Profile', { screen: 'Notifications' })}
+                >
+                    <Ionicons name="notifications-outline" size={24} color={whiteTheme.white} />
+                </TouchableOpacity>
+
                 <View style={styles.heroContent}>
                     <Text style={styles.heroTitle}>
                         {isAuthenticated ? `Welcome back, ${user?.name?.split(' ')[0] || 'User'}!` : 'Discover Your Career'}
@@ -354,6 +362,18 @@ const styles = StyleSheet.create({
     },
     bottomPadding: {
         height: 100,
+    },
+    notificationBell: {
+        position: 'absolute',
+        top: spacing.xl,
+        right: spacing.lg,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10,
     },
 });
 

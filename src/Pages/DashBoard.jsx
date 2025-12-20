@@ -3,20 +3,19 @@ import React, { useState } from 'react';
 const DashboardCard = ({ title, path, description, badge }) => (
   <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden transform hover:scale-105">
     {badge && (
-      <span className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-semibold ${
-        badge === 'Public' ? 'bg-blue-100 text-blue-700' :
-        badge === 'User' ? 'bg-green-100 text-green-700' :
-        badge === 'Mentor' ? 'bg-purple-100 text-purple-700' :
-        badge === 'Admin' ? 'bg-red-100 text-red-700' :
-        'bg-yellow-100 text-yellow-700'
-      }`}>
+      <span className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-semibold ${badge === 'Public' ? 'bg-blue-100 text-blue-700' :
+          badge === 'User' ? 'bg-green-100 text-green-700' :
+            badge === 'Mentor' ? 'bg-purple-100 text-purple-700' :
+              badge === 'Admin' ? 'bg-red-100 text-red-700' :
+                'bg-yellow-100 text-yellow-700'
+        }`}>
         {badge}
       </span>
     )}
     <h3 className="text-xl font-semibold mb-2 text-gray-800 pr-16">{title}</h3>
     <p className="text-gray-600 mb-4 text-sm">{description}</p>
-    <a 
-      href={path} 
+    <a
+      href={path}
       className="text-blue-500 hover:text-blue-700 font-medium inline-flex items-center group"
     >
       Go to {title}
@@ -39,7 +38,7 @@ const Dashboard = () => {
       { title: 'Profile', path: '/profile', description: 'View and edit your profile', badge: 'User' },
       { title: 'Dashboard', path: '/dashboard', description: 'User dashboard overview', badge: 'User' },
     ],
-    
+
     auth: [
       { title: 'Login', path: '/login', description: 'Log in to your account', badge: 'Public' },
       { title: 'Signup', path: '/signup', description: 'Create a new account', badge: 'Public' },
@@ -63,62 +62,69 @@ const Dashboard = () => {
 
     mentorship: [
       { title: 'Mentorship Home', path: '/mentorHome', description: 'Mentorship program overview', badge: 'Public' },
-      { title: 'Find Mentors', path: '/mentorship', description: 'View available mentors', badge: 'Public' },
-      { title: 'Mentor Dashboard', path: '/mentorDashboard', description: 'Mentor profile and dashboard', badge: 'Mentor' },
-      { title: 'Apply for Mentorship', path: '/application', description: 'Submit mentorship application', badge: 'User' },
-      { title: 'Application Tracker', path: '/tracker', description: 'Track your application status', badge: 'User' },
-      { title: 'My Applications', path: '/my-applications', description: 'View your mentorship appointments', badge: 'User' },
-      { title: 'My Sessions', path: '/my-sessions', description: 'View your mentoring sessions', badge: 'Mentor' },
-      { title: 'Schedule Session', path: '/schedulementor', description: 'Book a mentoring session', badge: 'Public' },
-      { title: 'User Feedback', path: '/userFeedback', description: 'Provide feedback on mentorship', badge: 'Admin' },
-      { title: 'Mentor Home Alt', path: '/mentor', description: 'Alternative mentor home page', badge: 'Public' },
+      { title: 'Find Mentors', path: '/mentorship', description: 'Browse and book available mentors', badge: 'Public' },
+      { title: 'Mentor Dashboard', path: '/mentorDashboard', description: 'Mentor profile and settings', badge: 'Mentor' },
+      { title: 'Become a Mentor', path: '/application', description: 'Apply to become a mentor', badge: 'User' },
+      { title: 'Track Application', path: '/tracker', description: 'Track your mentor application status', badge: 'User' },
+      { title: 'My Appointments', path: '/my-applications', description: 'View scheduled appointments', badge: 'User' },
+      { title: 'My Bookings', path: '/my-bookings', description: 'View your booking history', badge: 'User' },
+      { title: 'Mentor Sessions', path: '/mentor-sessions', description: 'Manage your mentoring sessions', badge: 'Mentor' },
+      { title: 'My Sessions (Old)', path: '/my-sessions', description: 'Legacy session view', badge: 'Mentor' },
+      { title: 'Book Session', path: '/schedulementor', description: 'Schedule a mentoring session', badge: 'Public' },
+      { title: 'Rate Session', path: '/rate-session/:bookingId', description: 'Rate your completed session', badge: 'User' },
+      { title: 'User Feedback', path: '/userFeedback', description: 'View all user feedback', badge: 'Admin' },
     ],
 
     learning: [
-      { title: 'Learn Videos', path: '/learn', description: 'Upload educational videos', badge: 'Public' },
-      { title: 'Learn List', path: '/learnlist', description: 'View list of educational content', badge: 'Public' },
-      { title: 'Add Resources', path: '/addResources', description: 'Add educational resources', badge: 'Admin' },
-      { title: 'View Books', path: '/view-books', description: 'View available books and resources', badge: 'Public' },
-      { title: 'Workshops', path: '/workshops', description: 'View available workshops', badge: 'Public' },
-      { title: 'Add Workshop', path: '/workshopAdd', description: 'Add a new workshop', badge: 'Admin' },
+      { title: 'Add Videos', path: '/learn', description: 'Upload educational videos', badge: 'Admin' },
+      { title: 'Video Library', path: '/learnlist', description: 'Browse training videos', badge: 'Public' },
+      { title: 'Add Resources', path: '/addResources', description: 'Add books and materials', badge: 'Admin' },
+      { title: 'Resource Library', path: '/view-books', description: 'Browse books and resources', badge: 'Public' },
+      { title: 'Workshops', path: '/workshops', description: 'Explore available workshops', badge: 'Public' },
+      { title: 'Add Workshop', path: '/workshopAdd', description: 'Create new workshop', badge: 'Admin' },
     ],
 
     roadmaps: [
-      { title: 'Roadmap', path: '/roadmap', description: 'General career roadmap', badge: 'Public' },
+      { title: 'Career Roadmaps', path: '/roadmap', description: 'Explore career paths', badge: 'Public' },
       { title: 'Software Engineer', path: '/softwareengineer', description: 'Frontend developer roadmap', badge: 'Public' },
-      { title: 'Data Scientist', path: '/datascientist', description: 'Data scientist career path', badge: 'Public' },
+      { title: 'Data Scientist', path: '/datascientist', description: 'Data science career path', badge: 'Public' },
+      { title: 'All Career Paths', path: '/careerPaths', description: 'Browse all tech career paths', badge: 'Public' },
     ],
 
     admin: [
-      { title: 'Admin Dashboard', path: '/dashboardAdmin', description: 'Access admin dashboard', badge: 'Admin' },
-      { title: 'Admin Mentor Dashboard', path: '/amdashboard', description: 'Admin mentor management', badge: 'Mentor' },
+      { title: 'Admin Dashboard', path: '/dashboardAdmin', description: 'Main admin control panel', badge: 'Admin' },
+      { title: 'Analytics', path: '/analytics', description: 'System analytics and metrics', badge: 'Admin' },
+      { title: 'Announcements', path: '/admin/announcements', description: 'Send notifications to users', badge: 'Admin' },
+      { title: 'User Management', path: '/admin/user-management', description: 'Manage all users', badge: 'Admin' },
+      { title: 'User Data', path: '/admin/userData', description: 'Detailed user analytics', badge: 'Admin' },
+      { title: 'Mentor Applications', path: '/mentoapplication', description: 'Review mentor applications', badge: 'Admin' },
       { title: 'Add Mentor', path: '/addmentor', description: 'Register new mentors', badge: 'Admin' },
-      { title: 'Mentor Applications', path: '/mentoapplication', description: 'View and manage mentor applications', badge: 'Admin' },
-      { title: 'Analytics', path: '/analytics', description: 'View system analytics', badge: 'Admin' },
-      { title: 'User Management', path: '/admin/user-management', description: 'Manage users', badge: 'Admin' },
-      { title: 'User Data', path: '/admin/userData', description: 'View user data dashboard', badge: 'Admin' },
-      { title: 'Admin Updates', path: '/admin/updates', description: 'Manage system updates', badge: 'Admin' },
+      { title: 'Admin Updates', path: '/admin/updates', description: 'Manage platform updates', badge: 'Admin' },
+      { title: 'System Settings', path: '/admin/system-settings', description: 'Configure system settings', badge: 'Admin' },
+      { title: 'Server Logs', path: '/admin/server-logs', description: 'View server activity logs', badge: 'Admin' },
+      { title: 'Mentor Dashboard', path: '/amdashboard', description: 'Mentor management view', badge: 'Mentor' },
     ],
 
     management: [
-      { title: 'Job Titles', path: '/JobForm', description: 'Manage job titles', badge: 'Admin' },
-      { title: 'Companies', path: '/Companyform', description: 'Manage company information', badge: 'Admin' },
-      { title: 'Interests', path: '/interestForm', description: 'Manage your interests', badge: 'Mentor' },
-      { title: 'Strengths', path: '/StrengthForm', description: 'Manage your strengths', badge: 'Mentor' },
-      { title: 'Skills', path: '/skillform', description: 'Manage your skills', badge: 'Mentor' },
-      { title: 'Colleges', path: '/collegeform', description: 'Manage college information', badge: 'Mentor' },
-      { title: 'College List', path: '/colleges', description: 'View all colleges', badge: 'Public' },
+      { title: 'Job Titles', path: '/JobForm', description: 'Manage job title database', badge: 'Admin' },
+      { title: 'Companies', path: '/Companyform', description: 'Manage company database', badge: 'Admin' },
+      { title: 'My Interests', path: '/interestForm', description: 'Update your interests', badge: 'Mentor' },
+      { title: 'My Strengths', path: '/StrengthForm', description: 'Update your strengths', badge: 'Mentor' },
+      { title: 'My Skills', path: '/skillform', description: 'Manage your skills', badge: 'Mentor' },
+      { title: 'Colleges', path: '/collegeform', description: 'Manage college database', badge: 'Mentor' },
+      { title: 'Browse Colleges', path: '/colleges', description: 'Explore all colleges', badge: 'Public' },
     ],
 
     university: [
-      { title: 'University Management', path: '/universityManagement', description: 'Manage universities', badge: 'Admin' },
-      { title: 'Uni Admin Portal', path: '/uniAdminPortal', description: 'University admin dashboard', badge: 'UniAdmin' },
-      { title: 'Teacher Dashboard', path: '/teacher/dashboard', description: 'Teacher portal', badge: 'UniTeach' },
+      { title: 'University Management', path: '/universityManagement', description: 'Admin university control', badge: 'Admin' },
+      { title: 'University Portal', path: '/uniAdminPortal', description: 'University admin dashboard', badge: 'UniAdmin' },
+      { title: 'Teacher Dashboard', path: '/teacher/dashboard', description: 'Teacher management portal', badge: 'UniTeach' },
     ],
 
     community: [
-      { title: 'Community', path: '/community', description: 'Join the community', badge: 'Public' },
-      { title: 'Updates', path: '/updates', description: 'View latest updates', badge: 'Public' },
+      { title: 'Community', path: '/community', description: 'Connect with other users', badge: 'Public' },
+      { title: 'Platform Updates', path: '/updates', description: 'Latest news and updates', badge: 'Public' },
+      { title: 'Documentation', path: '/docs', description: 'Platform documentation', badge: 'Public' },
     ],
   };
 
@@ -141,7 +147,7 @@ const Dashboard = () => {
   Object.entries(sections).forEach(([key, cards]) => {
     const filtered = cards.filter(card => {
       const matchesSearch = card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           card.description.toLowerCase().includes(searchTerm.toLowerCase());
+        card.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesBadge = selectedBadge === 'All' || card.badge === selectedBadge;
       return matchesSearch && matchesBadge;
     });
@@ -179,17 +185,16 @@ const Dashboard = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            
+
             <div className="flex flex-wrap gap-2 justify-center">
               {badges.map(badge => (
                 <button
                   key={badge}
                   onClick={() => setSelectedBadge(badge)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    selectedBadge === badge
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${selectedBadge === badge
                       ? 'bg-blue-500 text-white shadow-lg scale-105'
                       : 'bg-white text-gray-700 hover:bg-gray-100'
-                  }`}
+                    }`}
                 >
                   {badge}
                 </button>
@@ -254,7 +259,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-          <style>{`
+      <style>{`
             @keyframes fadeIn {
               from { opacity: 0; transform: translateY(20px); }
               to { opacity: 1; transform: translateY(0); }
@@ -263,9 +268,8 @@ const Dashboard = () => {
               animation: fadeIn 0.6s ease-out;
             }
           `}</style>
-        </div>
-      );
-    };
-    
-    export default Dashboard;
-    
+    </div>
+  );
+};
+
+export default Dashboard;

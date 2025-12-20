@@ -71,47 +71,49 @@ export default function Navbar() {
     }, [])
 
     const navItems = [
-        { name: "Home", path: "/", show: "desktop" },
-        { name: "Career", path: "/assesmentinfo", show: "both" },
-        { name: "Mentorship", path: "/mentorship", show: "both" },
-        { name: "Workshop", path: "/workshops", show: "both" },
+        { name: "Home", path: "/", show: "both" },
+        { name: "Assessment", path: "/Assesmentinfo", show: "both" },
+        { name: "Mentors", path: "/mentorship", show: "both" },
+        { name: "Workshops", path: "/workshops", show: "both" },
+        { name: "Resources", path: "/view-books", show: "desktop" },
         { name: "Community", path: "/community", show: "mobile" },
-        { name: "PathWays", path: "/careerPaths", show: "mobile" },
+        { name: "Career Paths", path: "/careerPaths", show: "mobile" },
     ]
 
     const dropdownItems = {
         User: [
-            { name: "Profile", path: "/profile" },
-            { name: "My Bookings", path: "/my-bookings" },
-            { name: "My Applications", path: "/my-applications" },
-            { name: "Resources", path: "/view-books" },
-            { name: "Workshops", path: "/workshops" },
+            { name: "👤 My Profile", path: "/profile" },
+            { name: "📅 My Bookings", path: "/my-bookings" },
+            { name: "📝 My Applications", path: "/my-applications" },
+            { name: "📋 Track Application", path: "/tracker" },
+            { name: "📚 Resources", path: "/view-books" },
         ],
         Mentor: [
-            { name: "Profile", path: "/mentorDashboard" },
-            { name: "My Sessions", path: "/mentor-sessions" },
-            { name: "My Bookings", path: "/my-bookings" },
-            { name: "Resources", path: "/view-books" },
-            { name: "Mentor Training", path: "/learnlist" },
-            { name: "Dashboard", path: "/amdashboard" },
+            { name: "👤 My Profile", path: "/mentorDashboard" },
+            { name: "📅 My Sessions", path: "/mentor-sessions" },
+            { name: "🎓 Mentor Panel", path: "/amdashboard" },
+            { name: "📚 Training Videos", path: "/learnlist" },
+            { name: "📝 My Bookings", path: "/my-bookings" },
         ],
         Admin: [
-            { name: "Main", path: "/dashboard" },
-            { name: "System Settings", path: "/admin/system-settings" },
-            { name: "Server Logs", path: "/admin/server-logs" },
-            { name: "Mentor Sessions", path: "/mentor-sessions" },
-            { name: "University", path: "/universityManagement" },
-            { name: "Dashboard", path: "/dashboardAdmin" },
-            { name: "Manage Users", path: "/manage-users" },
-            { name: "Updates", path: "/admin/updates" },
-            { name: "Reports", path: "/reports" },
-            { name: "Feedback", path: "/userFeedback" },
+            { name: "📊 Dashboard", path: "/dashboard" },
+            { name: "🛠️ Admin Panel", path: "/dashboardAdmin" },
+            { name: "📈 Analytics", path: "/analytics" },
+            { name: "📢 Announcements", path: "/admin/announcements" },
+            { name: "👥 User Management", path: "/admin/user-management" },
+            { name: "🎓 Mentor Applications", path: "/mentoapplication" },
+            { name: "📅 Mentor Sessions", path: "/mentor-sessions" },
+            { name: "🏫 Universities", path: "/universityManagement" },
+            { name: "⚙️ System Settings", path: "/admin/system-settings" },
+            { name: "📋 Server Logs", path: "/admin/server-logs" },
         ],
         UniTeach: [
-            { name: "Dashboard", path: "/teacher/dashboard" }
+            { name: "🏫 Teacher Portal", path: "/teacher/dashboard" },
+            { name: "📚 Resources", path: "/view-books" },
         ],
         UniAdmin: [
-            { name: "Dashboard", path: "/uniAdminPortal" }
+            { name: "🏫 University Portal", path: "/uniAdminPortal" },
+            { name: "📚 Resources", path: "/view-books" },
         ]
     }
 
