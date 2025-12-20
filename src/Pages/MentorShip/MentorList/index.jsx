@@ -101,6 +101,19 @@ const MentorList = () => {
     const filterMentors = () => {
         let filtered = [...mentors];
 
+        // ==========================================
+        // HIDE SELF: Filter out logged-in user's own profile
+        // ==========================================
+        if (user) {
+            const currentUserId = user.id || user._id;
+            if (currentUserId) {
+                filtered = filtered.filter(mentor => {
+                    const mentorUserId = mentor.userId?._id || mentor.userId || mentor._id;
+                    return mentorUserId !== currentUserId;
+                });
+            }
+        }
+
         // Search filter
         if (searchTerm) {
             const term = searchTerm.toLowerCase();

@@ -98,6 +98,7 @@ export default function Navbar() {
         Admin: [
             { name: "Main", path: "/dashboard" },
             { name: "System Settings", path: "/admin/system-settings" },
+            { name: "Server Logs", path: "/admin/server-logs" },
             { name: "Mentor Sessions", path: "/mentor-sessions" },
             { name: "University", path: "/universityManagement" },
             { name: "Dashboard", path: "/dashboardAdmin" },

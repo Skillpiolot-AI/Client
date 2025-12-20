@@ -49,6 +49,7 @@ const UniAdminPortal = lazy(() => import('./Pages/University/UniAdminPortal'));
 const TeacherDashboard = lazy(() => import('./Pages/University/TeacherDashboard'));
 const AdminUserManagement = lazy(() => import('./Pages/Admin/AdminUserManagement'));
 const UserManagementDashboard = lazy(() => import('./Pages/Admin/UserManagementDashboard'));
+const ServerLogs = lazy(() => import('./Pages/Admin/ServerLogs'));
 
 // 🧾 Forms Management
 const JobTitlesManagement = lazy(() => import('./Pages/Forms/JobTitles'));
@@ -199,6 +200,7 @@ function App() {
             <Route path="/admin/user-management" element={<AdminUserManagement />} />
             <Route path="/admin/userData" element={<UserManagementDashboard />} />
             <Route path="/admin/system-settings" element={<SystemSettings />} />
+            <Route path="/admin/server-logs" element={<ServerLogs />} />
           </Route>
 
           {/* 🏫 University Admin Routes */}
