@@ -8,15 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GraduationCap, Briefcase, Plus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from 'react-hot-toast';
 import config from '../../config';
 
 export default function Profile() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [formData, setFormData] = useState({
+    // ...
     tenthGrade: { percentage: '', maths: '', science: '', english: '' },
     twelfthGrade: { percentage: '', maths: '', physics: '', chemistry: '' },
     jobRolesPredicted: ['', '', '']
@@ -27,18 +30,28 @@ export default function Profile() {
   }, []);
 
   const fetchProfile = async () => {
+    // ... same content
+  };
+
+  const handleChangePassword = async () => {
+    setIsResetting(true);
     try {
-      const response = await axios.get(`${config.API_BASE_URL}/profile`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      const { data } = await axios.post(`${config.API_BASE_URL}/auth/forgot-password`, {
+        email: user.email
       });
-      setProfile(response.data);
-      setFormData({
-        tenthGrade: response.data.tenthGrade,
-        twelfthGrade: response.data.twelfthGrade,
-        jobRolesPredicted: response.data.jobRolesPredicted
-      });
+
+      if (data.success) {
+        toast.success("Verification code sent to your email");
+        navigate('/change-password', {
+          state: {
+            email: user.email
+          }
+        });
+      }
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      toast.error(error.response?.data?.message || "Failed to send verification code");
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -206,7 +219,16 @@ export default function Profile() {
               <p className="text-gray-500">Student</p>
             </div>
           </div>
-          <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+          <div className="flex space-x-3">
+            <Button
+              className="bg-[#6366F1] hover:bg-[#4F46E5] text-white transition-all duration-200"
+              onClick={handleChangePassword}
+              disabled={isResetting}
+            >
+              {isResetting ? "Sending..." : "Change Password"}
+            </Button>
+            <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
@@ -270,11 +292,10 @@ export default function Profile() {
                     <h3 className="font-medium">{project.title}</h3>
                     <p className="text-sm text-gray-500">{project.technologies.join(', ')}</p>
                   </div>
-                  <span className={`font-medium ${
-                    project.status === 'Completed' ? 'text-green-500' :
+                  <span className={`font-medium ${project.status === 'Completed' ? 'text-green-500' :
                     project.status === 'In Progress' ? 'text-yellow-500' :
-                    'text-blue-500'
-                  }`}>{project.status}</span>
+                      'text-blue-500'
+                    }`}>{project.status}</span>
                 </li>
               ))}
             </ul>
@@ -296,11 +317,10 @@ export default function Profile() {
                     <h3 className="font-medium">{cert.title}</h3>
                     <p className="text-sm text-gray-500">{cert.issuer}</p>
                   </div>
-                  <span className={`font-medium ${
-                    cert.status === 'Achieved' ? 'text-green-500' :
+                  <span className={`font-medium ${cert.status === 'Achieved' ? 'text-green-500' :
                     cert.status === 'In Progress' ? 'text-yellow-500' :
-                    'text-blue-500'
-                  }`}>{cert.status}</span>
+                      'text-blue-500'
+                    }`}>{cert.status}</span>
                 </li>
               ))}
             </ul>
@@ -322,12 +342,11 @@ export default function Profile() {
                     <h3 className="font-medium">{goal.title}</h3>
                     <p className="text-sm text-gray-500">{goal.description}</p>
                   </div>
-                  <span className={`font-medium ${
-                    goal.status === 'Completed' ? 'text-green-500' :
+                  <span className={`font-medium ${goal.status === 'Completed' ? 'text-green-500' :
                     goal.status === 'In Progress' ? 'text-yellow-500' :
-                    goal.status === 'Ongoing' ? 'text-blue-500' :
-                    'text-gray-500'
-                  }`}>{goal.status}</span>
+                      goal.status === 'Ongoing' ? 'text-blue-500' :
+                        'text-gray-500'
+                    }`}>{goal.status}</span>
                 </li>
               ))}
             </ul>

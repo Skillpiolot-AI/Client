@@ -6,6 +6,7 @@ import { Label } from '../../../components/ui/label';
 import axios from 'axios';
 import config from '../../../config';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../AuthContext';
 
 const SecuritySettings = ({ user }) => {
@@ -21,6 +22,8 @@ const SecuritySettings = ({ user }) => {
     const [deletePassword, setDeletePassword] = useState('');
     const [deleteConfirmText, setDeleteConfirmText] = useState('');
     const [deleteLoading, setDeleteLoading] = useState(false);
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleRequestEmailChange = async () => {
         if (!newEmail) {
@@ -80,6 +83,27 @@ const SecuritySettings = ({ user }) => {
             toast.error(error.response?.data?.message || 'Verification failed');
         } finally {
             setEmailLoading(false);
+        }
+    };
+
+    const handleRequestPasswordChange = async () => {
+        setPasswordLoading(true);
+        try {
+            const response = await axios.post(`${config.API_BASE_URL}/auth/forgot-password`,
+                { email: user?.email }
+            );
+
+            if (response.data.success) {
+                toast.success('Verification code sent to your email');
+                navigate('/change-password', { state: { email: user?.email } });
+            }
+        } catch (error) {
+            const data = error.response?.data;
+            const errorMessage = data?.message || error.message || 'Failed to send verification code';
+            const diagnosticInfo = data?.errorCode ? ` [Code: ${data.errorCode}]` : '';
+            toast.error(`${errorMessage}${diagnosticInfo}`);
+        } finally {
+            setPasswordLoading(false);
         }
     };
 
@@ -190,8 +214,12 @@ const SecuritySettings = ({ user }) => {
                         <h3>Change Password</h3>
                         <p>Update your password regularly for security</p>
                     </div>
-                    <Button variant="outline" onClick={() => window.location.href = '/forgot-password'}>
-                        Change Password
+                    <Button
+                        className="bg-[#6366F1] hover:bg-[#4F46E5] text-white transition-all duration-200"
+                        onClick={handleRequestPasswordChange}
+                        disabled={passwordLoading}
+                    >
+                        {passwordLoading ? <Loader2 size={16} className="animate-spin" /> : 'Change Password'}
                     </Button>
                 </div>
 

@@ -8,16 +8,24 @@ import { Eye, EyeOff, ArrowLeft, Mail, Lock, CheckCircle, Loader2, AlertCircle }
 import axios from "axios"
 import { toast } from "react-hot-toast"
 import config from "../../config"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 
 export default function ForgotPassword() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [step, setStep] = useState(1) // 1: Email, 2: OTP, 3: New Password, 4: Success
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [countdown, setCountdown] = useState(0)
-  
+
+  // Auto-start countdown if we arrive at step 2 (e.g. via resend or manual step change)
+  useEffect(() => {
+    if (step === 2 && countdown === 0) {
+      startCountdown()
+    }
+  }, [step])
+
   const [formData, setFormData] = useState({
     email: "",
     otp: "",
@@ -55,7 +63,7 @@ export default function ForgotPassword() {
   // Step 1: Request OTP
   const handleRequestOTP = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.email) {
       setErrors({ ...errors, email: "Email is required" })
       return
@@ -83,14 +91,14 @@ export default function ForgotPassword() {
         toast.success(data.message)
         setStep(2)
         startCountdown()
-        
+
         // Show debug info in development
         if (data.debug) {
           console.log('🔑 DEBUG - OTP:', data.debug.otp)
           console.log('⏰ Expires in:', data.debug.expiresIn)
           toast.success(`DEBUG: OTP is ${data.debug.otp}`, { duration: 10000 })
         }
-        
+
         // Show preview URL in console for testing
         if (data.previewUrl) {
           console.log('📧 Preview Email:', data.previewUrl)
@@ -99,9 +107,12 @@ export default function ForgotPassword() {
     } catch (error) {
       console.error("❌ Request OTP error:", error)
       console.error("Error response:", error.response?.data)
-      
-      const errorMessage = error.response?.data?.message || "Failed to send reset code. Please try again."
-      toast.error(errorMessage)
+
+      const data = error.response?.data;
+      const errorMessage = data?.message || error.message || "Failed to send reset code. Please try again.";
+      const diagnosticInfo = data?.errorCode ? ` [Code: ${data.errorCode}]` : '';
+
+      toast.error(`${errorMessage}${diagnosticInfo}`);
       setErrors({ ...errors, email: errorMessage })
     } finally {
       setIsLoading(false)
@@ -111,7 +122,7 @@ export default function ForgotPassword() {
   // Step 2: Verify OTP
   const handleVerifyOTP = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.otp) {
       setErrors({ ...errors, otp: "Please enter the OTP code" })
       return
@@ -144,7 +155,7 @@ export default function ForgotPassword() {
     } catch (error) {
       console.error("❌ Verify OTP error:", error)
       console.error("Error response:", error.response?.data)
-      
+
       const errorMessage = error.response?.data?.message || "Invalid OTP. Please try again."
       toast.error(errorMessage)
       setErrors({ ...errors, otp: errorMessage })
@@ -172,13 +183,13 @@ export default function ForgotPassword() {
         toast.success(data.message)
         setFormData({ ...formData, otp: "" })
         startCountdown()
-        
+
         // Show debug info
         if (data.debug) {
           console.log('🔑 DEBUG - New OTP:', data.debug.otp)
           toast.success(`DEBUG: New OTP is ${data.debug.otp}`, { duration: 10000 })
         }
-        
+
         if (data.previewUrl) {
           console.log('📧 Preview Email:', data.previewUrl)
         }
@@ -194,7 +205,7 @@ export default function ForgotPassword() {
   // Step 3: Reset Password
   const handleResetPassword = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.newPassword || !formData.confirmPassword) {
       setErrors({ ...errors, password: "Both password fields are required" })
       return
@@ -226,8 +237,8 @@ export default function ForgotPassword() {
       if (data.success) {
         toast.success(data.message)
         setStep(4)
-        
-        // Redirect to login after 3 seconds
+
+        // Redirect after 3 seconds
         setTimeout(() => {
           navigate('/login')
         }, 3000)
@@ -235,7 +246,7 @@ export default function ForgotPassword() {
     } catch (error) {
       console.error("❌ Reset password error:", error)
       console.error("Error response:", error.response?.data)
-      
+
       const errorMessage = error.response?.data?.message || "Failed to reset password. Please try again."
       toast.error(errorMessage)
       setErrors({ ...errors, password: errorMessage })
@@ -267,8 +278,8 @@ export default function ForgotPassword() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md space-y-8">
           {/* Back to login */}
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -301,9 +312,8 @@ export default function ForgotPassword() {
                     onChange={handleChange}
                     placeholder="Enter your email address"
                     required
-                    className={`h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${
-                      errors.email ? 'border-red-300 focus:border-red-500' : ''
-                    }`}
+                    className={`h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.email ? 'border-red-300 focus:border-red-500' : ''
+                      }`}
                   />
                   {errors.email && (
                     <p className="text-sm text-red-600 flex items-center space-x-1">
@@ -316,8 +326,7 @@ export default function ForgotPassword() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer"
-                  style={{ backgroundColor: "#3F3FF3" }}
+                  className="w-full h-12 text-sm font-medium text-white bg-[#6366F1] hover:bg-[#4F46E5] transition-all duration-200 rounded-lg shadow-none cursor-pointer"
                 >
                   {isLoading ? (
                     <>
@@ -359,9 +368,8 @@ export default function ForgotPassword() {
                     onChange={handleChange}
                     placeholder="000000"
                     required
-                    className={`h-12 text-center text-2xl tracking-widest border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${
-                      errors.otp ? 'border-red-300 focus:border-red-500' : ''
-                    }`}
+                    className={`h-12 text-center text-2xl tracking-widest border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.otp ? 'border-red-300 focus:border-red-500' : ''
+                      }`}
                   />
                   {errors.otp && (
                     <p className="text-sm text-red-600 flex items-center space-x-1">
@@ -374,8 +382,7 @@ export default function ForgotPassword() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer"
-                  style={{ backgroundColor: "#3F3FF3" }}
+                  className="w-full h-12 text-sm font-medium text-white bg-[#6366F1] hover:bg-[#4F46E5] transition-all duration-200 rounded-lg shadow-none cursor-pointer"
                 >
                   {isLoading ? (
                     <>
@@ -443,9 +450,8 @@ export default function ForgotPassword() {
                       onChange={handleChange}
                       placeholder="Enter new password"
                       required
-                      className={`h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${
-                        errors.password ? 'border-red-300 focus:border-red-500' : ''
-                      }`}
+                      className={`h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.password ? 'border-red-300 focus:border-red-500' : ''
+                        }`}
                     />
                     <Button
                       type="button"
@@ -476,9 +482,8 @@ export default function ForgotPassword() {
                       onChange={handleChange}
                       placeholder="Confirm new password"
                       required
-                      className={`h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${
-                        errors.password ? 'border-red-300 focus:border-red-500' : ''
-                      }`}
+                      className={`h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.password ? 'border-red-300 focus:border-red-500' : ''
+                        }`}
                     />
                     <Button
                       type="button"
@@ -511,8 +516,7 @@ export default function ForgotPassword() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer"
-                  style={{ backgroundColor: "#3F3FF3" }}
+                  className="w-full h-12 text-sm font-medium text-white bg-[#6366F1] hover:bg-[#4F46E5] transition-all duration-200 rounded-lg shadow-none cursor-pointer"
                 >
                   {isLoading ? (
                     <>
@@ -543,12 +547,13 @@ export default function ForgotPassword() {
               <div className="space-y-3">
                 <Button
                   onClick={() => navigate('/login')}
-                  className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer"
-                  style={{ backgroundColor: "#3F3FF3" }}
+                  className="w-full h-12 text-sm font-medium text-white bg-[#6366F1] hover:bg-[#4F46E5] transition-all duration-200 rounded-lg shadow-none cursor-pointer"
                 >
                   Go to Login
                 </Button>
-                <p className="text-sm text-gray-500">Redirecting to login in 3 seconds...</p>
+                <p className="text-sm text-gray-500">
+                  Redirecting to login in 3 seconds...
+                </p>
               </div>
             </div>
           )}

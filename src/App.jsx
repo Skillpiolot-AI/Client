@@ -16,6 +16,7 @@ const SignupForm = lazy(() => import('./Pages/User/Signup'));
 const ProtectedRoute = lazy(() => import('./Pages/Protection/ProtectedRoute'));
 const GoogleProfileCompletion = lazy(() => import('./Pages/User/GoogleProfileCompletion'));
 const Forgotpassword = lazy(() => import('./Pages/User/ForgotPassword'));
+const Changepassword = lazy(() => import('./Pages/User/ChangePassword'));
 const VerifyEmail = lazy(() => import('./Pages/User/VerifyEmail'));
 const VerifyLogin = lazy(() => import('./Pages/User/VerifyLogin'));
 
@@ -179,6 +180,7 @@ function App() {
             <Route path="/my-applications" element={<UserAppointments />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/change-password" element={<Changepassword />} />
           </Route>
 
           {/* 🎓 Mentor Protected Routes */}

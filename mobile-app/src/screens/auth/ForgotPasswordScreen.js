@@ -31,48 +31,14 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
         try {
             await authAPI.forgotPassword(email);
-            setSuccess(true);
+            setLoading(false);
+            // Navigate to OTP verification instead of showing success message
+            navigation.navigate('OtpVerification', { email });
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to send reset email');
+            setLoading(false);
         }
-
-        setLoading(false);
     };
-
-    if (success) {
-        return (
-            <ScreenWrapper scrollable={false}>
-                <View style={styles.successContainer}>
-                    <LinearGradient
-                        colors={[colors.info + '30', colors.info + '10']}
-                        style={styles.successIcon}
-                    >
-                        <Ionicons name="mail" size={60} color={colors.info} />
-                    </LinearGradient>
-                    <Text style={styles.successTitle}>Check Your Email</Text>
-                    <Text style={styles.successText}>
-                        We've sent password reset instructions to {email}
-                    </Text>
-                    <Button
-                        title="Back to Login"
-                        variant="gradient"
-                        size="lg"
-                        onPress={() => navigation.navigate('Login')}
-                        style={styles.successButton}
-                    />
-                    <TouchableOpacity
-                        style={styles.resendButton}
-                        onPress={() => {
-                            setSuccess(false);
-                            handleResetRequest();
-                        }}
-                    >
-                        <Text style={styles.resendText}>Didn't receive email? Resend</Text>
-                    </TouchableOpacity>
-                </View>
-            </ScreenWrapper>
-        );
-    }
 
     return (
         <ScreenWrapper scrollable={false}>

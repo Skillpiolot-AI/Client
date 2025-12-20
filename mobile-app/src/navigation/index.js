@@ -9,7 +9,10 @@ import { Loading } from '../components/ui';
 import { fontSize } from '../theme';
 
 // Auth Screens
-import { WelcomeScreen, LoginScreen, SignupScreen, ForgotPasswordScreen, VerifyEmailScreen } from '../screens/auth';
+import {
+    WelcomeScreen, LoginScreen, SignupScreen, ForgotPasswordScreen,
+    VerifyEmailScreen, OtpVerificationScreen, ResetPasswordScreen
+} from '../screens/auth';
 
 // Main Screens
 import { HomeScreen, DashboardScreen } from '../screens/home';
@@ -35,6 +38,8 @@ const AuthStack = () => (
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
+        <Stack.Screen name="OtpVerification" component={OtpVerificationScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
     </Stack.Navigator>
 );
 
@@ -71,6 +76,8 @@ const ProfileStack = () => (
     <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="ProfileMain" component={ProfileScreen} />
         <Stack.Screen name="EditMentorProfile" component={EditMentorProfileScreen} />
+        <Stack.Screen name="OtpVerification" component={OtpVerificationScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
     </Stack.Navigator>
 );
 

@@ -164,7 +164,47 @@ const ProfileScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     )}
 
-                    <TouchableOpacity style={styles.menuRow}>
+                    <TouchableOpacity
+                        style={styles.menuRow}
+                        onPress={async () => {
+                            try {
+                                Alert.alert(
+                                    'Change Password',
+                                    'We will send a verification code to your email to change your password. Proceed?',
+                                    [
+                                        { text: 'Cancel', style: 'cancel' },
+                                        {
+                                            text: 'Send Code',
+                                            onPress: async () => {
+                                                setLoading(true);
+                                                try {
+                                                    await authAPI.forgotPassword(user.email);
+                                                    navigation.navigate('OtpVerification', {
+                                                        email: user.email,
+                                                        fromProfile: true
+                                                    });
+                                                } catch (err) {
+                                                    const data = err.response?.data;
+                                                    const errorMessage = data?.message || data?.error || err.message || 'Failed to send verification code';
+                                                    const diagnosticCode = data?.errorCode ? ` [Code: ${data.errorCode}]` : '';
+                                                    const technicalDetail = err.response ? ` (Status: ${err.response.status}${diagnosticCode})` : ' (Network Error)';
+
+                                                    Alert.alert(
+                                                        'Error',
+                                                        `${errorMessage}${technicalDetail}\n\n${data?.emailResponse || ''}`.trim()
+                                                    );
+                                                } finally {
+                                                    setLoading(false);
+                                                }
+                                            }
+                                        }
+                                    ]
+                                );
+                            } catch (err) {
+                                Alert.alert('Error', 'Something went wrong');
+                            }
+                        }}
+                    >
                         <View style={styles.menuRowLeft}>
                             <Ionicons name="lock-closed-outline" size={22} color={uiTheme.textSecondary} />
                             <Text style={styles.menuLabel}>Change Password</Text>
