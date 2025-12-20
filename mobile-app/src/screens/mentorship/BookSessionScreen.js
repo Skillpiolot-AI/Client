@@ -71,13 +71,16 @@ const BookSessionScreen = ({ navigation, route }) => {
             const scheduledAt = new Date(`${selectedDate}T${selectedTime}:00`).toISOString();
 
             // Prepare booking data
+            // API returns: id, mentorProfileId, userId - use mentorProfileId for booking
             const bookingData = {
-                mentorProfileId: mentor?._id || mentor?.profileId,
+                mentorProfileId: mentor?.mentorProfileId || mentor?.id || mentor?._id,
                 scheduledAt,
                 duration: selectedDuration,
                 remark: remark.trim() || undefined,
                 topics: topics.trim() ? topics.split(',').map(t => t.trim()) : undefined,
             };
+
+            console.log('Booking data:', bookingData);
 
             const response = await mentorshipAPI.bookSession(bookingData);
 

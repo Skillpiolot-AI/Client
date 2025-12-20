@@ -6,9 +6,10 @@ export const mentorshipAPI = {
     // MENTOR ROUTES (under /api/mentors)
     // ========================================
 
-    // Get all mentors
+    // Get all mentors (public list)
     getMentors: async (params = {}) => {
-        const response = await api.get('/mentors', { params });
+        // Use /all-mentors endpoint which returns all verified mentors
+        const response = await api.get('/all-mentors', { params });
         return response.data;
     },
 
