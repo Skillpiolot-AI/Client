@@ -52,6 +52,7 @@ const AdminUserManagement = lazy(() => import('./Pages/Admin/AdminUserManagement
 const UserManagementDashboard = lazy(() => import('./Pages/Admin/UserManagementDashboard'));
 const ServerLogs = lazy(() => import('./Pages/Admin/ServerLogs'));
 const AnnouncementsDashboard = lazy(() => import('./Pages/Admin/Announcements'));
+const NotificationsPage = lazy(() => import('./Pages/Notifications'));
 
 // 🧾 Forms Management
 const JobTitlesManagement = lazy(() => import('./Pages/Forms/JobTitles'));
@@ -176,6 +177,7 @@ function App() {
             <Route path="/tracker" element={<ApplicationTracker />} />
             <Route path="/my-applications" element={<UserAppointments />} />
             <Route path="/my-bookings" element={<MyBookings />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
           </Route>
 
           {/* 🎓 Mentor Protected Routes */}

@@ -43,7 +43,7 @@ const useServerStatus = () => {
 
     useEffect(() => {
         checkServerStatus()
-        const interval = setInterval(checkServerStatus, 30000)
+        const interval = setInterval(checkServerStatus, 30000000)
         return () => clearInterval(interval)
     }, [])
 
@@ -83,6 +83,7 @@ export default function Navbar() {
     const dropdownItems = {
         User: [
             { name: "👤 My Profile", path: "/profile" },
+            { name: "🔔 Notifications", path: "/notifications" },
             { name: "📅 My Bookings", path: "/my-bookings" },
             { name: "📝 My Applications", path: "/my-applications" },
             { name: "📋 Track Application", path: "/tracker" },
@@ -90,6 +91,7 @@ export default function Navbar() {
         ],
         Mentor: [
             { name: "👤 My Profile", path: "/mentorDashboard" },
+            { name: "🔔 Notifications", path: "/notifications" },
             { name: "📅 My Sessions", path: "/mentor-sessions" },
             { name: "🎓 Mentor Panel", path: "/amdashboard" },
             { name: "📚 Training Videos", path: "/learnlist" },
@@ -109,10 +111,12 @@ export default function Navbar() {
         ],
         UniTeach: [
             { name: "🏫 Teacher Portal", path: "/teacher/dashboard" },
+            { name: "🔔 Notifications", path: "/notifications" },
             { name: "📚 Resources", path: "/view-books" },
         ],
         UniAdmin: [
             { name: "🏫 University Portal", path: "/uniAdminPortal" },
+            { name: "🔔 Notifications", path: "/notifications" },
             { name: "📚 Resources", path: "/view-books" },
         ]
     }

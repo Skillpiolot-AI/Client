@@ -40,7 +40,7 @@ const ProfileScreen = ({ navigation }) => {
 
     const menuItems = [
         { icon: 'person-outline', label: 'Edit Profile', action: () => setEditing(true) },
-        { icon: 'notifications-outline', label: 'Notifications', action: () => { } },
+        { icon: 'notifications-outline', label: 'Notifications', action: () => navigation.navigate('Notifications') },
         { icon: 'shield-outline', label: 'Privacy & Security', action: () => { } },
         { icon: 'help-circle-outline', label: 'Help & Support', action: () => { } },
         { icon: 'information-circle-outline', label: 'About', action: () => { } },

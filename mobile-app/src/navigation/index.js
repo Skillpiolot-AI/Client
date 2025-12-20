@@ -69,7 +69,6 @@ const CareerStack = () => (
 const ProfileStack = () => (
     <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="ProfileMain" component={ProfileScreen} />
-        <Stack.Screen name="Notifications" component={NotificationsScreen} />
     </Stack.Navigator>
 );
 
@@ -123,7 +122,10 @@ const RootNavigator = () => {
     return (
         <Stack.Navigator screenOptions={screenOptions}>
             {isAuthenticated ? (
-                <Stack.Screen name="Main" component={MainTabs} />
+                <>
+                    <Stack.Screen name="Main" component={MainTabs} />
+                    <Stack.Screen name="Notifications" component={NotificationsScreen} />
+                </>
             ) : (
                 <Stack.Screen name="Auth" component={AuthStack} />
             )}

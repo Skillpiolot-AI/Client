@@ -54,7 +54,7 @@ const HomeScreen = ({ navigation }) => {
                 {/* Notification Bell Icon */}
                 <TouchableOpacity
                     style={styles.notificationBell}
-                    onPress={() => navigation.navigate('Profile', { screen: 'Notifications' })}
+                    onPress={() => navigation.navigate('Notifications')}
                 >
                     <Ionicons name="notifications-outline" size={24} color={whiteTheme.white} />
                 </TouchableOpacity>
