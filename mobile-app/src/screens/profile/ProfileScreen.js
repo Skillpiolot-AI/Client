@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { Avatar, Button, Input } from '../../components/ui';
 import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import authAPI from '../../services/authAPI';
 
 // UI Reference Theme Colors
 export const uiTheme = {

@@ -55,6 +55,7 @@ const ServerLogs = lazy(() => import('./Pages/Admin/ServerLogs'));
 const AnnouncementsDashboard = lazy(() => import('./Pages/Admin/Announcements'));
 const NotificationsPage = lazy(() => import('./Pages/Notifications'));
 const MentorProfileReview = lazy(() => import('./Pages/Admin/MentorProfileReview'));
+const MentorProfilePage = lazy(() => import('./pages/MentorProfile'));
 
 // 🧾 Forms Management
 const JobTitlesManagement = lazy(() => import('./Pages/Forms/JobTitles'));
@@ -187,6 +188,7 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['Mentor', 'Admin']} />}>
             <Route path="/my-sessions" element={<MentorAppointments />} />
             <Route path="/mentor-sessions" element={<MentorSessions />} />
+            <Route path="/mentor-profile" element={<MentorProfilePage />} />
             <Route path="/interestForm" element={<InterestManagement />} />
             <Route path="/StrengthForm" element={<StrengthManagement />} />
             <Route path="/amdashboard" element={<AMDashboard />} />
