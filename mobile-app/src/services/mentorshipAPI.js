@@ -103,6 +103,28 @@ export const mentorshipAPI = {
         const response = await api.get('/bookings/admin/settings');
         return response.data;
     },
+
+    // ========================================
+    // NEW DASHBOARD & MANAGEMENT ROUTES
+    // ========================================
+
+    // Get mentor dashboard stats
+    getDashboardStats: async () => {
+        const response = await api.get('/mentors/dashboard-stats');
+        return response.data;
+    },
+
+    // Get mentor activity graph data
+    getActivityGraph: async () => {
+        const response = await api.get('/mentors/activity-graph');
+        return response.data;
+    },
+
+    // Request profile update (Admin Review flow)
+    requestProfileUpdate: async (updateData) => {
+        const response = await api.put('/mentors/request-profile-update', updateData);
+        return response.data;
+    },
 };
 
 export default mentorshipAPI;

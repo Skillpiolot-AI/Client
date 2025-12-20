@@ -13,7 +13,7 @@ import { WelcomeScreen, LoginScreen, SignupScreen, ForgotPasswordScreen, VerifyE
 
 // Main Screens
 import { HomeScreen, DashboardScreen } from '../screens/home';
-import { MentorListScreen, BookSessionScreen, MyBookingsScreen } from '../screens/mentorship';
+import { MentorListScreen, BookSessionScreen, MyBookingsScreen, MentorDashboardScreen, EditMentorProfileScreen } from '../screens/mentorship';
 import { ProfileScreen } from '../screens/profile';
 import { CareerQuizScreen, RecommendationsScreen } from '../screens/career';
 import { AssessmentScreen, AssessmentQuizScreen } from '../screens/assessment';
@@ -73,43 +73,55 @@ const ProfileStack = () => (
 );
 
 // Main Tab Navigator
-const MainTabs = () => (
-    <Tab.Navigator
-        screenOptions={({ route }) => ({
-            headerShown: false,
-            tabBarStyle: {
-                backgroundColor: '#FFFFFF',
-                borderTopColor: '#E5E7EB',
-                height: 70,
-                paddingBottom: 10,
-                paddingTop: 10,
-                elevation: 8,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-            },
-            tabBarActiveTintColor: '#FF6B35',
-            tabBarInactiveTintColor: '#9CA3AF',
-            tabBarLabelStyle: { fontSize: fontSize.xs, fontWeight: '600' },
-            tabBarIcon: ({ focused, color, size }) => {
-                let iconName;
-                switch (route.name) {
-                    case 'Home': iconName = focused ? 'home' : 'home-outline'; break;
-                    case 'Mentorship': iconName = focused ? 'people' : 'people-outline'; break;
-                    case 'Career': iconName = focused ? 'compass' : 'compass-outline'; break;
-                    case 'Profile': iconName = focused ? 'person' : 'person-outline'; break;
-                }
-                return <Ionicons name={iconName} size={24} color={color} />;
-            },
-        })}
-    >
-        <Tab.Screen name="Home" component={HomeStack} />
-        <Tab.Screen name="Mentorship" component={MentorshipStack} />
-        <Tab.Screen name="Career" component={CareerStack} />
-        <Tab.Screen name="Profile" component={ProfileStack} />
-    </Tab.Navigator>
-);
+const MainTabs = () => {
+    const { user } = useAuth();
+    const isMentor = user?.role === 'Mentor';
+
+    return (
+        <Tab.Navigator
+            screenOptions={({ route }) => ({
+                headerShown: false,
+                tabBarStyle: {
+                    backgroundColor: '#FFFFFF',
+                    borderTopColor: '#E5E7EB',
+                    height: 70,
+                    paddingBottom: 10,
+                    paddingTop: 10,
+                    elevation: 8,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: -2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 8,
+                },
+                tabBarActiveTintColor: '#FF6B35',
+                tabBarInactiveTintColor: '#9CA3AF',
+                tabBarLabelStyle: { fontSize: fontSize.xs, fontWeight: '600' },
+                tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
+                    switch (route.name) {
+                        case 'Home': iconName = focused ? 'home' : 'home-outline'; break;
+                        case 'Mentorship': iconName = focused ? 'people' : 'people-outline'; break;
+                        case 'Dashboard': iconName = focused ? 'stats-chart' : 'stats-chart-outline'; break;
+                        case 'Career': iconName = focused ? 'compass' : 'compass-outline'; break;
+                        case 'Profile': iconName = focused ? 'person' : 'person-outline'; break;
+                    }
+                    return <Ionicons name={iconName} size={24} color={color} />;
+                },
+            })}
+        >
+            <Tab.Screen name="Home" component={HomeStack} />
+            <Tab.Screen name="Mentorship" component={MentorshipStack} />
+
+            {/* Conditional Dashboard for Mentors */}
+            {isMentor && (
+                <Tab.Screen name="Dashboard" component={MentorDashboardScreen} />
+            )}
+
+            <Tab.Screen name="Career" component={CareerStack} />
+            <Tab.Screen name="Profile" component={ProfileStack} />
+        </Tab.Navigator>
+    );
+};
 
 // Root Navigator
 const RootNavigator = () => {

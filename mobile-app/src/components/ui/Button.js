@@ -14,10 +14,19 @@ const Button = ({
     icon,
     style,
     textStyle,
+    color,
     ...props
 }) => {
     const getButtonStyle = () => {
         const baseStyle = [styles.base, styles[size]];
+
+        if (color && !disabled) {
+            if (variant === 'primary') {
+                baseStyle.push({ backgroundColor: color });
+            } else if (variant === 'outline') {
+                baseStyle.push({ borderColor: color });
+            }
+        }
 
         if (disabled) {
             baseStyle.push(styles.disabled);
@@ -39,6 +48,9 @@ const Button = ({
 
         if (variant === 'outline' || variant === 'ghost') {
             baseTextStyle.push(styles.outlineText);
+            if (color && !disabled) {
+                baseTextStyle.push({ color: color });
+            }
         }
 
         if (disabled) {
@@ -58,7 +70,7 @@ const Button = ({
                 {...props}
             >
                 <LinearGradient
-                    colors={disabled ? ['#475569', '#334155'] : [colors.primary, colors.secondary]}
+                    colors={disabled ? ['#475569', '#334155'] : (color ? [color, color] : [colors.primary, colors.secondary])}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={[styles.base, styles[size], styles.gradient]}
@@ -85,7 +97,7 @@ const Button = ({
             {...props}
         >
             {loading ? (
-                <ActivityIndicator color={variant === 'outline' || variant === 'ghost' ? colors.primary : colors.white} />
+                <ActivityIndicator color={variant === 'outline' || variant === 'ghost' ? (color || colors.primary) : colors.white} />
             ) : (
                 <>
                     {icon}

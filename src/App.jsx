@@ -53,6 +53,7 @@ const UserManagementDashboard = lazy(() => import('./Pages/Admin/UserManagementD
 const ServerLogs = lazy(() => import('./Pages/Admin/ServerLogs'));
 const AnnouncementsDashboard = lazy(() => import('./Pages/Admin/Announcements'));
 const NotificationsPage = lazy(() => import('./Pages/Notifications'));
+const MentorProfileReview = lazy(() => import('./Pages/Admin/MentorProfileReview'));
 
 // 🧾 Forms Management
 const JobTitlesManagement = lazy(() => import('./Pages/Forms/JobTitles'));
@@ -207,6 +208,7 @@ function App() {
             <Route path="/admin/system-settings" element={<SystemSettings />} />
             <Route path="/admin/server-logs" element={<ServerLogs />} />
             <Route path="/admin/announcements" element={<AnnouncementsDashboard />} />
+            <Route path="/admin/profile-reviews" element={<MentorProfileReview />} />
           </Route>
 
           {/* 🏫 University Admin Routes */}

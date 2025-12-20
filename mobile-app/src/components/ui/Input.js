@@ -21,6 +21,7 @@ const Input = ({
     editable = true,
     style,
     inputStyle,
+    focusedColor,
     ...props
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -30,19 +31,23 @@ const Input = ({
 
     return (
         <View style={[styles.container, style]}>
-            {label && <Text style={styles.label}>{label}</Text>}
+            {label && <Text style={[styles.label, isFocused && { color: focusedColor || colors.primary }]}>{label}</Text>}
 
             <View
                 style={[
                     styles.inputContainer,
-                    isFocused && styles.focused,
+                    isFocused && { borderColor: focusedColor || colors.primary, borderWidth: 2 },
                     error && styles.error,
                     !editable && styles.disabled,
                 ]}
             >
                 {icon && (
                     <View style={styles.iconLeft}>
-                        {icon}
+                        {typeof icon === 'string' ? (
+                            <Ionicons name={icon} size={20} color={isFocused ? (focusedColor || colors.primary) : colors.textMuted} />
+                        ) : (
+                            icon
+                        )}
                     </View>
                 )}
 
@@ -66,6 +71,7 @@ const Input = ({
                     multiline={multiline}
                     numberOfLines={numberOfLines}
                     editable={editable}
+                    selectionColor={focusedColor || colors.primary}
                     {...props}
                 />
 

@@ -9,31 +9,36 @@ const Badge = ({
     size = 'md',
     style,
     textStyle,
+    color,
 }) => {
     const getBadgeStyle = () => {
         const baseStyle = [styles.badge, styles[size]];
 
-        switch (variant) {
-            case 'success':
-                baseStyle.push(styles.success);
-                break;
-            case 'warning':
-                baseStyle.push(styles.warning);
-                break;
-            case 'error':
-                baseStyle.push(styles.error);
-                break;
-            case 'info':
-                baseStyle.push(styles.info);
-                break;
-            case 'primary':
-                baseStyle.push(styles.primary);
-                break;
-            case 'secondary':
-                baseStyle.push(styles.secondary);
-                break;
-            default:
-                baseStyle.push(styles.default);
+        if (color && variant === 'primary') {
+            baseStyle.push({ backgroundColor: color + '20' });
+        } else {
+            switch (variant) {
+                case 'success':
+                    baseStyle.push(styles.success);
+                    break;
+                case 'warning':
+                    baseStyle.push(styles.warning);
+                    break;
+                case 'error':
+                    baseStyle.push(styles.error);
+                    break;
+                case 'info':
+                    baseStyle.push(styles.info);
+                    break;
+                case 'primary':
+                    baseStyle.push(styles.primary);
+                    break;
+                case 'secondary':
+                    baseStyle.push(styles.secondary);
+                    break;
+                default:
+                    baseStyle.push(styles.default);
+            }
         }
 
         return baseStyle;
@@ -44,6 +49,10 @@ const Badge = ({
 
         if (variant === 'warning') {
             baseTextStyle.push(styles.darkText);
+        }
+
+        if (color && variant === 'primary') {
+            baseTextStyle.push({ color: color });
         }
 
         return baseTextStyle;

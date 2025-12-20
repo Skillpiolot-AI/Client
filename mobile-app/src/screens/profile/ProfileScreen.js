@@ -1,30 +1,44 @@
-// Profile Screen
+// Profile/Settings Screen Redesign
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Switch, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
-import { Card, Avatar, Button, Input, Badge } from '../../components/ui';
-import { Header } from '../../components/layout';
-import { colors, fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { Avatar, Button, Input } from '../../components/ui';
+import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+
+// UI Reference Theme Colors
+export const uiTheme = {
+    primary: '#1A237E', // Navy Blue from reference
+    background: '#FFFFFF',
+    surface: '#F8F9FA',
+    text: '#000000',
+    textSecondary: '#4B5563',
+    textMuted: '#9CA3AF',
+    border: '#E5E7EB',
+    helpBg: '#EEF6F6', // Light teal/blue for help box
+    white: '#FFFFFF',
+    error: '#EF4444',
+};
 
 const ProfileScreen = ({ navigation }) => {
     const { user, logout, updateUser } = useAuth();
-    const [editing, setEditing] = useState(false);
+    const [view, setView] = useState('settings'); // 'settings' or 'edit'
     const [loading, setLoading] = useState(false);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [formData, setFormData] = useState({
-        name: user?.name || '',
+        firstName: user?.name?.split(' ')[0] || '',
+        lastName: user?.name?.split(' ').slice(1).join(' ') || '',
         email: user?.email || '',
         phone: user?.phone || '',
-        bio: user?.bio || '',
     });
 
     const handleSave = async () => {
         setLoading(true);
-        const result = await updateUser(formData);
+        const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+        const result = await updateUser({ ...formData, name: fullName });
         if (result.success) {
-            setEditing(false);
-            Alert.alert('Success', 'Profile updated');
+            setView('settings');
+            Alert.alert('Success', 'Profile updated successfully');
         } else {
             Alert.alert('Error', result.error);
         }
@@ -33,94 +47,313 @@ const ProfileScreen = ({ navigation }) => {
 
     const handleLogout = () => {
         Alert.alert('Logout', 'Are you sure you want to logout?', [
-            { text: 'Cancel' },
+            { text: 'Cancel', style: 'cancel' },
             { text: 'Logout', onPress: logout, style: 'destructive' },
         ]);
     };
 
-    const menuItems = [
-        { icon: 'person-outline', label: 'Edit Profile', action: () => setEditing(true) },
-        { icon: 'notifications-outline', label: 'Notifications', action: () => navigation.navigate('Notifications') },
-        { icon: 'shield-outline', label: 'Privacy & Security', action: () => { } },
-        { icon: 'help-circle-outline', label: 'Help & Support', action: () => { } },
-        { icon: 'information-circle-outline', label: 'About', action: () => { } },
-    ];
+    const handleWhatsApp = () => {
+        const phone = '+911234567890'; // Example phone
+        Linking.openURL(`whatsapp://send?phone=${phone}&text=Hello, I have a query regarding SkillPilot.`);
+    };
+
+    if (view === 'edit') {
+        return (
+            <View style={styles.container}>
+                <View style={styles.headerEdit}>
+                    <TouchableOpacity onPress={() => setView('settings')}>
+                        <Ionicons name="arrow-back" size={24} color={uiTheme.primary} />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitleEdit}>User Profile</Text>
+                    <View style={{ width: 24 }} />
+                </View>
+
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                    <View style={styles.avatarContainerEdit}>
+                        <View>
+                            <Avatar source={user?.profileImage} name={user?.name} size="xxxl" />
+                            <TouchableOpacity style={styles.cameraBadge}>
+                                <Ionicons name="camera-outline" size={16} color={uiTheme.textSecondary} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    <View style={styles.formContainer}>
+                        <Input
+                            label="First Name"
+                            value={formData.firstName}
+                            onChangeText={(v) => setFormData({ ...formData, firstName: v })}
+                            placeholder="John"
+                            focusedColor={uiTheme.primary}
+                        />
+                        <Input
+                            label="Last Name"
+                            value={formData.lastName}
+                            onChangeText={(v) => setFormData({ ...formData, lastName: v })}
+                            placeholder="Doe"
+                            focusedColor={uiTheme.primary}
+                        />
+                        <Input
+                            label="E-Mail"
+                            value={formData.email}
+                            onChangeText={(v) => setFormData({ ...formData, email: v })}
+                            keyboardType="email-address"
+                            placeholder="johndoe@gmail.com"
+                            focusedColor={uiTheme.primary}
+                        />
+                        <Input
+                            label="Mobile"
+                            value={formData.phone}
+                            onChangeText={(v) => setFormData({ ...formData, phone: v })}
+                            keyboardType="phone-pad"
+                            placeholder="+91-123456789"
+                            focusedColor={uiTheme.primary}
+                        />
+                    </View>
+
+                    <Button
+                        title="SAVE"
+                        variant="primary"
+                        onPress={handleSave}
+                        loading={loading}
+                        color={uiTheme.primary}
+                        style={styles.saveBtn}
+                        textStyle={styles.saveBtnText}
+                    />
+                </ScrollView>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
-            <Header title="Profile" showBack />
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Profile Header */}
-                <LinearGradient colors={[colors.primary, colors.secondary]} style={styles.header}>
-                    <Avatar source={user?.profileImage} name={user?.name} size="xxl" style={styles.avatar} />
-                    <Text style={styles.name}>{user?.name}</Text>
-                    <Text style={styles.email}>{user?.email}</Text>
-                    <Badge text={user?.role || 'User'} variant="primary" style={styles.badge} />
-                </LinearGradient>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                <Text style={styles.mainTitle}>Settings</Text>
 
-                {editing ? (
-                    <View style={styles.editForm}>
-                        <Input label="Name" value={formData.name} onChangeText={(v) => setFormData({ ...formData, name: v })} />
-                        <Input label="Email" value={formData.email} onChangeText={(v) => setFormData({ ...formData, email: v })} keyboardType="email-address" />
-                        <Input label="Phone" value={formData.phone} onChangeText={(v) => setFormData({ ...formData, phone: v })} keyboardType="phone-pad" />
-                        <Input label="Bio" value={formData.bio} onChangeText={(v) => setFormData({ ...formData, bio: v })} multiline />
-                        <View style={styles.editButtons}>
-                            <Button title="Cancel" variant="outline" onPress={() => setEditing(false)} style={styles.editBtn} />
-                            <Button title="Save" variant="gradient" loading={loading} onPress={handleSave} style={styles.editBtn} />
+                {/* User Info Card */}
+                <View style={styles.userCard}>
+                    <View style={styles.userCardLeft}>
+                        <Avatar source={user?.profileImage} name={user?.name} size="lg" />
+                        <View style={styles.userInfo}>
+                            <Text style={styles.welcomeLabel}>Welcome</Text>
+                            <Text style={styles.userName}>Mr. {user?.name}</Text>
                         </View>
                     </View>
-                ) : (
-                    <>
-                        {/* Stats */}
-                        <View style={styles.stats}>
-                            <View style={styles.stat}><Text style={styles.statNum}>{user?.assessments || 0}</Text><Text style={styles.statLabel}>Assessments</Text></View>
-                            <View style={styles.stat}><Text style={styles.statNum}>{user?.sessions || 0}</Text><Text style={styles.statLabel}>Sessions</Text></View>
-                            <View style={styles.stat}><Text style={styles.statNum}>{user?.courses || 0}</Text><Text style={styles.statLabel}>Courses</Text></View>
-                        </View>
+                    <TouchableOpacity onPress={handleLogout}>
+                        <Ionicons name="log-out-outline" size={24} color={uiTheme.primary} />
+                    </TouchableOpacity>
+                </View>
 
-                        {/* Menu */}
-                        <View style={styles.menu}>
-                            {menuItems.map((item, i) => (
-                                <TouchableOpacity key={i} style={styles.menuItem} onPress={item.action}>
-                                    <Ionicons name={item.icon} size={22} color={colors.primary} />
-                                    <Text style={styles.menuLabel}>{item.label}</Text>
-                                    <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
-                                </TouchableOpacity>
-                            ))}
+                {/* Settings Menu */}
+                <View style={styles.menuContainer}>
+                    <TouchableOpacity style={styles.menuRow} onPress={() => setView('edit')}>
+                        <View style={styles.menuRowLeft}>
+                            <Ionicons name="person-circle-outline" size={22} color={uiTheme.textSecondary} />
+                            <Text style={styles.menuLabel}>User Profile</Text>
                         </View>
+                        <Ionicons name="chevron-forward" size={20} color={uiTheme.primary} />
+                    </TouchableOpacity>
 
-                        {/* Logout */}
-                        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-                            <Ionicons name="log-out-outline" size={22} color={colors.error} />
-                            <Text style={styles.logoutText}>Logout</Text>
+                    {user?.role === 'Mentor' && (
+                        <TouchableOpacity style={styles.menuRow} onPress={() => navigation.navigate('Mentorship', { screen: 'EditMentorProfile' })}>
+                            <View style={styles.menuRowLeft}>
+                                <Ionicons name="briefcase-outline" size={22} color={uiTheme.textSecondary} />
+                                <Text style={styles.menuLabel}>Mentor Settings</Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={20} color={uiTheme.primary} />
                         </TouchableOpacity>
-                    </>
-                )}
-                <View style={{ height: 100 }} />
+                    )}
+
+                    <TouchableOpacity style={styles.menuRow}>
+                        <View style={styles.menuRowLeft}>
+                            <Ionicons name="lock-closed-outline" size={22} color={uiTheme.textSecondary} />
+                            <Text style={styles.menuLabel}>Change Password</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color={uiTheme.primary} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.menuRow}>
+                        <View style={styles.menuRowLeft}>
+                            <Ionicons name="help-circle-outline" size={22} color={uiTheme.textSecondary} />
+                            <Text style={styles.menuLabel}>FAQs</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color={uiTheme.primary} />
+                    </TouchableOpacity>
+
+                    <View style={styles.menuRow}>
+                        <View style={styles.menuRowLeft}>
+                            <Ionicons name="notifications-outline" size={22} color={uiTheme.textSecondary} />
+                            <Text style={styles.menuLabel}>Push Notification</Text>
+                        </View>
+                        <Switch
+                            value={notificationsEnabled}
+                            onValueChange={setNotificationsEnabled}
+                            trackColor={{ false: '#D1D5DB', true: '#4ADE80' }}
+                            thumbColor={uiTheme.white}
+                        />
+                    </View>
+                </View>
+
+                {/* Help Box */}
+
             </ScrollView>
+
+            {/* Bottom Nav Mock (Placeholder to match UI reference) */}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    header: { alignItems: 'center', padding: spacing.xl, paddingTop: spacing.lg },
-    avatar: { borderWidth: 4, borderColor: colors.white },
-    name: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, color: colors.white, marginTop: spacing.md },
-    email: { fontSize: fontSize.md, color: colors.white + 'CC' },
-    badge: { marginTop: spacing.sm },
-    stats: { flexDirection: 'row', justifyContent: 'space-around', padding: spacing.lg, backgroundColor: colors.surface, marginHorizontal: spacing.md, marginTop: -spacing.lg, borderRadius: borderRadius.xl },
-    stat: { alignItems: 'center' },
-    statNum: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.primary },
-    statLabel: { fontSize: fontSize.sm, color: colors.textSecondary },
-    menu: { margin: spacing.md },
-    menuItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, padding: spacing.md, borderRadius: borderRadius.lg, marginBottom: spacing.sm },
-    menuLabel: { flex: 1, marginLeft: spacing.md, fontSize: fontSize.md, color: colors.text },
-    logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', margin: spacing.md, padding: spacing.md, backgroundColor: colors.error + '20', borderRadius: borderRadius.lg },
-    logoutText: { marginLeft: spacing.sm, fontSize: fontSize.md, color: colors.error, fontWeight: fontWeight.semibold },
-    editForm: { padding: spacing.md },
-    editButtons: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.md },
-    editBtn: { flex: 1 },
+    container: {
+        flex: 1,
+        backgroundColor: uiTheme.background,
+    },
+    scrollContent: {
+        paddingHorizontal: 24,
+        paddingTop: 60,
+    },
+    mainTitle: {
+        fontSize: 32,
+        fontWeight: '700',
+        color: uiTheme.text,
+        marginBottom: 30,
+    },
+    userCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+        marginBottom: 30,
+    },
+    userCardLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    userInfo: {
+        marginLeft: 16,
+    },
+    welcomeLabel: {
+        fontSize: 12,
+        color: uiTheme.textMuted,
+        marginBottom: 2,
+    },
+    userName: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: uiTheme.text,
+    },
+    menuContainer: {
+        backgroundColor: uiTheme.white,
+        borderRadius: 16,
+        marginBottom: 40,
+    },
+    menuRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F3F4F6',
+    },
+    menuRowLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    menuLabel: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: uiTheme.text,
+        marginLeft: 16,
+    },
+    helpBox: {
+        backgroundColor: uiTheme.helpBg,
+        borderRadius: 16,
+        padding: 24,
+        alignItems: 'center',
+    },
+    helpText: {
+        fontSize: 14,
+        color: uiTheme.text,
+        textAlign: 'center',
+        lineHeight: 20,
+        marginBottom: 12,
+        fontWeight: '500',
+    },
+    whatsappLink: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: uiTheme.primary,
+        textDecorationLine: 'underline',
+    },
+    bottomNavMock: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        paddingVertical: 12,
+        borderTopWidth: 1,
+        borderTopColor: '#F3F4F6',
+        backgroundColor: uiTheme.white,
+        paddingBottom: 30,
+    },
+    navItem: {
+        alignItems: 'center',
+    },
+    navLabel: {
+        fontSize: 10,
+        color: uiTheme.textMuted,
+        marginTop: 4,
+    },
+    navLabelActive: {
+        fontSize: 10,
+        color: uiTheme.primary,
+        marginTop: 4,
+        fontWeight: '600',
+    },
+    // Edit View Styles
+    headerEdit: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingTop: 60,
+        paddingBottom: 20,
+    },
+    headerTitleEdit: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: uiTheme.text,
+    },
+    avatarContainerEdit: {
+        alignItems: 'center',
+        marginVertical: 30,
+    },
+    cameraBadge: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: uiTheme.white,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: uiTheme.border,
+        elevation: 2,
+    },
+    formContainer: {
+        marginBottom: 30,
+    },
+    saveBtn: {
+        borderRadius: 30,
+        height: 56,
+        marginBottom: 40,
+    },
+    saveBtnText: {
+        fontSize: 16,
+        fontWeight: '800',
+        letterSpacing: 1,
+    },
 });
 
 export default ProfileScreen;
