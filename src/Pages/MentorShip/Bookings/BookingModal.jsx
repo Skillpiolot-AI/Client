@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from 'react';
-import { X, Calendar, Clock, MessageSquare, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { X, Calendar, Clock, MessageSquare, AlertCircle, Loader2 } from 'lucide-react';
+import config from '../../../config';
 import './BookingModal.css';
 
 /**
  * BookingModal - Modal for scheduling a mentorship session
- * Shows a date/time picker limited to next 7 days
+ * Shows a date/time picker with smart slot availability
  */
 const BookingModal = ({
     isOpen,
@@ -19,6 +21,51 @@ const BookingModal = ({
     const [selectedTime, setSelectedTime] = useState('');
     const [remark, setRemark] = useState('');
     const [topics, setTopics] = useState('');
+    const [slots, setSlots] = useState([]);
+    const [slotsLoading, setSlotsLoading] = useState(false);
+    const [slotsError, setSlotsError] = useState(null);
+    const [dayMessage, setDayMessage] = useState('');
+
+    useEffect(() => {
+        if (selectedDate && mentor) {
+            fetchAvailableSlots(selectedDate);
+        } else {
+            setSlots([]);
+            setDayMessage('');
+        }
+        setSelectedTime('');
+    }, [selectedDate, mentor]);
+
+    const fetchAvailableSlots = async (date) => {
+        setSlotsLoading(true);
+        setSlotsError(null);
+        setDayMessage('');
+
+        try {
+            const mentorProfileId = mentor.mentorProfileId || mentor.id || mentor._id;
+            const response = await axios.get(
+                `${config.API_BASE_URL}/bookings/available-slots/${mentorProfileId}?date=${date}`
+            );
+
+            const data = response.data;
+
+            if (data.isBusyDate || data.isWeeklyUnavailable) {
+                setSlots([]);
+                setDayMessage(data.message || 'Mentor is unavailable on this date');
+            } else {
+                setSlots(data.slots || []);
+                if (data.availableCount === 0) {
+                    setDayMessage('All slots are booked for this date');
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching slots:', error);
+            setSlotsError('Failed to load available slots');
+            setSlots([]);
+        } finally {
+            setSlotsLoading(false);
+        }
+    };
 
     if (!isOpen || !mentor) return null;
 
@@ -43,19 +90,6 @@ const BookingModal = ({
         return days;
     };
 
-    // Generate time slots (9 AM to 9 PM)
-    const getTimeSlots = () => {
-        const slots = [];
-        for (let hour = 9; hour <= 21; hour++) {
-            const time24 = `${hour.toString().padStart(2, '0')}:00`;
-            const time12 = hour <= 12
-                ? `${hour}:00 ${hour < 12 ? 'AM' : 'PM'}`
-                : `${hour - 12}:00 PM`;
-            slots.push({ value: time24, label: time12 });
-        }
-        return slots;
-    };
-
     const handleSubmit = () => {
         if (!selectedDate || !selectedTime) return;
 
@@ -71,7 +105,8 @@ const BookingModal = ({
     };
 
     const nextSevenDays = getNextSevenDays();
-    const timeSlots = getTimeSlots();
+    const availableSlots = slots.filter(s => s.isAvailable);
+    const bookedSlots = slots.filter(s => s.isBooked);
 
     return (
         <div className="booking-modal-overlay" onClick={onClose}>
@@ -129,18 +164,48 @@ const BookingModal = ({
                     <label>
                         <Clock size={16} />
                         Select Time
+                        {selectedDate && !slotsLoading && availableSlots.length > 0 && (
+                            <span className="slot-count">
+                                ({availableSlots.length} available)
+                            </span>
+                        )}
                     </label>
-                    <div className="time-grid">
-                        {timeSlots.map(slot => (
-                            <button
-                                key={slot.value}
-                                className={`time-btn ${selectedTime === slot.value ? 'selected' : ''}`}
-                                onClick={() => setSelectedTime(slot.value)}
-                            >
-                                {slot.label}
-                            </button>
-                        ))}
-                    </div>
+
+                    {!selectedDate ? (
+                        <div className="slots-placeholder">
+                            <Calendar size={24} />
+                            <p>Please select a date to see available slots</p>
+                        </div>
+                    ) : slotsLoading ? (
+                        <div className="slots-loading">
+                            <Loader2 size={24} className="spin" />
+                            <p>Loading available slots...</p>
+                        </div>
+                    ) : slotsError ? (
+                        <div className="slots-error">
+                            <AlertCircle size={24} />
+                            <p>{slotsError}</p>
+                        </div>
+                    ) : dayMessage ? (
+                        <div className="slots-unavailable">
+                            <AlertCircle size={24} />
+                            <p>{dayMessage}</p>
+                        </div>
+                    ) : (
+                        <div className="time-grid">
+                            {slots.map(slot => (
+                                <button
+                                    key={slot.time}
+                                    className={`time-btn ${selectedTime === slot.time ? 'selected' : ''} ${slot.isBooked ? 'booked' : ''}`}
+                                    onClick={() => !slot.isBooked && setSelectedTime(slot.time)}
+                                    disabled={slot.isBooked}
+                                >
+                                    {slot.label}
+                                    {slot.isBooked && <span className="booked-label">Booked</span>}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Remark/Message */}
@@ -199,6 +264,66 @@ const BookingModal = ({
                     </button>
                 </div>
             </div>
+
+            <style jsx>{`
+                .slots-placeholder,
+                .slots-loading,
+                .slots-error,
+                .slots-unavailable {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 24px;
+                    background: #f8fafc;
+                    border-radius: 12px;
+                    color: #64748b;
+                    text-align: center;
+                    gap: 8px;
+                }
+
+                .slots-error {
+                    background: #fef2f2;
+                    color: #dc2626;
+                }
+
+                .slots-unavailable {
+                    background: #fef3c7;
+                    color: #d97706;
+                }
+
+                .slot-count {
+                    font-weight: normal;
+                    color: #059669;
+                    margin-left: 8px;
+                }
+
+                .time-btn.booked {
+                    background: #fee2e2 !important;
+                    color: #dc2626 !important;
+                    border-color: #fecaca !important;
+                    cursor: not-allowed;
+                    position: relative;
+                    opacity: 0.8;
+                }
+
+                .time-btn .booked-label {
+                    display: block;
+                    font-size: 9px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-top: 2px;
+                }
+
+                .spin {
+                    animation: spin 1s linear infinite;
+                }
+
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     );
 };
