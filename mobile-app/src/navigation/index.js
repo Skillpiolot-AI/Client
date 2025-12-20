@@ -13,7 +13,7 @@ import { WelcomeScreen, LoginScreen, SignupScreen, ForgotPasswordScreen, VerifyE
 
 // Main Screens
 import { HomeScreen, DashboardScreen } from '../screens/home';
-import { MentorListScreen, BookSessionScreen, MyBookingsScreen, MentorDashboardScreen, EditMentorProfileScreen } from '../screens/mentorship';
+import { MentorListScreen, BookSessionScreen, MyBookingsScreen, MentorDashboardScreen, EditMentorProfileScreen, MentorDetailScreen } from '../screens/mentorship';
 import { ProfileScreen } from '../screens/profile';
 import { CareerQuizScreen, RecommendationsScreen } from '../screens/career';
 import { AssessmentScreen, AssessmentQuizScreen } from '../screens/assessment';
@@ -50,6 +50,7 @@ const HomeStack = () => (
 const MentorshipStack = () => (
     <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="MentorList" component={MentorListScreen} />
+        <Stack.Screen name="MentorDetail" component={MentorDetailScreen} />
         <Stack.Screen name="BookSession" component={BookSessionScreen} />
         <Stack.Screen name="MyBookings" component={MyBookingsScreen} />
     </Stack.Navigator>
@@ -69,6 +70,7 @@ const CareerStack = () => (
 const ProfileStack = () => (
     <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+        <Stack.Screen name="EditMentorProfile" component={EditMentorProfileScreen} />
     </Stack.Navigator>
 );
 

@@ -155,7 +155,7 @@ const ProfileScreen = ({ navigation }) => {
                     </TouchableOpacity>
 
                     {user?.role === 'Mentor' && (
-                        <TouchableOpacity style={styles.menuRow} onPress={() => navigation.navigate('Mentorship', { screen: 'EditMentorProfile' })}>
+                        <TouchableOpacity style={styles.menuRow} onPress={() => navigation.navigate('EditMentorProfile')}>
                             <View style={styles.menuRowLeft}>
                                 <Ionicons name="briefcase-outline" size={22} color={uiTheme.textSecondary} />
                                 <Text style={styles.menuLabel}>Mentor Settings</Text>

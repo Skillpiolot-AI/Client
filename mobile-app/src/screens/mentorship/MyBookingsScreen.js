@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { useAuth } from '../../context/AuthContext';
 import mentorshipAPI from '../../services/mentorshipAPI';
 
 // White Theme Colors
@@ -28,6 +29,8 @@ const whiteTheme = {
 };
 
 const MyBookingsScreen = ({ navigation }) => {
+    const { user } = useAuth();
+    const isMentor = user?.role === 'Mentor';
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -39,14 +42,18 @@ const MyBookingsScreen = ({ navigation }) => {
 
     const fetchBookings = async () => {
         try {
-            const response = await mentorshipAPI.getMyBookings();
+            setLoading(true);
+            const response = isMentor
+                ? await mentorshipAPI.getMentorSessions()
+                : await mentorshipAPI.getMyBookings();
+
             // API returns: { bookings: [...] } or just array
-            console.log('Bookings response keys:', Object.keys(response || {}));
+            console.log(`${isMentor ? 'Mentor' : 'Student'} Bookings response keys:`, Object.keys(response || {}));
             const bookingData = response?.bookings || response?.data?.bookings || response || [];
-            console.log('Bookings count:', bookingData.length);
+            console.log(`${isMentor ? 'Mentor' : 'Student'} Bookings count:`, bookingData.length);
             setBookings(Array.isArray(bookingData) ? bookingData : []);
         } catch (error) {
-            console.log('Fetch bookings error:', error);
+            console.log(`Fetch ${isMentor ? 'mentor' : 'my'} bookings error:`, error);
         } finally {
             setLoading(false);
         }
@@ -133,14 +140,11 @@ const MyBookingsScreen = ({ navigation }) => {
         const statusStyle = getStatusStyle(item.status);
 
         // Backend populates: 
-        // - mentorId with User: { name, email, imageUrl }
-        // - mentorProfileId with MentorProfile: { displayName, tagline, profileImage }
-        const mentorName = item.mentorProfileId?.displayName ||
-            item.mentorId?.name ||
-            item.mentor?.name ||
-            'Mentor';
-        const mentorImage = item.mentorProfileId?.profileImage ||
-            item.mentorId?.imageUrl;
+        // For Students: mentorId (User) and mentorProfileId (Profile)
+        // For Mentors: userId (User who booked)
+        const displayUser = isMentor ? (item.userId || {}) : (item.mentorProfileId || item.mentorId || item.mentor || {});
+        const displayName = isMentor ? (displayUser.name || 'Student') : (displayUser.displayName || displayUser.name || 'Mentor');
+        const displayImage = isMentor ? displayUser.imageUrl : (displayUser.profileImage || displayUser.imageUrl);
 
         // Use scheduledAt field (from backend) or fallback to date/time
         const sessionDate = item.scheduledAt || item.date;
@@ -149,18 +153,18 @@ const MyBookingsScreen = ({ navigation }) => {
             <View style={styles.card}>
                 {/* Mentor Info Row */}
                 <View style={styles.row}>
-                    {mentorImage ? (
-                        <Image source={{ uri: mentorImage }} style={styles.avatar} />
+                    {displayImage ? (
+                        <Image source={{ uri: displayImage }} style={styles.avatar} />
                     ) : (
                         <View style={styles.avatarPlaceholder}>
                             <Text style={styles.avatarText}>
-                                {mentorName.charAt(0).toUpperCase()}
+                                {displayName.charAt(0).toUpperCase()}
                             </Text>
                         </View>
                     )}
 
                     <View style={styles.info}>
-                        <Text style={styles.name}>{mentorName}</Text>
+                        <Text style={styles.name}>{displayName}</Text>
                         <View style={styles.dateRow}>
                             <Ionicons name="calendar-outline" size={14} color={whiteTheme.textSecondary} />
                             <Text style={styles.dateText}>{formatDate(sessionDate)}</Text>
@@ -251,7 +255,7 @@ const MyBookingsScreen = ({ navigation }) => {
                 <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
                     <Ionicons name="chevron-back" size={24} color={whiteTheme.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>My Bookings</Text>
+                <Text style={styles.headerTitle}>{isMentor ? 'My Sessions' : 'My Bookings'}</Text>
                 <View style={{ width: 44 }} />
             </View>
 
@@ -287,18 +291,20 @@ const MyBookingsScreen = ({ navigation }) => {
                 ListEmptyComponent={
                     <View style={styles.empty}>
                         <Ionicons name="calendar-outline" size={64} color={whiteTheme.textMuted} />
-                        <Text style={styles.emptyTitle}>No Bookings Found</Text>
+                        <Text style={styles.emptyTitle}>No Sessions Found</Text>
                         <Text style={styles.emptyText}>
-                            {filter === 'all'
-                                ? "You haven't booked any sessions yet"
-                                : `No ${filter} bookings`}
+                            {isMentor
+                                ? "You don't have any booked sessions with students yet."
+                                : "You haven't booked any sessions yet."}
                         </Text>
-                        <TouchableOpacity
-                            style={styles.browseBtn}
-                            onPress={() => navigation.navigate('MentorList')}
-                        >
-                            <Text style={styles.browseBtnText}>Browse Mentors</Text>
-                        </TouchableOpacity>
+                        {!isMentor && (
+                            <TouchableOpacity
+                                style={styles.browseBtn}
+                                onPress={() => navigation.navigate('MentorList')}
+                            >
+                                <Text style={styles.browseBtnText}>Browse Mentors</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 }
             />

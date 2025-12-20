@@ -107,12 +107,12 @@ const MentorDashboardScreen = ({ navigation }) => {
                 <View style={[styles.kpiBox, { backgroundColor: '#1E88E5' }]}>
                     <Ionicons name="calendar-outline" size={24} color="#FFF" />
                     <Text style={styles.kpiBoxLabel}>This Week</Text>
-                    <Text style={styles.kpiBoxValue}>{stats?.thisWeek || 0}</Text>
+                    <Text style={styles.kpiBoxValue}>{stats?.weekSessions || 0}</Text>
                 </View>
                 <View style={[styles.kpiBox, { backgroundColor: '#4FC3F7' }]}>
                     <Ionicons name="calendar" size={24} color="#FFF" />
                     <Text style={styles.kpiBoxLabel}>This Month</Text>
-                    <Text style={styles.kpiBoxValue}>{stats?.thisMonth || 0}</Text>
+                    <Text style={styles.kpiBoxValue}>{stats?.monthSessions || 0}</Text>
                 </View>
             </View>
 
@@ -133,6 +133,25 @@ const MentorDashboardScreen = ({ navigation }) => {
                     withVerticalLines={false}
                     withHorizontalLines={true}
                 />
+            </View>
+
+            {/* Recent Sessions Heading */}
+            <View style={styles.sectionHeaderRow}>
+                <Text style={styles.sectionTitle}>Sessions</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('MyBookings')}>
+                    <Text style={styles.viewAllText}>View All</Text>
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.sessionsPlaceholder}>
+                <View style={styles.placeholderRow}>
+                    <Ionicons name="calendar-outline" size={32} color="#6B7280" />
+                    <View style={styles.placeholderContent}>
+                        <Text style={styles.placeholderTitle}>Track all your mentor sessions</Text>
+                        <Text style={styles.placeholderSub}>View history and upcoming student calls</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={24} color="#6B7280" />
+                </View>
             </View>
 
             {/* Growth Section Mock (Matching Reference) */}
@@ -297,7 +316,42 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         fontWeight: '500',
         flex: 1,
-    }
+    },
+    sectionHeaderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    viewAllText: {
+        fontSize: 14,
+        color: '#1A237E',
+        fontWeight: '600',
+    },
+    sessionsPlaceholder: {
+        backgroundColor: '#F3F4F6',
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 24,
+    },
+    placeholderRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    placeholderContent: {
+        flex: 1,
+        marginLeft: 12,
+    },
+    placeholderTitle: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#000',
+    },
+    placeholderSub: {
+        fontSize: 12,
+        color: '#6B7280',
+        marginTop: 2,
+    },
 });
 
 export default MentorDashboardScreen;
