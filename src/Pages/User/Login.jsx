@@ -52,7 +52,7 @@ export default function LoginPage() {
         window.location.href = "/teacher/dashboard"
         break
       case "Mentor":
-        window.location.href = "/mentorDashboard"
+        window.location.href = "/mentor-profile"
         break
       case "User":
       default:

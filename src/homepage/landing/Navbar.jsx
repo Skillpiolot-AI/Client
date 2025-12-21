@@ -90,7 +90,7 @@ export default function Navbar() {
             { name: "📚 Resources", path: "/view-books" },
         ],
         Mentor: [
-            { name: "👤 My Profile", path: "/mentorDashboard" },
+            { name: "👤 My Profile", path: "/mentor-profile" },
             { name: "🔔 Notifications", path: "/notifications" },
             { name: "📅 My Sessions", path: "/mentor-sessions" },
             { name: "🎓 Mentor Panel", path: "/amdashboard" },
