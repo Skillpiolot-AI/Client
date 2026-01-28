@@ -1,6 +1,7 @@
 {
     "cli": {
-        "version": ">= 15.0.0"
+        "version": ">= 15.0.0",
+        "appVersionSource": "remote"
     },
     "build": {
         "development": {
@@ -16,13 +17,35 @@
                 "buildType": "apk"
             }
         },
-        "production": {
+        "internal": {
+            "distribution": "store",
             "android": {
-                "buildType": "app-bundle"
+                "buildType": "app-bundle",
+                "autoIncrement": "versionCode"
+            }
+        },
+        "production": {
+            "distribution": "store",
+            "android": {
+                "buildType": "app-bundle",
+                "autoIncrement": "versionCode"
             }
         }
     },
     "submit": {
-        "production": {}
+        "internal": {
+            "android": {
+                "serviceAccountKeyPath": "./google-service-account.json",
+                "track": "internal",
+                "releaseStatus": "draft"
+            }
+        },
+        "production": {
+            "android": {
+                "serviceAccountKeyPath": "./google-service-account.json",
+                "track": "production",
+                "releaseStatus": "draft"
+            }
+        }
     }
 }

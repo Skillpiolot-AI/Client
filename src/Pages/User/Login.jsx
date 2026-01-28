@@ -8,10 +8,15 @@ import { GoogleLogin } from '@react-oauth/google'
 import axios from "axios"
 import { toast } from "react-hot-toast"
 import config from "../../config"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Get the page user was trying to access before login
+  const from = location.state?.from || null
+
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [form, setForm] = useState({
@@ -41,6 +46,14 @@ export default function LoginPage() {
   const redirectBasedOnRole = (userRole) => {
     console.log("Redirecting user with role:", userRole)
 
+    // If user was trying to access a specific page before login, redirect them there
+    if (from) {
+      console.log("Redirecting to previous page:", from)
+      window.location.href = from
+      return
+    }
+
+    // Otherwise, redirect based on role
     switch (userRole) {
       case "Admin":
         window.location.href = "/amdashboard"
@@ -116,9 +129,9 @@ export default function LoginPage() {
       }, 100)
     } catch (error) {
       console.error("❌ Login error:", error.response?.data || error.message)
-      
+
       const errorResponse = error.response?.data
-      
+
       if (error.response?.status === 400) {
         setErrors({
           username: "",
@@ -164,10 +177,10 @@ export default function LoginPage() {
   // Handle Google Login Success
   const handleGoogleSuccess = async (credentialResponse) => {
     console.log('🔐 Google login initiated')
-    
+
     try {
       setIsLoading(true)
-      
+
       const { data } = await axios.post(`${config.API_BASE_URL}/auth/google`, {
         credential: credentialResponse.credential
       })
@@ -177,7 +190,7 @@ export default function LoginPage() {
       if (data.success) {
         localStorage.setItem("token", data.token)
         localStorage.setItem("role", data.role)
-        
+
         if (data.user) {
           localStorage.setItem("user", JSON.stringify(data.user))
         }
@@ -190,7 +203,7 @@ export default function LoginPage() {
       }
     } catch (error) {
       console.error("❌ Google login error:", error)
-      
+
       const errorMessage = error.response?.data?.message || "Google login failed. Please try again."
       setErrors({
         username: "",
@@ -264,16 +277,16 @@ export default function LoginPage() {
                 <div className="flex-1">
                   <p className="text-sm text-red-800">{errors.general}</p>
                   {errors.general.includes("No account found") && (
-                    <Link 
-                      to="/signup" 
+                    <Link
+                      to="/signup"
                       className="text-sm font-medium text-red-600 hover:text-red-700 mt-1 inline-block"
                     >
                       Create an account →
                     </Link>
                   )}
                   {errors.general.includes("locked") && (
-                    <Link 
-                      to="/forgot-password" 
+                    <Link
+                      to="/forgot-password"
                       className="text-sm font-medium text-red-600 hover:text-red-700 mt-1 inline-block"
                     >
                       Reset your password →
@@ -298,9 +311,8 @@ export default function LoginPage() {
                   onChange={handleChange}
                   placeholder="Enter your username, email, or registration number"
                   required
-                  className={`h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${
-                    errors.username ? 'border-red-300 focus:border-red-500' : ''
-                  }`}
+                  className={`h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.username ? 'border-red-300 focus:border-red-500' : ''
+                    }`}
                 />
                 {errors.username && (
                   <p className="text-sm text-red-600 flex items-center space-x-1">
@@ -324,9 +336,8 @@ export default function LoginPage() {
                     onChange={handleChange}
                     placeholder="Enter your password"
                     required
-                    className={`h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${
-                      errors.password ? 'border-red-300 focus:border-red-500' : ''
-                    }`}
+                    className={`h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.password ? 'border-red-300 focus:border-red-500' : ''
+                      }`}
                   />
                   <Button
                     type="button"
@@ -407,8 +418,8 @@ export default function LoginPage() {
             {/* Sign Up Link */}
             <div className="text-center text-sm">
               <span className="text-muted-foreground">Don't have an account? </span>
-              <Link 
-                to="/signup" 
+              <Link
+                to="/signup"
                 className="font-medium text-[#3F3FF3] hover:text-[#2F2FD3] transition-colors"
               >
                 Sign up
