@@ -1,103 +1,103 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import './assesment/styles/global.css';
+import './features/assessment/styles/global.css';
 
 // 🧭 Core Pages
-const Landingpage = lazy(() => import("./homepage/pages/LandingPage"));
-const Home = lazy(() => import('./Pages/Home'));
-const Recommendation = lazy(() => import('./Pages/Recommendation/Recommendation'));
-const JobDetails = lazy(() => import('./Pages/Recommendation/RecommDetails'));
-const NotFound = lazy(() => import('./Pages/Error/NotFound'));
-const Dashboard = lazy(() => import('./Pages/DashBoard'));
+const Landingpage = lazy(() => import("./layouts/LandingPage"));
+const Home = lazy(() => import('./scrape/Home'));
+const Recommendation = lazy(() => import('./features/career/recommendation/Recommendation'));
+const JobDetails = lazy(() => import('./features/career/recommendation/RecommDetails'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Dashboard = lazy(() => import('./features/dashboard/DashBoard'));
 
 // 🔐 Auth Pages
-const LoginForm = lazy(() => import('./Pages/User/Login'));
-const SignupForm = lazy(() => import('./Pages/User/Signup'));
-const ProtectedRoute = lazy(() => import('./Pages/Protection/ProtectedRoute'));
-const GoogleProfileCompletion = lazy(() => import('./Pages/User/GoogleProfileCompletion'));
-const Forgotpassword = lazy(() => import('./Pages/User/ForgotPassword'));
-const Changepassword = lazy(() => import('./Pages/User/ChangePassword'));
-const VerifyEmail = lazy(() => import('./Pages/User/VerifyEmail'));
-const VerifyLogin = lazy(() => import('./Pages/User/VerifyLogin'));
+const LoginForm = lazy(() => import('./features/auth/Login'));
+const SignupForm = lazy(() => import('./features/auth/Signup'));
+const ProtectedRoute = lazy(() => import('./routes/ProtectedRoute'));
+const GoogleProfileCompletion = lazy(() => import('./features/auth/GoogleProfileCompletion'));
+const Forgotpassword = lazy(() => import('./features/auth/ForgotPassword'));
+const Changepassword = lazy(() => import('./features/auth/ChangePassword'));
+const VerifyEmail = lazy(() => import('./features/auth/VerifyEmail'));
+const VerifyLogin = lazy(() => import('./features/auth/VerifyLogin'));
 
 // 🎓 Career & Mentorship
-const CareerForm = lazy(() => import('./Pages/Forms/CareerForm'));
-const CareerRecommendationForm = lazy(() => import('./Pages/Forms/Questions'));
-const RecommendationForm = lazy(() => import('./Pages/Forms/Recommendation'));
-const CreativeApplicationForm = lazy(() => import('./Pages/MentorShip/Form'));
-const AdminApplicationsPage = lazy(() => import('./Pages/MentorShip/MentorApplication'));
-const ApplicationTracker = lazy(() => import('./Pages/MentorShip/Tracker'));
-const MentorRegistrationForm = lazy(() => import('./Pages/MentorShip/Registor'));
-const MentorList = lazy(() => import('./Pages/MentorShip/MentorList'));
-const MentorAppointments = lazy(() => import('./Pages/MentorShip/MentorAppointments'));
-const UserAppointments = lazy(() => import('./Pages/MentorShip/UserAppointment'));
-const MentorFeedback = lazy(() => import('./Pages/MentorShip/MentoFeedback'));
-const ScheduleSession = lazy(() => import('./Pages/MentorShip/BookAppointment'));
-const MentorshipPage = lazy(() => import('./Pages/Mentor Home/HomePage'));
-const MentoHome = lazy(() => import('./Pages/MentoHome'));
-const CoachProfile = lazy(() => import('./Pages/DashBoard/MentorDashBoard'));
-const AMDashboard = lazy(() => import('./Pages/DashBoard/AdminMento'));
-const Profile = lazy(() => import('./Pages/Profile'));
-const MyBookings = lazy(() => import('./Pages/MentorShip/Bookings/MyBookings'));
-const MentorSessions = lazy(() => import('./Pages/MentorShip/Bookings/MentorSessions'));
-const RateSession = lazy(() => import('./Pages/MentorShip/RateSession'));
+const CareerForm = lazy(() => import('./features/forms/CareerForm'));
+const CareerRecommendationForm = lazy(() => import('./features/forms/Questions'));
+const RecommendationForm = lazy(() => import('./features/forms/Recommendation'));
+const CreativeApplicationForm = lazy(() => import('./features/mentorship/Form'));
+const AdminApplicationsPage = lazy(() => import('./features/mentorship/application/admin'));
+const ApplicationTracker = lazy(() => import('./features/mentorship/Tracker'));
+const MentorRegistrationForm = lazy(() => import('./features/mentorship/Registor'));
+const MentorList = lazy(() => import('./features/mentorship/list/MentorList'));
+const MentorAppointments = lazy(() => import('./features/mentorship/sessions/MentorAppointments'));
+const UserAppointments = lazy(() => import('./features/mentorship/sessions/UserAppointment'));
+const MentorFeedback = lazy(() => import('./features/mentorship/MentoFeedback'));
+const ScheduleSession = lazy(() => import('./features/mentorship/sessions/BookAppointment'));
+const MentorshipPage = lazy(() => import('./features/mentorship/HomePage'));
+const MentoHome = lazy(() => import('./scrape/MentoHome'));
+const CoachProfile = lazy(() => import('./features/dashboard/DashBoard/MentorDashBoard'));
+const AMDashboard = lazy(() => import('./features/dashboard/DashBoard/AdminMento'));
+const Profile = lazy(() => import('./features/profile'));
+const MyBookings = lazy(() => import('./features/mentorship/bookings/MyBookings'));
+const MentorSessions = lazy(() => import('./features/mentorship/bookings/MentorSessions'));
+const RateSession = lazy(() => import('./features/mentorship/sessions/RateSession'));
 
 // 🏫 Admin & University Management
-const AdminDashboard = lazy(() => import('./Pages/Admin/DashBoard'));
-const AnalyticsDashboard = lazy(() => import('./Pages/Admin/Analytics/AnalyticsDashboard'));
-const SystemSettings = lazy(() => import('./Pages/Admin/SystemSettings'));
-const AdminUniversityManagement = lazy(() => import('./Pages/University/AdminUniversityManagement'));
-const UniAdminPortal = lazy(() => import('./Pages/University/UniAdminPortal'));
-const TeacherDashboard = lazy(() => import('./Pages/University/TeacherDashboard'));
-const AdminUserManagement = lazy(() => import('./Pages/Admin/AdminUserManagement'));
-const UserManagementDashboard = lazy(() => import('./Pages/Admin/UserManagementDashboard'));
-const ServerLogs = lazy(() => import('./Pages/Admin/ServerLogs'));
-const AnnouncementsDashboard = lazy(() => import('./Pages/Admin/Announcements'));
-const NotificationsPage = lazy(() => import('./Pages/Notifications'));
-const MentorProfileReview = lazy(() => import('./Pages/Admin/MentorProfileReview'));
-const MentorProfilePage = lazy(() => import('./pages/MentorProfile'));
+const AdminDashboard = lazy(() => import('./features/admin/dashboard/DashBoard'));
+const AnalyticsDashboard = lazy(() => import('./features/admin/analytics/AnalyticsDashboard'));
+const SystemSettings = lazy(() => import('./features/admin/settings'));
+const AdminUniversityManagement = lazy(() => import('./features/university/AdminUniversityManagement'));
+const UniAdminPortal = lazy(() => import('./features/university/UniAdminPortal'));
+const TeacherDashboard = lazy(() => import('./features/university/TeacherDashboard'));
+const AdminUserManagement = lazy(() => import('./features/admin/users/AdminUserManagement'));
+const UserManagementDashboard = lazy(() => import('./features/admin/users/UserManagementDashboard'));
+const ServerLogs = lazy(() => import('./features/admin/logs/ServerLogs'));
+const AnnouncementsDashboard = lazy(() => import('./features/admin/announcements'));
+const NotificationsPage = lazy(() => import('./features/notifications'));
+const MentorProfileReview = lazy(() => import('./features/admin/users/MentorProfileReview'));
+const MentorProfilePage = lazy(() => import('./features/mentorship/profile'));
 
 // 🧾 Forms Management
-const JobTitlesManagement = lazy(() => import('./Pages/Forms/JobTitles'));
-const CompaniesManagement = lazy(() => import('./Pages/Forms/CompaniesManagement'));
-const InterestManagement = lazy(() => import('./Pages/Forms/InterestManagement'));
-const StrengthManagement = lazy(() => import('./Pages/Forms/StrengthManagement'));
-const SkillsManagement = lazy(() => import('./Pages/Forms/SkillsManagement'));
-const CollegesManagement = lazy(() => import('./Pages/Forms/CollegesManagement'));
-const AddWorkshop = lazy(() => import('./Pages/Forms/AddWorkshop'));
+const JobTitlesManagement = lazy(() => import('./features/forms/JobTitles'));
+const CompaniesManagement = lazy(() => import('./features/forms/CompaniesManagement'));
+const InterestManagement = lazy(() => import('./features/forms/InterestManagement'));
+const StrengthManagement = lazy(() => import('./features/forms/StrengthManagement'));
+const SkillsManagement = lazy(() => import('./features/forms/SkillsManagement'));
+const CollegesManagement = lazy(() => import('./features/forms/CollegesManagement'));
+const AddWorkshop = lazy(() => import('./features/forms/AddWorkshop'));
 
 // 🎥 Learning & Resources
-const VideoForm = lazy(() => import('./Pages/Educate/VideoForm'));
-const VideoList = lazy(() => import('./Pages/Educate/VideoList'));
-const AddResourcePage = lazy(() => import('./Pages/Resourses/AddResourses'));
-const ViewBooksPage = lazy(() => import('./Pages/Resourses/ViewResourses'));
-const AvailableWorkshops = lazy(() => import('./Pages/Workshops/AvailableWorkshops'));
+const VideoForm = lazy(() => import('./features/education/VideoForm'));
+const VideoList = lazy(() => import('./features/education/VideoList'));
+const AddResourcePage = lazy(() => import('./features/resources/AddResourses'));
+const ViewBooksPage = lazy(() => import('./features/resources/ViewResourses'));
+const AvailableWorkshops = lazy(() => import('./features/education/AvailableWorkshops'));
 
 // 🧠 Career Tools
-const CareerQuiz = lazy(() => import('./Pages/Quiz/Quiz'));
-const CombinedCareerAdvisor = lazy(() => import('./Pages/Quiz/Prediction'));
-const ChatCareerAdvisor = lazy(() => import('./Pages/Roadmap/Roadmap'));
-const RecommendationJobTitlesSearch = lazy(() => import('./Pages/Recommendation/JobTitle'));
-const JobInfo = lazy(() => import('./Pages/Recommendation/jobinfo'));
-const DummyJobInfo = lazy(() => import('./Pages/Recommendation/DummyInfo'));
-const TechCareerPathsHub = lazy(() => import('./Roadmap/Roadmap'));
-const FrontendRoadmap = lazy(() => import('./Roadmap/Frontend'));
-const DetailedDataScientistRoadmap = lazy(() => import('./Roadmap/DataScientist'));
-const AssessmentApp = lazy(() => import('./Assesment/AssessmentApp'));
+const CareerQuiz = lazy(() => import('./features/career/quiz/Quiz'));
+const CombinedCareerAdvisor = lazy(() => import('./features/career/quiz/Prediction'));
+const ChatCareerAdvisor = lazy(() => import('./features/career/roadmap/Roadmap'));
+const RecommendationJobTitlesSearch = lazy(() => import('./features/career/recommendation/JobTitle'));
+const JobInfo = lazy(() => import('./features/career/recommendation/jobinfo'));
+const DummyJobInfo = lazy(() => import('./features/career/recommendation/DummyInfo'));
+const TechCareerPathsHub = lazy(() => import('./features/career/roadmap/Roadmap'));
+const FrontendRoadmap = lazy(() => import('./features/career/roadmap/Frontend'));
+const DetailedDataScientistRoadmap = lazy(() => import('./features/career/roadmap/DataScientist'));
+const AssessmentApp = lazy(() => import('./features/assessment/AssessmentApp'));
 
 // 🧩 Community & Updates
-const ModernCommunityPage = lazy(() => import('./Pages/community/community'));
-const UpdatesPage = lazy(() => import('./Pages/updates/UpdatesPage'));
-const AdminUpdatesPage = lazy(() => import('./Pages/updates/AdminUpdatesPage'));
+const ModernCommunityPage = lazy(() => import('./features/community/community'));
+const UpdatesPage = lazy(() => import('./features/updates/UpdatesPage'));
+const AdminUpdatesPage = lazy(() => import('./features/updates/AdminUpdatesPage'));
 
 // 🎓 Other
-const CollegeList = lazy(() => import('./Pages/Colleges/CollegeList'));
-const AIlandingpage = lazy(() => import("./AILandingpage/AILandingPage"));
-const DocsPage = lazy(() => import('./Pages/Docs/DocsPage'));
+const CollegeList = lazy(() => import('./features/colleges/CollegeList'));
+const AIlandingpage = lazy(() => import("./features/ai-landing/AILandingPage"));
+const DocsPage = lazy(() => import('./pages/DocsPage'));
 
 // 🌐 Global Components
-import Navbar from "./homepage/landing/Navbar"
-import ChatBot1 from './chatbot/ChatBot';
+import Navbar from "./layouts/Navbar"
+import ChatBot1 from './features/chatbot/ChatBot';
 
 // Loading Component
 const PageLoading = () => (
@@ -124,7 +124,7 @@ function App() {
     setAssessmentData(null);
     setCurrentPage('home');
   };
-//hello world
+
   return (
     <>
       <Navbar />
