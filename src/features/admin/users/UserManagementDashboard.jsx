@@ -5,7 +5,7 @@ import {
   RefreshCw, Download, Upload, Lock, Eye, ChevronLeft, ChevronRight,
   Loader2, Check, X, UserCheck, UserX
 } from 'lucide-react';
-import config from '../../config';
+import config from '../../config/config';
 
 const UserManagementDashboard = () => {
   const [users, setUsers] = useState([]);

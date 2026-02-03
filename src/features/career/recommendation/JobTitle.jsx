@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import config from '../../config';
+import config from '../../config/config';
 
 const RecommendationJobTitlesSearch = () => {
   const [jobTitles, setJobTitles] = useState([]);

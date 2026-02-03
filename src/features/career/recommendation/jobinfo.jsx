@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import config from '../../config'
+import config from '../../config/config'
 import { 
   BookOpen, Sparkles, Building, DollarSign, School, MapPin, 
   TrendingUp, Briefcase, Heart, ChevronLeft, BarChart2, 

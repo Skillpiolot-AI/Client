@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
-import config from '../../config';
+import config from '../../config/config';
 import CollegeCard from './CollegeCard';
 import FilterSidebar from './FilterSidebar';
 import FilterBar from './FilterBar';

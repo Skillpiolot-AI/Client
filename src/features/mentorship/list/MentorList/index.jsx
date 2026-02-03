@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
-import config from '../../../config';
+import { useAuth } from '../../../../contexts/AuthContext';
+import config from '../../../../config/config';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Search, Filter, Calendar } from 'lucide-react';
@@ -13,7 +13,7 @@ import { Search, Filter, Calendar } from 'lucide-react';
 import SearchBar from './SearchBar';
 import FilterSidebar from './FilterSidebar';
 import MentorCard from './MentorCard';
-import BookingModal from '../Bookings/BookingModal';
+import BookingModal from '../../bookings/BookingModal';
 import CampaignBanner from './CampaignBanner';
 import './styles.css';
 

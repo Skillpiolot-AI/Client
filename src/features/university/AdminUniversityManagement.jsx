@@ -25,7 +25,7 @@ import {
   Globe,
   Building
 } from "lucide-react";
-import config from '../../config';
+import config from '../../config/config';
 import { useAuth } from '../../contexts/AuthContext'; // Import useAuth hook
 
 export default function AdminUniversityManagement() {

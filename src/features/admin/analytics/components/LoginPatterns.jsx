@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { TrendingUp, Clock } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import config from '../../../../config';
+import config from '../../../../config/config';
 
 export default function LoginPatterns({ timeframe, detailed = false }) {
   const [loginPatterns, setLoginPatterns] = useState([]);

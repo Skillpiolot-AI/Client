@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Plus, Trash2, Edit } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import config from '../../config';
+import config from '../../config/config';
 
 export default function RecommendationForm() {
   const [formData, setFormData] = useState({

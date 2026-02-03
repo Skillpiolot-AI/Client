@@ -13,7 +13,7 @@ import {
   Search, Filter, BookOpen, GraduationCap, Shield, 
   ChevronDown, ChevronUp, Activity, LogIn, LogOut
 } from "lucide-react";
-import config from '../../config';
+import config from '../../config/config';
 
 export default function EnhancedUniAdminPortal() {
   const [university, setUniversity] = useState(null);

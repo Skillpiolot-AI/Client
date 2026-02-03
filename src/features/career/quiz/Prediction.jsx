@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Sparkles, X, Globe } from 'lucide-react';
-import config from '../../config';
+import config from '../../config/config';
 
 // Multilingual support
 const languages = {

@@ -20,7 +20,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from 'react-hot-toast';
-import config from '../../../config';
+import config from '../../../config/config';
 import OverviewCards from './components/OverviewCards';
 import UserAnalytics from './components/UserAnalytics';
 import ActivityStats from './components/ActivityStats';

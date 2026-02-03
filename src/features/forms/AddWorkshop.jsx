@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Loader2 } from 'lucide-react';
-import config from '../../config';
+import config from '../../config/config';
 
 export default function AddWorkshop() {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();

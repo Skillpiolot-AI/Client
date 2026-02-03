@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, Sparkles } from 'lucide-react'
-import config from '../../config'
+import config from '../../config/config'
 
 export default function CareerExplorerWithFilters() {
   const navigate = useNavigate()
@@ -199,7 +199,7 @@ export default function CareerExplorerWithFilters() {
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // import { Loader2, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
-// import config from '../../config'
+// import config from '../../config/config'
 
 // export default function CareerExplorer() {
 //   const [formData, setFormData] = useState({

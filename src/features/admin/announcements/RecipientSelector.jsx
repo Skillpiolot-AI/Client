@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Users, Search, X } from 'lucide-react';
-import config from '../../../config';
+import config from '../../../config/config';
 
 const RecipientSelector = ({ recipientType, targetRoles, recipientIds, onChange }) => {
     const [users, setUsers] = useState([]);

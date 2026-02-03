@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Star, Send, CheckCircle, AlertCircle, User, Calendar, Clock } from 'lucide-react';
-import config from '../../../config';
+import config from '../../../config/config';
 import './RateSession.css';
 
 const RateSession = () => {

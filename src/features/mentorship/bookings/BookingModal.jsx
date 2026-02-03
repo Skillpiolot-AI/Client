@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { X, Calendar, Clock, MessageSquare, AlertCircle, Loader2 } from 'lucide-react';
-import config from '../../../config';
+import config from '../../../config/config';
 import './BookingModal.css';
 
 /**

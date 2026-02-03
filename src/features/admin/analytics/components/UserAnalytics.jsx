@@ -23,7 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from 'react-hot-toast';
-import config from '../../../../config';
+import config from '../../../../config/config';
 
 export default function UserAnalytics({ timeframe }) {
   const [userStats, setUserStats] = useState({

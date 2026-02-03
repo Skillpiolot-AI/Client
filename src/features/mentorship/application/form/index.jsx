@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import config from '../../../config';
+import config from '../../../config/config';
 import StepProgress from './StepProgress';
 import Sidebar from './Sidebar';
 import Step1PersonalInfo from './Step1PersonalInfo';

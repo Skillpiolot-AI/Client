@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import config from '../../config'
+import config from '../../config/config'
 const ApplicationTracker = () => {
   const [trackingId, setTrackingId] = useState('');
   const [applicationStatus, setApplicationStatus] = useState(null);
@@ -39,8 +39,8 @@ const ApplicationTracker = () => {
             placeholder="Enter your 5-digit tracking ID"
           />
         </div>
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
           disabled={loading}
         >
@@ -51,10 +51,9 @@ const ApplicationTracker = () => {
         <div className="mt-6">
           <h3 className="text-xl font-semibold mb-2">Application Status</h3>
           <p>Tracking ID: {applicationStatus.trackingId}</p>
-          <p>Status: <span className={`font-bold ${
-            applicationStatus.status === 'Pending' ? 'text-yellow-500' :
-            applicationStatus.status === 'Approved' ? 'text-green-500' : 'text-red-500'
-          }`}>{applicationStatus.status}</span></p>
+          <p>Status: <span className={`font-bold ${applicationStatus.status === 'Pending' ? 'text-yellow-500' :
+              applicationStatus.status === 'Approved' ? 'text-green-500' : 'text-red-500'
+            }`}>{applicationStatus.status}</span></p>
           <p>Submitted: {new Date(applicationStatus.submittedAt).toLocaleDateString()}</p>
         </div>
       )}

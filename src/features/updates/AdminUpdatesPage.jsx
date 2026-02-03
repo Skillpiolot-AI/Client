@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
-import config from '../../config';
+import config from '../../config/config';
 import { 
   Plus, 
   Edit, 

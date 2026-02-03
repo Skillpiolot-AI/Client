@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../config/config';
 
 const VideoList = () => {
   const [videos, setVideos] = useState([]);

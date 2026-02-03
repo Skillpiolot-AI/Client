@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Loader2 } from 'lucide-react';
-import config from '../../config';
+import config from '../../config/config';
 import { toast } from 'react-hot-toast';
 
 export default function MentorRegistrationForm() {
@@ -221,10 +221,10 @@ export default function MentorRegistrationForm() {
           </form>
         </CardContent>
         <CardFooter>
-          <Button 
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white" 
-            type="submit" 
-            onClick={handleSubmit} 
+          <Button
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+            type="submit"
+            onClick={handleSubmit}
             disabled={isLoading}
           >
             {isLoading ? (

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { X, Send, Save, Users, Eye } from 'lucide-react';
-import config from '../../../config';
+import config from '../../../config/config';
 import RecipientSelector from './RecipientSelector';
 
 const CreateAnnouncement = ({ announcement, onClose, onCreate, onUpdate }) => {

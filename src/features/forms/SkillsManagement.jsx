@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Loader2, Trash2, Edit2 } from 'lucide-react';
-import config from '../../config';
+import config from '../../config/config';
 import { toast } from 'react-hot-toast';
 
 export default function SkillsManagement() {

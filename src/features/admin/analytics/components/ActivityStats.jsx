@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Activity, TrendingUp } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import config from '../../../../config';
+import config from '../../../../config/config';
 
 export default function ActivityStats({ timeframe, detailed = false }) {
   const [activityStats, setActivityStats] = useState([]);

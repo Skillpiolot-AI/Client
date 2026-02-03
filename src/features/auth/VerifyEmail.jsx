@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { CheckCircle, XCircle, Loader2, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../config/config';
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Bell, Send, Plus, TestTube, Mail, RefreshCw } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
-import config from '../../../config';
+import config from '../../../config/config';
 import AnnouncementList from './AnnouncementList';
 import CreateAnnouncement from './CreateAnnouncement';
 import EmailAnnouncement from './EmailAnnouncement';

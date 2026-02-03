@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Bell, CheckCircle, AlertCircle, RefreshCw, Calendar, Clock, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import config from '../../config';
+import config from '../../config/config';
 import './styles.css';
 
 const NotificationsPage = () => {

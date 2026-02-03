@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, BookOpen, Calendar, Settings } from 'lucide-react';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../config/config';
 import { toast } from 'react-hot-toast';
 
 export default function TeacherDashboard() {

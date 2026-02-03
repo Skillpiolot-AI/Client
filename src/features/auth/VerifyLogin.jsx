@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Shield, CheckCircle, XCircle, Loader2, MapPin, Clock, Monitor, Globe, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../config/config';
 
 export default function VerifyLogin() {
   const [searchParams] = useSearchParams();

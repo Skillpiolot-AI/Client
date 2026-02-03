@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, MinusCircle, Save, Trash2 } from 'lucide-react';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../config/config';
 
 const CareerForm = ({ initialData, onSave, onDelete }) => {
   const [formData, setFormData] = useState(initialData || {

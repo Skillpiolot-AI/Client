@@ -14,7 +14,7 @@ import {
     BarChart3,
     ChevronDown
 } from 'lucide-react';
-import config from '../../../config';
+import config from '../../../config/config';
 import ApplicationCard from './ApplicationCard';
 import ApplicationDetailModal from './ApplicationDetailModal';
 import './styles.css';
