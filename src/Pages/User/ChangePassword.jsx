@@ -196,7 +196,7 @@ export default function ChangePassword() {
                     </div>
 
                     <div className="flex justify-between items-center text-white/70 text-sm">
-                        <span>Copyright © 2025 SkillPilot AI</span>
+                        <span>Copyright © 2025 SkillPilot</span>
                         <span className="cursor-pointer hover:text-white/90">Support</span>
                     </div>
                 </div>

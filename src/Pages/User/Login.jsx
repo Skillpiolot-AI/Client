@@ -120,7 +120,7 @@ export default function LoginPage() {
 
       const welcomeMessage = data.user?.universityName
         ? `Welcome to ${data.user.universityName}!`
-        : "Welcome to the Spark Career Guidance Portal!"
+        : "Welcome to SkillPilot!"
 
       toast.success(welcomeMessage)
 
@@ -239,7 +239,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex justify-between items-center text-white/70 text-sm">
-            <span>Copyright © 2025 Skill pilot Career Guidance</span>
+            <span>Copyright © 2025 SkillPilot</span>
             <span className="cursor-pointer hover:text-white/90 transition-colors">
               Privacy Policy
             </span>
@@ -258,7 +258,7 @@ export default function LoginPage() {
             >
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
-            <h1 className="text-xl font-semibold text-foreground">Spark</h1>
+            <h1 className="text-xl font-semibold text-foreground">SkillPilot</h1>
           </div>
 
           <div className="space-y-6">

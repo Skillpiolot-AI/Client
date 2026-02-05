@@ -43,17 +43,17 @@ export default function GoogleProfileCompletion() {
 
     try {
       const { data } = await axios.post(`${API_URL}/api/auth/check-username`, { username });
-      
+
       setUsernameStatus({
         checking: false,
         available: data.available,
         message: data.message
       });
     } catch (error) {
-      setUsernameStatus({ 
-        checking: false, 
-        available: false, 
-        message: 'Error checking username' 
+      setUsernameStatus({
+        checking: false,
+        available: false,
+        message: 'Error checking username'
       });
     }
   };
@@ -103,7 +103,7 @@ export default function GoogleProfileCompletion() {
         localStorage.setItem('role', data.role);
         localStorage.setItem('user', JSON.stringify(data.user));
 
-        toast.success('Welcome to Spark! Your account is ready! 🎉');
+        toast.success('Welcome to SkillPilot! Your account is ready! 🎉');
 
         // Redirect to dashboard
         setTimeout(() => {
@@ -140,8 +140,8 @@ export default function GoogleProfileCompletion() {
           {/* Google Account Info */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-6">
             <div className="flex items-center space-x-3">
-              <img 
-                src={googleData.picture} 
+              <img
+                src={googleData.picture}
                 alt={googleData.name}
                 className="w-12 h-12 rounded-full border-2 border-white shadow"
               />
@@ -166,13 +166,12 @@ export default function GoogleProfileCompletion() {
                   type="text"
                   value={formData.username}
                   onChange={handleUsernameChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 ${
-                    usernameStatus.available === false
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 ${usernameStatus.available === false
                       ? 'border-red-500 focus:ring-red-500'
                       : usernameStatus.available === true
-                      ? 'border-green-500 focus:ring-green-500'
-                      : 'border-gray-300 focus:ring-blue-500'
-                  }`}
+                        ? 'border-green-500 focus:ring-green-500'
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
                   placeholder="cooluser123"
                   required
                   minLength={3}
@@ -189,12 +188,11 @@ export default function GoogleProfileCompletion() {
                   )}
                 </div>
               </div>
-              
+
               {/* Username Status Message */}
               {usernameStatus.message && (
-                <p className={`mt-2 text-sm flex items-center ${
-                  usernameStatus.available ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <p className={`mt-2 text-sm flex items-center ${usernameStatus.available ? 'text-green-600' : 'text-red-600'
+                  }`}>
                   {usernameStatus.available ? (
                     <CheckCircle className="w-4 h-4 mr-1" />
                   ) : (

@@ -18,8 +18,8 @@ const HeroSection = () => (
         explore workshops worldwide.
       </p>
       <div className="pt-6">
-        <a 
-          href="/signup" 
+        <a
+          href="/signup"
           className="inline-flex items-center px-8 py-3 bg-[#37322F] text-white rounded-full font-medium hover:bg-[#37322F]/90 transition-colors"
         >
           Start Your Journey
@@ -53,8 +53,8 @@ const FAQSection = () => {
 
   const faqs = [
     {
-      question: "What is MentorHub and who is it for?",
-      answer: "MentorHub is a comprehensive mentorship platform designed for young professionals looking to advance their careers."
+      question: "What is SkillPilot and who is it for?",
+      answer: "SkillPilot is a comprehensive career guidance platform designed for young professionals looking to advance their careers."
     },
     {
       question: "How does the mentorship booking work?",
@@ -73,22 +73,21 @@ const FAQSection = () => {
           <h2 className="text-3xl md:text-4xl font-semibold text-[#49423D] mb-4">
             Frequently Asked Questions
           </h2>
-          <p className="text-[#605A57]">Everything you need to know about MentorHub</p>
+          <p className="text-[#605A57]">Everything you need to know about SkillPilot</p>
         </div>
-        
+
         <div className="space-y-2">
           {faqs.map((faq, index) => (
             <div key={index} className="border-b border-gray-200">
               <button
-                onClick={() => setOpenItems(prev => 
+                onClick={() => setOpenItems(prev =>
                   prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
                 )}
                 className="w-full py-4 flex justify-between items-center text-left hover:bg-gray-50 transition-colors"
               >
                 <span className="font-medium text-[#49423D]">{faq.question}</span>
-                <ChevronDown className={`w-5 h-5 transition-transform ${
-                  openItems.includes(index) ? "rotate-180" : ""
-                }`} />
+                <ChevronDown className={`w-5 h-5 transition-transform ${openItems.includes(index) ? "rotate-180" : ""
+                  }`} />
               </button>
               {openItems.includes(index) && (
                 <div className="pb-4 text-sm text-[#605A57]">{faq.answer}</div>
@@ -106,9 +105,9 @@ const CTASection = () => (
     <div className="max-w-4xl mx-auto text-center space-y-6">
       <h2 className="text-3xl md:text-4xl font-semibold text-[#37322F]">Ready to Get Started?</h2>
       <p className="text-[#605A57] max-w-2xl mx-auto">
-        Join thousands of students and professionals who are already using MentorHub to advance their careers.
+        Join thousands of students and professionals who are already using SkillPilot to advance their careers.
       </p>
-      <a 
+      <a
         href="/signup"
         className="inline-flex items-center px-8 py-3 bg-[#37322F] text-white rounded-full font-medium hover:bg-[#37322F]/90 transition-colors"
       >
@@ -123,10 +122,10 @@ const FooterSection = () => (
     <div className="max-w-6xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div>
-          <h3 className="text-xl font-semibold text-[#49423D] mb-4">MentorHub</h3>
+          <h3 className="text-xl font-semibold text-[#49423D] mb-4">SkillPilot</h3>
           <p className="text-sm text-[#605A57]">Your career journey starts here</p>
         </div>
-        
+
         <div>
           <h4 className="font-medium text-[#49423D] mb-3">Product</h4>
           <ul className="space-y-2 text-sm text-[#605A57]">
@@ -135,7 +134,7 @@ const FooterSection = () => (
             <li><a href="/assessment" className="hover:text-[#37322F]">Assessment</a></li>
           </ul>
         </div>
-        
+
         <div>
           <h4 className="font-medium text-[#49423D] mb-3">Company</h4>
           <ul className="space-y-2 text-sm text-[#605A57]">
@@ -144,7 +143,7 @@ const FooterSection = () => (
             <li><a href="/contact" className="hover:text-[#37322F]">Contact</a></li>
           </ul>
         </div>
-        
+
         <div>
           <h4 className="font-medium text-[#49423D] mb-3">Resources</h4>
           <ul className="space-y-2 text-sm text-[#605A57]">
@@ -154,9 +153,9 @@ const FooterSection = () => (
           </ul>
         </div>
       </div>
-      
+
       <div className="pt-8 border-t border-gray-200 text-center text-sm text-[#605A57]">
-        © 2025 MentorHub. All rights reserved.
+        © 2025 SkillPilot. All rights reserved.
       </div>
     </div>
   </footer>

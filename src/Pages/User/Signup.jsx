@@ -199,7 +199,7 @@ function SignupPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
-            <p className="text-gray-600">Join Spark Career Guidance today</p>
+            <p className="text-gray-600">Join SkillPilot today</p>
           </div>
 
           {/* Google Sign Up Button */}

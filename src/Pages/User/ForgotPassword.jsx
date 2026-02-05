@@ -268,7 +268,7 @@ export default function ForgotPassword() {
           </div>
 
           <div className="flex justify-between items-center text-white/70 text-sm">
-            <span>Copyright © 2025 Spark Career Guidance</span>
+            <span>Copyright © 2025 SkillPilot</span>
             <span className="cursor-pointer hover:text-white/90">Privacy Policy</span>
           </div>
         </div>

@@ -6,7 +6,7 @@ export default function FooterSection() {
         <div className="h-auto p-4 md:p-8 flex flex-col justify-start items-start gap-8">
           {/* Brand Section */}
           <div className="self-stretch flex justify-start items-center gap-3">
-            <div className="text-center text-[#49423D] text-xl font-semibold leading-4 font-sans">MentorHub</div>
+            <div className="text-center text-[#49423D] text-xl font-semibold leading-4 font-sans">SkillPilot</div>
           </div>
           <div className="text-[rgba(73,66,61,0.90)] text-sm font-medium leading-[18px] font-sans">
             Your career journey starts here
@@ -97,7 +97,7 @@ export default function FooterSection() {
 
       {/* Bottom Section */}
       <div className="self-stretch h-12 relative overflow-hidden border-t border-b border-[rgba(55,50,47,0.12)]">
-        <div className="w-full text-center text-[#605A57] text-xs py-3">© 2025 MentorHub. All rights reserved.</div>
+        <div className="w-full text-center text-[#605A57] text-xs py-3">© 2025 SkillPilot. All rights reserved.</div>
       </div>
     </div>
   )

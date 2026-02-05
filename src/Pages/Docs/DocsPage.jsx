@@ -64,12 +64,12 @@ const DocsPage = () => {
     // Page documentation content
     const content = {
         overview: {
-            title: 'MentorHub Documentation',
-            subtitle: 'Complete guide to the mentorship platform',
+            title: 'SkillPilot Documentation',
+            subtitle: 'Complete guide to the career guidance platform',
             content: `
-## Welcome to MentorHub
+## Welcome to SkillPilot
 
-MentorHub is a comprehensive career guidance and mentorship platform designed to connect students with industry professionals. The platform provides AI-powered career recommendations, mentorship booking, workshops, and career path exploration.
+SkillPilot is a comprehensive career guidance and mentorship platform designed to connect students with industry professionals. The platform provides AI-powered career recommendations, mentorship booking, workshops, and career path exploration.
 
 ### Key Features
 
@@ -92,7 +92,7 @@ MentorHub is a comprehensive career guidance and mentorship platform designed to
         },
         installation: {
             title: 'Installation',
-            subtitle: 'Get started with MentorHub development',
+            subtitle: 'Get started with SkillPilot development',
             content: `
 ## Prerequisites
 
@@ -104,7 +104,7 @@ MentorHub is a comprehensive career guidance and mentorship platform designed to
 
 \`\`\`bash
 # Clone the repository
-git clone https://github.com/your-org/mentorhub.git
+git clone https://github.com/your-org/skillpilot.git
 
 # Install client dependencies
 cd Client-landing-page
@@ -236,7 +236,7 @@ The landing page (\`/\`) is the first page users see. It showcases the platform'
             content: `
 ## Auth Flow
 
-MentorHub uses JWT-based authentication with optional Google OAuth.
+SkillPilot uses JWT-based authentication with optional Google OAuth.
 
 ### Pages
 
@@ -573,7 +573,7 @@ Create and manage workshops.
                     </button>
                     <div className="flex items-center gap-2">
                         <Book className="w-6 h-6 text-indigo-500" />
-                        <span className="font-bold text-xl">MentorHub Docs</span>
+                        <span className="font-bold text-xl">SkillPilot Docs</span>
                     </div>
                 </div>
 

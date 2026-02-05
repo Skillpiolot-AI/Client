@@ -145,7 +145,7 @@ export default function Navbar() {
                                 onClick={() => handleNavigation("/")}
                                 className="text-[#2F3037] text-xl font-semibold hover:opacity-80 transition-opacity"
                             >
-                                MentorHub
+                                SkillPilot
                             </button>
                         </div>
 
