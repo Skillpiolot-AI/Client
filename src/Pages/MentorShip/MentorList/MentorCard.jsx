@@ -46,20 +46,6 @@ const MentorCard = ({
         ? mentor.bio.substring(0, 180) + '...'
         : mentor.bio;
 
-    // Get company logo (placeholder for now)
-    const getCompanyLogo = (company) => {
-        const logos = {
-            'Google': 'https://www.google.com/favicon.ico',
-            'Microsoft': 'https://www.microsoft.com/favicon.ico',
-            'Amazon': 'https://www.amazon.com/favicon.ico',
-            'Meta': 'https://www.meta.com/favicon.ico',
-            'Apple': 'https://www.apple.com/favicon.ico',
-            'Salesforce': 'https://www.salesforce.com/favicon.ico',
-            'Walmart': 'https://www.walmart.com/favicon.ico'
-        };
-        return logos[company] || null;
-    };
-
     return (
         <div className="mentor-card">
             <div className="mentor-card-content">
@@ -71,11 +57,15 @@ const MentorCard = ({
                             alt={mentor.displayName || mentor.name}
                             className="mentor-profile-image"
                         />
-                        <div className="mentor-rating-badge">
-                            <Star />
-                            <span>{mentor.averageRating?.toFixed(1) || '5.0'}</span>
-                            <span className="reviews-count">({mentor.totalReviews || 0}+ reviews)</span>
-                        </div>
+                        {mentor.averageRating > 0 && (
+                            <div className="mentor-rating-badge">
+                                <Star />
+                                <span>{mentor.averageRating?.toFixed(1)}</span>
+                                {mentor.totalReviews > 0 && (
+                                    <span className="reviews-count">({mentor.totalReviews}+ reviews)</span>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -124,35 +114,30 @@ const MentorCard = ({
 
                     {/* Company & Experience Badges */}
                     <div className="company-badges">
-                        {mentor.currentCompany && (
+                        {mentor.currentCompany && mentor.jobTitle && (
                             <div className="company-badge">
-                                {getCompanyLogo(mentor.currentCompany) && (
-                                    <img src={getCompanyLogo(mentor.currentCompany)} alt={mentor.currentCompany} />
-                                )}
                                 <div className="company-info">
-                                    <span className="company-title">{mentor.jobTitle || 'Senior Engineer'}</span>
+                                    <span className="company-title">{mentor.jobTitle}</span>
                                     <span className="company-name">{mentor.currentCompany}</span>
                                 </div>
                             </div>
                         )}
                         {mentor.companiesWorked && mentor.companiesWorked.length > 0 && (
                             <div className="company-badge">
-                                <img
-                                    src={getCompanyLogo(mentor.companiesWorked[0]) || 'https://via.placeholder.com/24'}
-                                    alt={mentor.companiesWorked[0]}
-                                />
                                 <div className="company-info">
                                     <span className="company-title">Previously at</span>
                                     <span className="company-name">{mentor.companiesWorked[0]}</span>
                                 </div>
                             </div>
                         )}
-                        <div className="experience-badge">
-                            <div>
-                                <span className="experience-years">{mentor.experience || 5}+</span>
-                                <span className="experience-label"> Years</span>
+                        {mentor.experience && (
+                            <div className="experience-badge">
+                                <div>
+                                    <span className="experience-years">{mentor.experience}+</span>
+                                    <span className="experience-label"> Years</span>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Bio */}
@@ -185,11 +170,7 @@ const MentorCard = ({
                             <span className="target-item">
                                 <Building2 />
                                 Targeting Domains: <strong>{mentor.targetingDomains[0]}</strong>
-                                {mentor.targetingDomains.length > 1 && (
-                                    <a href="#" onClick={(e) => { e.preventDefault(); }}>
-                                        | More
-                                    </a>
-                                )}
+                                {mentor.targetingDomains.length > 1 && ` +${mentor.targetingDomains.length - 1} More`}
                             </span>
                         )}
                     </div>
@@ -198,24 +179,23 @@ const MentorCard = ({
                 {/* Right - Features & Actions */}
                 <div className="mentor-right-section">
                     <div className="mentor-features">
-                        <div className="feature-item">
-                            <Phone />
-                            <span><strong>{mentor.sessionsPerWeek || 1}x</strong> Sessions Per Week</span>
-                        </div>
-                        {mentor.referralsInTopCompanies && (
+                        {mentor.sessionsPerWeek && (
                             <div className="feature-item">
-                                <Building2 />
-                                <span>Referrals in Top Companies</span>
-                                <a href="#" className="view-link" onClick={(e) => e.preventDefault()}>
-                                    +{mentor.topCompanies?.length || 12} More
-                                </a>
+                                <Phone />
+                                <span><strong>{mentor.sessionsPerWeek}x</strong> Sessions Per Week</span>
                             </div>
                         )}
-                        {mentor.curriculum?.available && (
+                        {mentor.referralsInTopCompanies && mentor.topCompanies?.length > 0 && (
+                            <div className="feature-item">
+                                <Building2 />
+                                <span>Referrals in Top Companies ({mentor.topCompanies.length})</span>
+                            </div>
+                        )}
+                        {mentor.curriculum?.available && mentor.curriculum?.url && (
                             <div className="feature-item">
                                 <BookOpen />
                                 <span>Detailed Curriculum Available</span>
-                                <a href="#" className="view-link" onClick={(e) => e.preventDefault()}>
+                                <a href={mentor.curriculum.url} className="view-link" target="_blank" rel="noopener noreferrer">
                                     View <ExternalLink size={12} />
                                 </a>
                             </div>
@@ -248,7 +228,11 @@ const MentorCard = ({
                             className="btn-book-trial"
                             onClick={() => onBookTrial(mentor)}
                         >
-                            {mentor.isFree ? 'Book Free Session' : `Book Golden Trial @ ₹${mentor.trialSession?.price || 199}`}
+                            {mentor.isFree
+                                ? 'Book Free Session'
+                                : mentor.trialSession?.price
+                                    ? `Book Golden Trial @ ₹${mentor.trialSession.price}`
+                                    : 'Book Trial Session'}
                             <span className="subtitle">
                                 {mentor.isFree
                                     ? 'Free mentorship available!'
