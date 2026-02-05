@@ -29,3 +29,7 @@ node_modules
 # Local Netlify folder
 .netlify
 .env
+
+# Google Service Account (contains secrets)
+mobile-app/google-service-account.json
+*.json.bak
