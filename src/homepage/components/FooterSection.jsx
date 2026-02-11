@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 export default function FooterSection() {
   const footerLinks = {
     "Career Growth": [
-      { name: "Assessment Info", path: "/Assesmentinfo" },
+      { name: "Pathfinder", path: "/Assesmentinfo" },
       { name: "Career Quiz", path: "/careerquiz" },
       { name: "Prediction Hub", path: "/combinedquiz" },
       { name: "Job Titles", path: "/jobtitleall" },

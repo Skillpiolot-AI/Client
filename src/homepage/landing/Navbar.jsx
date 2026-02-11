@@ -25,7 +25,7 @@ export default function Navbar() {
 
     const navItems = [
         { name: "Home", path: "/", show: "both" },
-        { name: "Assessment", path: "/Assesmentinfo", show: "both" },
+        { name: "Pathfinder", path: "/Assesmentinfo", show: "both" },
         { name: "Mentors", path: "/mentorship", show: "both" },
         { name: "About Us", path: "/about", show: "both" },
     ]
