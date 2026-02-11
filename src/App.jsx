@@ -97,6 +97,7 @@ const DocsPage = lazy(() => import('./Pages/Docs/DocsPage'));
 
 // 🌐 Global Components
 import Navbar from "./homepage/landing/Navbar"
+import FooterSection from "./homepage/components/FooterSection"
 import ChatBot1 from './chatbot/ChatBot';
 
 // Loading Component
@@ -124,7 +125,7 @@ function App() {
     setAssessmentData(null);
     setCurrentPage('home');
   };
-//hello world
+  //hello world
   return (
     <>
       <Navbar />
@@ -232,6 +233,7 @@ function App() {
       </Suspense>
 
       <ChatBot1 />
+      <FooterSection />
     </>
   );
 }

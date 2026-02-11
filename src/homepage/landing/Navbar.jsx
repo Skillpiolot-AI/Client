@@ -1,54 +1,9 @@
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, Activity, ChevronDown, Menu, X } from "lucide-react"
+import { ChevronDown, Menu, X } from "lucide-react"
 import { useAuth } from "../../AuthContext"
 import { useNavigate } from "react-router-dom"
 import config from "../../config"
-
-// Server Status Hook
-const useServerStatus = () => {
-    const [isOnline, setIsOnline] = useState(false)
-    const [isChecking, setIsChecking] = useState(false)
-    const [lastChecked, setLastChecked] = useState(null)
-
-    const checkServerStatus = async () => {
-        setIsChecking(true)
-        try {
-            const controller = new AbortController()
-            const timeoutId = setTimeout(() => controller.abort(), 5000)
-
-            const response = await fetch(`${config.API_BASE_URL1}/health`, {
-                method: "GET",
-                signal: controller.signal,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-
-            clearTimeout(timeoutId)
-
-            if (response.ok) {
-                setIsOnline(true)
-            } else {
-                setIsOnline(false)
-            }
-        } catch (error) {
-            console.log("Server status check failed:", error.message)
-            setIsOnline(false)
-        } finally {
-            setIsChecking(false)
-            setLastChecked(new Date())
-        }
-    }
-
-    useEffect(() => {
-        checkServerStatus()
-        const interval = setInterval(checkServerStatus, 30000000)
-        return () => clearInterval(interval)
-    }, [])
-
-    return { isOnline, isChecking, lastChecked, checkServerStatus }
-}
 
 export default function Navbar() {
     const { user, logout, isAuthenticated } = useAuth()
@@ -57,8 +12,6 @@ export default function Navbar() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [activeTab, setActiveTab] = useState("Home")
     const dropdownRef = useRef(null)
-
-    const { isOnline, isChecking, checkServerStatus } = useServerStatus()
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -74,50 +27,24 @@ export default function Navbar() {
         { name: "Home", path: "/", show: "both" },
         { name: "Assessment", path: "/Assesmentinfo", show: "both" },
         { name: "Mentors", path: "/mentorship", show: "both" },
-        { name: "Workshops", path: "/workshops", show: "both" },
-        { name: "Resources", path: "/view-books", show: "desktop" },
-        { name: "Community", path: "/community", show: "mobile" },
-        { name: "Career Paths", path: "/careerPaths", show: "mobile" },
+        { name: "About Us", path: "/about", show: "both" },
     ]
 
     const dropdownItems = {
         User: [
             { name: "👤 My Profile", path: "/profile" },
-            { name: "🔔 Notifications", path: "/notifications" },
-            { name: "📅 My Bookings", path: "/my-bookings" },
-            { name: "📝 My Applications", path: "/my-applications" },
-            { name: "📋 Track Application", path: "/tracker" },
-            { name: "📚 Resources", path: "/view-books" },
         ],
         Mentor: [
             { name: "👤 My Profile", path: "/mentor-profile" },
-            { name: "🔔 Notifications", path: "/notifications" },
-            { name: "📅 My Sessions", path: "/mentor-sessions" },
-            { name: "🎓 Mentor Panel", path: "/amdashboard" },
-            { name: "📚 Training Videos", path: "/learnlist" },
-            { name: "📝 My Bookings", path: "/my-bookings" },
         ],
         Admin: [
             { name: "📊 Dashboard", path: "/dashboard" },
-            { name: "🛠️ Admin Panel", path: "/dashboardAdmin" },
-            { name: "📈 Analytics", path: "/analytics" },
-            { name: "📢 Announcements", path: "/admin/announcements" },
-            { name: "👥 User Management", path: "/admin/user-management" },
-            { name: "🎓 Mentor Applications", path: "/mentoapplication" },
-            { name: "📅 Mentor Sessions", path: "/mentor-sessions" },
-            { name: "🏫 Universities", path: "/universityManagement" },
-            { name: "⚙️ System Settings", path: "/admin/system-settings" },
-            { name: "📋 Server Logs", path: "/admin/server-logs" },
         ],
         UniTeach: [
             { name: "🏫 Teacher Portal", path: "/teacher/dashboard" },
-            { name: "🔔 Notifications", path: "/notifications" },
-            { name: "📚 Resources", path: "/view-books" },
         ],
         UniAdmin: [
             { name: "🏫 University Portal", path: "/uniAdminPortal" },
-            { name: "🔔 Notifications", path: "/notifications" },
-            { name: "📚 Resources", path: "/view-books" },
         ]
     }
 
@@ -172,44 +99,6 @@ export default function Navbar() {
                         {/* Right Section */}
                         <div className="flex items-center space-x-3">
 
-                            {/* Server Status - Desktop Only */}
-                            <div className="hidden lg:flex">
-                                {isChecking ? (
-                                    <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-white shadow-sm text-[rgba(49,45,43,0.80)] text-xs font-medium">
-                                        <motion.div
-                                            className="w-1.5 h-1.5 bg-yellow-500 rounded-full"
-                                            animate={{ scale: [1, 1.2, 1] }}
-                                            transition={{ duration: 1, repeat: Infinity }}
-                                        />
-                                        <span>Checking</span>
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={checkServerStatus}
-                                        className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full shadow-sm text-xs font-medium transition-all ${isOnline
-                                            ? "bg-white text-green-700"
-                                            : "bg-white text-red-700"
-                                            }`}
-                                    >
-                                        <motion.div
-                                            className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-500" : "bg-red-500"}`}
-                                            animate={{ scale: [1, 1.2, 1] }}
-                                            transition={{ duration: 2, repeat: Infinity }}
-                                        />
-                                        <span>{isOnline ? "Online" : "Offline"}</span>
-                                        <Activity className="w-3 h-3 opacity-60" />
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Updates Button */}
-                            <button
-                                onClick={() => handleNavigation("/updates")}
-                                className="hidden lg:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-white shadow-sm text-[rgba(49,45,43,0.80)] text-xs font-medium hover:shadow-md transition-shadow"
-                            >
-                                <Sparkles className="w-3 h-3" />
-                                <span>Updates</span>
-                            </button>
 
                             {/* Auth Section */}
                             {isAuthenticated() && user ? (
@@ -315,22 +204,9 @@ export default function Navbar() {
                 </AnimatePresence>
             </nav>
 
-            {/* Offline Status Banner */}
-            {!isOnline && !isChecking && (
-                <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    className="fixed top-16 left-0 right-0 z-40 bg-red-600 text-white py-2 text-center text-xs font-semibold shadow-lg"
-                >
-                    <div className="flex items-center justify-center space-x-2">
-                        <Activity className="w-3 h-3 animate-pulse" />
-                        <span>Server is offline. You are viewing the static page.</span>
-                    </div>
-                </motion.div>
-            )}
 
             {/* Spacer to prevent content from going under fixed navbar */}
-            <div className={!isOnline && !isChecking ? "h-24" : "h-16"}></div>
+            <div className="h-16"></div>
         </>
     )
 }

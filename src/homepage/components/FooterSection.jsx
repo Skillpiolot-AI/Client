@@ -1,103 +1,120 @@
+import { Link } from "react-router-dom"
+
 export default function FooterSection() {
+  const footerLinks = {
+    "Career Growth": [
+      { name: "Assessment Info", path: "/Assesmentinfo" },
+      { name: "Career Quiz", path: "/careerquiz" },
+      { name: "Prediction Hub", path: "/combinedquiz" },
+      { name: "Job Titles", path: "/jobtitleall" },
+      { name: "Recommendation Hub", path: "/recommendation" },
+      { name: "Tech Career Paths", path: "/careerPaths" },
+    ],
+    "Mentorship": [
+      { name: "Find Mentors", path: "/mentorship" },
+      { name: "Mentor Home", path: "/mentorHome" },
+      { name: "Book Session", path: "/schedulementor" },
+      { name: "Mentor Registration", path: "/application" },
+      { name: "Application Tracker", path: "/tracker" },
+      { name: "My Bookings", path: "/my-bookings" },
+    ],
+    "Resources & Community": [
+      { name: "Resource Library", path: "/view-books" },
+      { name: "Video Lessons", path: "/learnlist" },
+      { name: "Workshops", path: "/workshops" },
+      { name: "Community", path: "/community" },
+      { name: "Latest Updates", path: "/updates" },
+      { name: "Documentation", path: "/docs" },
+    ],
+    "Portals & Account": [
+      { name: "My Profile", path: "/profile" },
+      { name: "My Applications", path: "/my-applications" },
+      { name: "Mentor Dashboard", path: "/amdashboard" },
+      { name: "Admin Dashboard", path: "/dashboardAdmin" },
+      { name: "University Admin", path: "/uniAdminPortal" },
+      { name: "Teacher Dashboard", path: "/teacher/dashboard" },
+    ],
+    "Company": [
+      { name: "About Us", path: "/about" },
+      { name: "Contact", path: "/#contact" },
+      { name: "Careers", path: "/careers" },
+      { name: "Privacy Policy", path: "/privacy" },
+      { name: "Terms of Service", path: "/terms" },
+    ]
+  }
+
   return (
-    <div className="w-full pt-10 flex flex-col justify-start items-start">
+    <div className="w-full pt-16 flex flex-col justify-start items-start bg-[#F9F8F7] border-t border-[rgba(55,50,47,0.12)]">
       {/* Main Footer Content */}
-      <div className="self-stretch h-auto flex flex-col md:flex-row justify-between items-stretch pr-0 pb-8 pt-0">
-        <div className="h-auto p-4 md:p-8 flex flex-col justify-start items-start gap-8">
+      <div className="max-w-7xl mx-auto w-full flex flex-col items-stretch px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-8 pb-12">
           {/* Brand Section */}
-          <div className="self-stretch flex justify-start items-center gap-3">
-            <div className="text-center text-[#49423D] text-xl font-semibold leading-4 font-sans">SkillPilot</div>
-          </div>
-          <div className="text-[rgba(73,66,61,0.90)] text-sm font-medium leading-[18px] font-sans">
-            Your career journey starts here
-          </div>
+          <div className="flex flex-col justify-start items-start gap-6 lg:max-w-xs">
+            <div className="flex justify-start items-center gap-3">
+              <div className="text-[#49423D] text-2xl font-bold font-sans tracking-tight">SkillPilot</div>
+            </div>
+            <div className="text-[rgba(73,66,61,0.70)] text-sm font-medium font-sans leading-relaxed">
+              Empowering the next generation of professionals with AI-driven career guidance and expert mentorship.
+            </div>
 
-          {/* Social Media Icons */}
-          <div className="flex justify-start items-start gap-4">
-            <div className="w-6 h-6 relative overflow-hidden cursor-pointer hover:opacity-70">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-                  fill="#49423D"
-                />
-              </svg>
-            </div>
-            <div className="w-6 h-6 relative overflow-hidden cursor-pointer hover:opacity-70">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"
-                  fill="#49423D"
-                />
-              </svg>
-            </div>
-            <div className="w-6 h-6 relative overflow-hidden cursor-pointer hover:opacity-70">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.374-12-12-12z"
-                  fill="#49423D"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Links */}
-        <div className="self-stretch p-4 md:p-8 flex flex-col sm:flex-row flex-wrap justify-start sm:justify-between items-start gap-6 md:gap-8">
-          {/* Product Column */}
-          <div className="flex flex-col justify-start items-start gap-3 flex-1 min-w-[120px]">
-            <div className="self-stretch text-[rgba(73,66,61,0.50)] text-sm font-medium leading-5 font-sans">
-              Product
-            </div>
-            <div className="flex flex-col justify-end items-start gap-2">
-              <div className="text-[#49423D] text-sm font-normal leading-5 font-sans cursor-pointer hover:text-[#37322F] transition-colors">
-                Features
-              </div>
-              <div className="text-[#49423D] text-sm font-normal leading-5 font-sans cursor-pointer hover:text-[#37322F] transition-colors">
-                Pricing
-              </div>
-              <div className="text-[#49423D] text-sm font-normal leading-5 font-sans cursor-pointer hover:text-[#37322F] transition-colors">
-                Mentors
-              </div>
+            {/* Social Media Icons */}
+            <div className="flex justify-start items-start gap-5 pt-2">
+              <a href="#" className="text-[#49423D] opacity-60 hover:opacity-100 transition-all">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+                </svg>
+              </a>
+              <a href="#" className="text-[#49423D] opacity-60 hover:opacity-100 transition-all">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                  <rect x="2" y="9" width="4" height="12" />
+                  <circle cx="4" cy="4" r="2" />
+                </svg>
+              </a>
+              <a href="#" className="text-[#49423D] opacity-60 hover:opacity-100 transition-all">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                </svg>
+              </a>
             </div>
           </div>
 
-          {/* Company Column */}
-          <div className="flex flex-col justify-start items-start gap-3 flex-1 min-w-[120px]">
-            <div className="text-[rgba(73,66,61,0.50)] text-sm font-medium leading-5 font-sans">Company</div>
-            <div className="flex flex-col justify-center items-start gap-2">
-              <div className="text-[#49423D] text-sm font-normal leading-5 font-sans cursor-pointer hover:text-[#37322F] transition-colors">
-                About us
+          {/* Navigation Links Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-8 gap-y-10 flex-grow pt-4">
+            {Object.entries(footerLinks).map(([title, links]) => (
+              <div key={title} className="flex flex-col justify-start items-start gap-5">
+                <div className="text-[rgba(73,66,61,0.50)] text-xs font-bold uppercase tracking-[0.1em] font-sans">
+                  {title}
+                </div>
+                <div className="flex flex-col justify-start items-start gap-3">
+                  {links.map((link) => (
+                    <Link
+                      key={link.name}
+                      to={link.path}
+                      className="text-[#49423D] text-[13px] font-medium leading-5 font-sans hover:text-[#37322F] hover:translate-x-1 transition-all duration-200"
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
-              <div className="text-[#49423D] text-sm font-normal leading-5 font-sans cursor-pointer hover:text-[#37322F] transition-colors">
-                Careers
-              </div>
-              <div className="text-[#49423D] text-sm font-normal leading-5 font-sans cursor-pointer hover:text-[#37322F] transition-colors">
-                Contact
-              </div>
-            </div>
-          </div>
-
-          {/* Resources Column */}
-          <div className="flex flex-col justify-start items-start gap-3 flex-1 min-w-[120px]">
-            <div className="text-[rgba(73,66,61,0.50)] text-sm font-medium leading-5 font-sans">Resources</div>
-            <div className="flex flex-col justify-center items-center gap-2">
-              <div className="self-stretch text-[#49423D] text-sm font-normal leading-5 font-sans cursor-pointer hover:text-[#37322F] transition-colors">
-                Terms of use
-              </div>
-              <div className="self-stretch text-[#49423D] text-sm font-normal leading-5 font-sans cursor-pointer hover:text-[#37322F] transition-colors">
-                Documentation
-              </div>
-              <div className="self-stretch text-[#49423D] text-sm font-normal leading-5 font-sans cursor-pointer hover:text-[#37322F] transition-colors">
-                Support
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Bottom Section */}
-      <div className="self-stretch h-12 relative overflow-hidden border-t border-b border-[rgba(55,50,47,0.12)]">
-        <div className="w-full text-center text-[#605A57] text-xs py-3">© 2025 SkillPilot. All rights reserved.</div>
+      <div className="w-full border-t border-[rgba(55,50,47,0.12)] bg-white/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="text-[#605A57] text-xs font-medium">
+            © 2025 SkillPilot Platform. Built for the future of talent.
+          </div>
+          <div className="flex items-center gap-8">
+            <Link to="/privacy" className="text-[#605A57] text-xs font-medium hover:text-[#37322F] transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="text-[#605A57] text-xs font-medium hover:text-[#37322F] transition-colors">Terms of Service</Link>
+            <Link to="/docs" className="text-[#605A57] text-xs font-medium hover:text-[#37322F] transition-colors">Help Center</Link>
+          </div>
+        </div>
       </div>
     </div>
   )

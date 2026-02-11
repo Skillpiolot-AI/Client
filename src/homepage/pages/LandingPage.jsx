@@ -117,50 +117,6 @@ const CTASection = () => (
   </div>
 )
 
-const FooterSection = () => (
-  <footer className="py-12 px-4 border-t border-gray-200 bg-[#F9F8F7]">
-    <div className="max-w-6xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        <div>
-          <h3 className="text-xl font-semibold text-[#49423D] mb-4">SkillPilot</h3>
-          <p className="text-sm text-[#605A57]">Your career journey starts here</p>
-        </div>
-
-        <div>
-          <h4 className="font-medium text-[#49423D] mb-3">Product</h4>
-          <ul className="space-y-2 text-sm text-[#605A57]">
-            <li><a href="/mentorship" className="hover:text-[#37322F]">Mentors</a></li>
-            <li><a href="/workshops" className="hover:text-[#37322F]">Workshops</a></li>
-            <li><a href="/assessment" className="hover:text-[#37322F]">Assessment</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="font-medium text-[#49423D] mb-3">Company</h4>
-          <ul className="space-y-2 text-sm text-[#605A57]">
-            <li><a href="/about" className="hover:text-[#37322F]">About</a></li>
-            <li><a href="/careers" className="hover:text-[#37322F]">Careers</a></li>
-            <li><a href="/contact" className="hover:text-[#37322F]">Contact</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="font-medium text-[#49423D] mb-3">Resources</h4>
-          <ul className="space-y-2 text-sm text-[#605A57]">
-            <li><a href="/view-books" className="hover:text-[#37322F]">Library</a></li>
-            <li><a href="/community" className="hover:text-[#37322F]">Community</a></li>
-            <li><a href="/updates" className="hover:text-[#37322F]">Updates</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="pt-8 border-t border-gray-200 text-center text-sm text-[#605A57]">
-        © 2025 SkillPilot. All rights reserved.
-      </div>
-    </div>
-  </footer>
-)
-
 export default function LandingPage() {
   return (
     <div className="w-full min-h-screen bg-[#F9F8F7]">
@@ -170,7 +126,6 @@ export default function LandingPage() {
       <SocialProof />
       <FAQSection />
       <CTASection />
-      <FooterSection />
     </div>
   )
 }
