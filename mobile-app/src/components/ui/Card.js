@@ -10,26 +10,45 @@ const Card = ({
     onPress,
     style,
     gradient = false,
-    gradientColors = [colors.surface, colors.surfaceLight],
+    gradientColors = [colors.surfaceAlt, colors.surface],
+    bordered = false,
     ...props
 }) => {
     const CardContainer = onPress ? TouchableOpacity : View;
 
     const getCardStyle = () => {
-        const baseStyle = [styles.card, shadows.md];
+        const base = [styles.card];
 
-        if (variant === 'elevated') {
-            baseStyle.push(styles.elevated);
-        } else if (variant === 'outlined') {
-            baseStyle.push(styles.outlined);
+        switch (variant) {
+            case 'elevated':
+                base.push(styles.elevated);
+                break;
+            case 'outlined':
+                base.push(styles.outlined);
+                break;
+            case 'flat':
+                base.push(styles.flat);
+                break;
+            case 'surface':
+                base.push(styles.surfaceCard);
+                break;
         }
 
-        return baseStyle;
+        if (bordered && variant !== 'outlined') {
+            base.push(styles.bordered);
+        }
+
+        return base;
     };
 
     if (gradient) {
         return (
-            <CardContainer onPress={onPress} activeOpacity={0.9} style={style} {...props}>
+            <CardContainer
+                onPress={onPress}
+                activeOpacity={0.9}
+                style={[style]}
+                {...props}
+            >
                 <LinearGradient
                     colors={gradientColors}
                     start={{ x: 0, y: 0 }}
@@ -59,15 +78,36 @@ const styles = StyleSheet.create({
         backgroundColor: colors.card,
         borderRadius: borderRadius.xl,
         padding: spacing.md,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        ...shadows.sm,
     },
     gradientCard: {
         backgroundColor: 'transparent',
     },
+    // Variants
     elevated: {
-        backgroundColor: colors.surfaceLight,
+        ...shadows.md,
+        borderWidth: 0,
     },
     outlined: {
-        backgroundColor: 'transparent',
+        backgroundColor: colors.card,
+        borderWidth: 1.5,
+        borderColor: colors.border,
+        ...shadows.none,
+    },
+    flat: {
+        backgroundColor: colors.surface,
+        borderWidth: 0,
+        ...shadows.none,
+    },
+    surfaceCard: {
+        backgroundColor: colors.surface,
+        borderWidth: 1,
+        borderColor: colors.borderLight,
+        ...shadows.xs,
+    },
+    bordered: {
         borderWidth: 1,
         borderColor: colors.border,
     },

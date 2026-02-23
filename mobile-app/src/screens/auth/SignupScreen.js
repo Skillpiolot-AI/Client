@@ -1,32 +1,33 @@
-// Signup Screen - Clean White Theme with Orange Accent
+// Signup Screen — Dark Theme
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import {
+    View, Text, StyleSheet, TouchableOpacity, TextInput,
+    KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
+import { colors, fontSize, fontWeight, spacing, borderRadius } from '../../theme';
 
 const SignupScreen = ({ navigation }) => {
     const { signup } = useAuth();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [name, setName]                       = useState('');
+    const [email, setEmail]                     = useState('');
+    const [password, setPassword]               = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState(false);
+    const [showPassword, setShowPassword]       = useState(false);
+    const [loading, setLoading]                 = useState(false);
+    const [error, setError]                     = useState('');
+    const [success, setSuccess]                 = useState(false);
 
     const handleSignup = async () => {
         if (!name || !email || !password || !confirmPassword) {
-            setError('Please fill in all fields');
-            return;
+            setError('Please fill in all fields'); return;
         }
         if (password !== confirmPassword) {
-            setError('Passwords do not match');
-            return;
+            setError('Passwords do not match'); return;
         }
         if (password.length < 6) {
-            setError('Password must be at least 6 characters');
-            return;
+            setError('Password must be at least 6 characters'); return;
         }
         setLoading(true);
         setError('');
@@ -43,16 +44,13 @@ const SignupScreen = ({ navigation }) => {
         return (
             <View style={styles.successContainer}>
                 <View style={styles.successIcon}>
-                    <Ionicons name="checkmark-circle" size={80} color="#FF6B35" />
+                    <Ionicons name="checkmark-circle" size={80} color={colors.success} />
                 </View>
                 <Text style={styles.successTitle}>Account Created!</Text>
                 <Text style={styles.successText}>
                     We've sent a verification email to {email}. Please verify to continue.
                 </Text>
-                <TouchableOpacity
-                    style={styles.connectButton}
-                    onPress={() => navigation.navigate('Login')}
-                >
+                <TouchableOpacity style={styles.connectButton} onPress={() => navigation.navigate('Login')}>
                     <Text style={styles.connectButtonText}>Go to Login</Text>
                 </TouchableOpacity>
             </View>
@@ -64,28 +62,20 @@ const SignupScreen = ({ navigation }) => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
         >
-            <ScrollView
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* Back Button */}
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                >
-                    <Ionicons name="chevron-back" size={24} color="#1A1A2E" />
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                    <Ionicons name="chevron-back" size={24} color={colors.text} />
                 </TouchableOpacity>
 
                 {/* Header */}
                 <Text style={styles.title}>Create Account</Text>
-                <Text style={styles.subtitle}>
-                    Join us to unlock your career potential.
-                </Text>
+                <Text style={styles.subtitle}>Join us to unlock your career potential.</Text>
 
                 {/* Error Message */}
                 {error ? (
                     <View style={styles.errorBox}>
-                        <Ionicons name="alert-circle" size={18} color="#EF4444" />
+                        <Ionicons name="alert-circle" size={18} color={colors.error} />
                         <Text style={styles.errorText}>{error}</Text>
                     </View>
                 ) : null}
@@ -96,7 +86,7 @@ const SignupScreen = ({ navigation }) => {
                     <TextInput
                         style={styles.input}
                         placeholder="Your full name"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={name}
                         onChangeText={setName}
                     />
@@ -108,7 +98,7 @@ const SignupScreen = ({ navigation }) => {
                     <TextInput
                         style={styles.input}
                         placeholder="Your email"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={email}
                         onChangeText={setEmail}
                         autoCapitalize="none"
@@ -122,19 +112,16 @@ const SignupScreen = ({ navigation }) => {
                     <TextInput
                         style={styles.input}
                         placeholder="Create a password"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry={!showPassword}
                     />
-                    <TouchableOpacity
-                        onPress={() => setShowPassword(!showPassword)}
-                        style={styles.eyeIcon}
-                    >
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                         <Ionicons
                             name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                             size={20}
-                            color="#9CA3AF"
+                            color={colors.textMuted}
                         />
                     </TouchableOpacity>
                 </View>
@@ -145,7 +132,7 @@ const SignupScreen = ({ navigation }) => {
                     <TextInput
                         style={styles.input}
                         placeholder="Confirm your password"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
                         secureTextEntry={!showPassword}
@@ -153,14 +140,11 @@ const SignupScreen = ({ navigation }) => {
                 </View>
 
                 {/* Create Account Button */}
-                <TouchableOpacity
-                    style={styles.connectButton}
-                    onPress={handleSignup}
-                    disabled={loading}
-                >
-                    <Text style={styles.connectButtonText}>
-                        {loading ? 'Creating...' : 'Create Account'}
-                    </Text>
+                <TouchableOpacity style={styles.connectButton} onPress={handleSignup} disabled={loading}>
+                    {loading
+                        ? <ActivityIndicator color={colors.white} />
+                        : <Text style={styles.connectButtonText}>Create Account</Text>
+                    }
                 </TouchableOpacity>
 
                 {/* Divider */}
@@ -191,164 +175,169 @@ const SignupScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.background,
     },
     scrollContent: {
-        padding: 24,
+        padding: spacing.lg,
         paddingTop: 60,
     },
     backButton: {
         width: 44,
         height: 44,
-        borderRadius: 12,
-        backgroundColor: '#F5F5F7',
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 32,
+        marginBottom: spacing.xl,
     },
     title: {
-        fontSize: 32,
-        fontWeight: '700',
-        color: '#1A1A2E',
-        marginBottom: 8,
+        fontSize: fontSize.hero,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
+        marginBottom: spacing.sm,
     },
     subtitle: {
-        fontSize: 15,
-        color: '#6B7280',
-        marginBottom: 32,
+        fontSize: fontSize.md,
+        color: colors.textSecondary,
+        marginBottom: spacing.xl,
+        lineHeight: 22,
     },
     errorBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FEE2E2',
-        padding: 12,
-        borderRadius: 12,
-        marginBottom: 20,
-        gap: 8,
+        backgroundColor: colors.errorBg,
+        padding: spacing.md,
+        borderRadius: borderRadius.lg,
+        marginBottom: spacing.md,
+        gap: spacing.sm,
+        borderWidth: 1,
+        borderColor: colors.error + '40',
     },
     errorText: {
-        color: '#EF4444',
-        fontSize: 14,
+        color: colors.error,
+        fontSize: fontSize.sm,
         flex: 1,
     },
     label: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#374151',
-        marginBottom: 8,
+        fontSize: fontSize.sm,
+        fontWeight: fontWeight.medium,
+        color: colors.textSecondary,
+        marginBottom: spacing.sm,
     },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
+        backgroundColor: colors.surface,
+        borderRadius: borderRadius.lg,
         borderWidth: 1,
-        borderColor: '#E5E7EB',
-        marginBottom: 20,
+        borderColor: colors.border,
+        marginBottom: spacing.md,
         height: 52,
-        paddingHorizontal: 16,
+        paddingHorizontal: spacing.md,
     },
     input: {
         flex: 1,
-        fontSize: 16,
-        color: '#1A1A2E',
+        fontSize: fontSize.md,
+        color: colors.text,
     },
     eyeIcon: {
         padding: 4,
     },
     connectButton: {
-        backgroundColor: '#FF6B35',
-        borderRadius: 12,
+        backgroundColor: colors.primary,
+        borderRadius: borderRadius.lg,
         height: 52,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 24,
-        marginTop: 8,
+        marginBottom: spacing.lg,
+        marginTop: spacing.sm,
     },
     connectButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '600',
+        color: colors.white,
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.semibold,
     },
     divider: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: spacing.lg,
     },
     dividerLine: {
         flex: 1,
         height: 1,
-        backgroundColor: '#E5E7EB',
+        backgroundColor: colors.border,
     },
     dividerText: {
-        marginHorizontal: 16,
-        fontSize: 14,
-        color: '#9CA3AF',
+        marginHorizontal: spacing.md,
+        fontSize: fontSize.sm,
+        color: colors.textMuted,
     },
     socialButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
+        backgroundColor: colors.surface,
+        borderRadius: borderRadius.lg,
         height: 52,
         borderWidth: 1,
-        borderColor: '#E5E7EB',
-        marginBottom: 24,
+        borderColor: colors.border,
+        marginBottom: spacing.lg,
         gap: 10,
     },
     googleIcon: {
         fontSize: 18,
-        fontWeight: '700',
+        fontWeight: fontWeight.bold,
         color: '#EA4335',
     },
     socialButtonText: {
-        fontSize: 15,
-        color: '#374151',
-        fontWeight: '500',
+        fontSize: fontSize.md,
+        color: colors.text,
+        fontWeight: fontWeight.medium,
     },
     loginRow: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: 32,
+        marginBottom: spacing.xl,
     },
     loginText: {
-        fontSize: 15,
-        color: '#6B7280',
+        fontSize: fontSize.md,
+        color: colors.textSecondary,
     },
     loginLink: {
-        fontSize: 15,
-        color: '#FF6B35',
-        fontWeight: '600',
+        fontSize: fontSize.md,
+        color: colors.primary,
+        fontWeight: fontWeight.semibold,
     },
-    // Success styles
+    // Success state
     successContainer: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.background,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 24,
+        padding: spacing.lg,
     },
     successIcon: {
         width: 120,
         height: 120,
         borderRadius: 60,
-        backgroundColor: '#FFF3EE',
+        backgroundColor: colors.successBg,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 24,
+        marginBottom: spacing.lg,
+        borderWidth: 1,
+        borderColor: colors.success + '30',
     },
     successTitle: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#1A1A2E',
-        marginBottom: 12,
+        fontSize: fontSize.xxxl,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
+        marginBottom: spacing.sm,
     },
     successText: {
-        fontSize: 16,
-        color: '#6B7280',
+        fontSize: fontSize.md,
+        color: colors.textSecondary,
         textAlign: 'center',
-        marginBottom: 32,
+        marginBottom: spacing.xl,
         lineHeight: 24,
     },
 });

@@ -1,303 +1,314 @@
-// Dashboard Screen - White Theme
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, RefreshControl } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+// DashboardScreen.js — Centralized-theme refactor
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+    View, Text, StyleSheet, ScrollView, TouchableOpacity,
+    RefreshControl, Image, Dimensions,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { CommonActions } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
-import { Card, Button, Avatar, Badge, Loading } from '../../components/ui';
-import { fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
-import mentorshipAPI from '../../services/mentorshipAPI';
-import careerAPI from '../../services/careerAPI';
-
-// White Theme Colors
-const whiteTheme = {
-    background: '#FFFFFF',
-    surface: '#F8F9FA',
-    text: '#1A1A2E',
-    textSecondary: '#6B7280',
-    textMuted: '#9CA3AF',
-    primary: '#FF6B35',
-    primaryDark: '#E85A2A',
-    success: '#10B981',
-    accent: '#FF6B35',
-    border: '#E5E7EB',
-    white: '#FFFFFF',
-};
+import assessmentAPI from '../../services/assessmentAPI';
+import { colors, spacing, fontSize, fontWeight, borderRadius, shadows } from '../../theme';
 
 const { width } = Dimensions.get('window');
 
 const DashboardScreen = ({ navigation }) => {
     const { user } = useAuth();
-    const [loading, setLoading] = useState(true);
+    const insets = useSafeAreaInsets();
     const [refreshing, setRefreshing] = useState(false);
-    const [stats, setStats] = useState({
-        completedAssessments: 0,
-        upcomingSessions: 0,
-        applicationStatus: null,
-        careerPath: null,
-    });
-    const [upcomingBookings, setUpcomingBookings] = useState([]);
+    const [assessmentData, setAssessmentData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchDashboardData();
-    }, []);
-
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         try {
-            const [bookings] = await Promise.all([
-                mentorshipAPI.getMyBookings(),
-            ]);
-
-            setUpcomingBookings(bookings?.data?.slice(0, 3) || []);
-            setStats({
-                completedAssessments: user?.assessments || 0,
-                upcomingSessions: bookings?.data?.length || 0,
-                applicationStatus: user?.mentorApplication?.status || null,
-                careerPath: user?.careerPath || null,
-            });
-        } catch (error) {
-            console.log('Dashboard fetch error:', error);
+            const data = await assessmentAPI.getUserResults();
+            setAssessmentData(data);
+        } catch (err) {
+            console.log('Dashboard fetch error:', err.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const onRefresh = async () => {
+    useEffect(() => {
+        fetchDashboardData();
+    }, [fetchDashboardData]);
+
+    const onRefresh = useCallback(async () => {
         setRefreshing(true);
         await fetchDashboardData();
         setRefreshing(false);
+    }, [fetchDashboardData]);
+
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good Morning';
+        if (hour < 17) return 'Good Afternoon';
+        return 'Good Evening';
     };
 
-    const quickStats = [
-        { label: 'Sessions', value: stats.upcomingSessions, icon: 'calendar', color: whiteTheme.primary },
-        { label: 'Assessments', value: stats.completedAssessments, icon: 'checkmark-circle', color: whiteTheme.success },
-        { label: 'Progress', value: '75%', icon: 'trending-up', color: whiteTheme.accent },
-    ];
+    const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
+    const hasAssessment = assessmentData && assessmentData.length > 0;
+    const latestResult = hasAssessment ? assessmentData[0] : null;
 
-    const menuItems = [
-        { icon: 'calendar-outline', title: 'My Bookings', subtitle: 'Scheduled sessions', tab: 'Mentorship', screen: 'MyBookings', badge: stats.upcomingSessions },
-        { icon: 'document-text-outline', title: 'Assessments', subtitle: 'View your results', tab: 'Career', screen: 'Assessment' },
-        { icon: 'compass-outline', title: 'Find Mentors', subtitle: 'Get guidance', tab: 'Mentorship', screen: 'MentorList' },
-        { icon: 'rocket-outline', title: 'Career Quiz', subtitle: 'Discover your path', tab: 'Career', screen: 'CareerQuiz' },
-        { icon: 'person-outline', title: 'Profile', subtitle: 'View & edit profile', tab: 'Profile', screen: 'ProfileMain' },
-        { icon: 'settings-outline', title: 'Settings', subtitle: 'Account preferences', tab: 'Profile', screen: 'ProfileMain' },
+    const quickActions = [
+        { icon: 'school-outline', label: 'Take Assessment', screen: 'Assessment', color: colors.primary },
+        { icon: 'people-outline', label: 'Find Mentors', screen: 'MentorList', color: colors.info },
+        { icon: 'calendar-outline', label: 'My Bookings', screen: 'MyBookings', color: colors.success },
+        { icon: 'person-outline', label: 'My Profile', screen: 'Profile', color: colors.warning },
     ];
-
-    if (loading) {
-        return <Loading fullScreen text="Loading dashboard..." />;
-    }
 
     return (
-        <ScrollView
-            style={styles.container}
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    tintColor={whiteTheme.primary}
-                />
-            }
-        >
-            {/* Header */}
-            <LinearGradient
-                colors={[whiteTheme.primary, whiteTheme.primaryDark]}
-                style={styles.header}
+        <View style={styles.container}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={colors.primary}
+                        colors={[colors.primary]}
+                    />
+                }
             >
-                <View style={styles.headerContent}>
-                    <View style={styles.headerLeft}>
-                        <Text style={styles.greeting}>Hello,</Text>
-                        <Text style={styles.userName}>{user?.name || 'User'}</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-                        <Avatar
-                            source={user?.profileImage}
-                            name={user?.name}
-                            size="lg"
-                            style={styles.avatar}
-                        />
-                    </TouchableOpacity>
-                </View>
-
-                {/* Quick Stats */}
-                <View style={styles.quickStats}>
-                    {quickStats.map((stat, index) => (
-                        <View key={index} style={styles.statCard}>
-                            <View style={[styles.statIcon, { backgroundColor: stat.color + '30' }]}>
-                                <Ionicons name={stat.icon} size={20} color={stat.color} />
+                {/* ── Header Gradient ── */}
+                <LinearGradient
+                    colors={[colors.primary, colors.primaryDark]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={[styles.header, { paddingTop: insets.top + spacing.md }]}
+                >
+                    <View style={styles.headerContent}>
+                        <View style={styles.greetingRow}>
+                            <View style={styles.greetingText}>
+                                <Text style={styles.greeting}>{getGreeting()} 👋</Text>
+                                <Text style={styles.userName} numberOfLines={1}>{firstName}</Text>
                             </View>
-                            <Text style={styles.statValue}>{stat.value}</Text>
-                            <Text style={styles.statLabel}>{stat.label}</Text>
+                            <TouchableOpacity
+                                style={styles.notifBtn}
+                                onPress={() => navigation.navigate('Notifications')}
+                            >
+                                <Ionicons name="notifications-outline" size={22} color={colors.white} />
+                            </TouchableOpacity>
                         </View>
-                    ))}
-                </View>
-            </LinearGradient>
 
-            {/* Upcoming Sessions */}
-            {upcomingBookings.length > 0 && (
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Upcoming Sessions</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('MyBookings')}>
-                            <Text style={styles.seeAll}>See All</Text>
-                        </TouchableOpacity>
+                        {/* Stats Banner */}
+                        <View style={styles.statsBanner}>
+                            <View style={styles.statItem}>
+                                <Text style={styles.statValue}>{hasAssessment ? assessmentData.length : 0}</Text>
+                                <Text style={styles.statLabel}>Assessments</Text>
+                            </View>
+                            <View style={styles.statDivider} />
+                            <View style={styles.statItem}>
+                                <Text style={styles.statValue}>{latestResult?.overallScore?.toFixed(0) ?? '--'}</Text>
+                                <Text style={styles.statLabel}>Best Score</Text>
+                            </View>
+                            <View style={styles.statDivider} />
+                            <View style={styles.statItem}>
+                                <Text style={styles.statValue}>0</Text>
+                                <Text style={styles.statLabel}>Sessions</Text>
+                            </View>
+                        </View>
+                    </View>
+                </LinearGradient>
+
+                <View style={styles.body}>
+                    {/* ── Quick Actions ── */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Quick Actions</Text>
+                        <View style={styles.quickActionsGrid}>
+                            {quickActions.map((action) => (
+                                <TouchableOpacity
+                                    key={action.label}
+                                    style={styles.quickAction}
+                                    onPress={() => navigation.navigate(action.screen)}
+                                    activeOpacity={0.75}
+                                >
+                                    <View style={[styles.quickActionIcon, { backgroundColor: action.color + '18' }]}>
+                                        <Ionicons name={action.icon} size={24} color={action.color} />
+                                    </View>
+                                    <Text style={styles.quickActionLabel}>{action.label}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
                     </View>
 
-                    {upcomingBookings.map((booking, index) => (
-                        <Card key={index} style={styles.bookingCard}>
-                            <View style={styles.bookingContent}>
-                                <Avatar
-                                    source={booking.mentor?.profileImage}
-                                    name={booking.mentor?.name}
-                                    size="md"
-                                />
-                                <View style={styles.bookingInfo}>
-                                    <Text style={styles.bookingMentor}>{booking.mentor?.name}</Text>
-                                    <Text style={styles.bookingTime}>
-                                        <Ionicons name="time-outline" size={14} color={whiteTheme.textSecondary} />
-                                        {' '}{new Date(booking.date).toLocaleDateString()}
+                    {/* ── Assessment Progress ── */}
+                    <View style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Assessment Progress</Text>
+                            {hasAssessment && (
+                                <TouchableOpacity onPress={() => navigation.navigate('Assessment')}>
+                                    <Text style={styles.seeAll}>View All</Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+
+                        {hasAssessment ? (
+                            <View style={styles.progressCard}>
+                                <View style={styles.progressCardHeader}>
+                                    <View style={styles.progressCardIconWrap}>
+                                        <Ionicons name="trophy-outline" size={22} color={colors.primary} />
+                                    </View>
+                                    <View style={styles.progressCardInfo}>
+                                        <Text style={styles.progressCardTitle}>
+                                            {latestResult?.title || 'Latest Assessment'}
+                                        </Text>
+                                        <Text style={styles.progressCardSub}>
+                                            Most recent result
+                                        </Text>
+                                    </View>
+                                    <Text style={styles.progressScore}>
+                                        {latestResult?.overallScore?.toFixed(0) ?? '--'}%
                                     </Text>
                                 </View>
-                                <Badge
-                                    text={booking.status}
-                                    variant={booking.status === 'confirmed' ? 'success' : 'warning'}
-                                    size="sm"
-                                />
-                            </View>
-                        </Card>
-                    ))}
-                </View>
-            )}
 
-            {/* Quick Actions Menu */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Quick Actions</Text>
-                <View style={styles.menuGrid}>
-                    {menuItems.map((item, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={styles.menuItem}
-                            onPress={() => {
-                                // Use CommonActions for cross-tab navigation
-                                navigation.dispatch(
-                                    CommonActions.navigate({
-                                        name: item.tab,
-                                        params: {
-                                            screen: item.screen,
-                                        },
-                                    })
-                                );
-                            }}
-                        >
-                            <View style={styles.menuIconContainer}>
-                                <Ionicons name={item.icon} size={24} color={whiteTheme.primary} />
-                                {item.badge > 0 && (
-                                    <View style={styles.menuBadge}>
-                                        <Text style={styles.menuBadgeText}>{item.badge}</Text>
+                                {/* Score bar */}
+                                <View style={styles.scoreBarBg}>
+                                    <View
+                                        style={[
+                                            styles.scoreBarFill,
+                                            { width: `${Math.min(latestResult?.overallScore ?? 0, 100)}%` },
+                                        ]}
+                                    />
+                                </View>
+
+                                <View style={styles.domainChips}>
+                                    {(latestResult?.domains || []).slice(0, 3).map((d, i) => (
+                                        <View key={i} style={styles.domainChip}>
+                                            <Text style={styles.domainChipText}>{d.name}</Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
+                        ) : (
+                            <TouchableOpacity
+                                style={styles.emptyCard}
+                                onPress={() => navigation.navigate('Assessment')}
+                                activeOpacity={0.8}
+                            >
+                                <LinearGradient
+                                    colors={[colors.primary + '12', colors.primaryDark + '06']}
+                                    style={styles.emptyCardGradient}
+                                >
+                                    <Ionicons name="clipboard-outline" size={42} color={colors.primary} />
+                                    <Text style={styles.emptyCardTitle}>Start Your First Assessment</Text>
+                                    <Text style={styles.emptyCardSub}>
+                                        Discover your skill gaps and get personalized recommendations
+                                    </Text>
+                                    <View style={styles.emptyCardBtn}>
+                                        <Text style={styles.emptyCardBtnText}>Take Assessment →</Text>
                                     </View>
-                                )}
-                            </View>
-                            <Text style={styles.menuTitle}>{item.title}</Text>
-                            <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            </View>
-
-            {/* Career Progress */}
-            <View style={styles.section}>
-                <Card gradient gradientColors={[whiteTheme.accent + '30', whiteTheme.accent + '10']}>
-                    <View style={styles.progressCard}>
-                        <View style={styles.progressHeader}>
-                            <Ionicons name="rocket" size={32} color={whiteTheme.accent} />
-                            <View style={styles.progressInfo}>
-                                <Text style={styles.progressTitle}>Career Progress</Text>
-                                <Text style={styles.progressSubtitle}>Keep up the great work!</Text>
-                            </View>
-                        </View>
-                        <View style={styles.progressBar}>
-                            <View style={[styles.progressFill, { width: '75%' }]} />
-                        </View>
-                        <Text style={styles.progressText}>75% of profile completed</Text>
-                        <Button
-                            title="Complete Profile"
-                            variant="outline"
-                            size="sm"
-                            onPress={() => navigation.navigate('Profile')}
-                            style={styles.progressButton}
-                        />
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        )}
                     </View>
-                </Card>
-            </View>
 
-            <View style={styles.bottomPadding} />
-        </ScrollView>
+                    {/* ── Find Mentors CTA ── */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Get Expert Guidance</Text>
+                        <TouchableOpacity
+                            style={styles.mentorCTA}
+                            onPress={() => navigation.navigate('MentorList')}
+                            activeOpacity={0.8}
+                        >
+                            <LinearGradient
+                                colors={[colors.info + '15', colors.info + '06']}
+                                style={styles.mentorCTAInner}
+                            >
+                                <View style={styles.mentorCTAContent}>
+                                    <View style={styles.mentorCTAIcon}>
+                                        <Ionicons name="people" size={28} color={colors.info} />
+                                    </View>
+                                    <View>
+                                        <Text style={styles.mentorCTATitle}>Browse Mentors</Text>
+                                        <Text style={styles.mentorCTASub}>Free sessions available</Text>
+                                    </View>
+                                </View>
+                                <Ionicons name="arrow-forward" size={20} color={colors.info} />
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={{ height: 100 }} />
+                </View>
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: whiteTheme.background,
+        backgroundColor: colors.background,
     },
     header: {
-        padding: spacing.lg,
-        paddingTop: spacing.xxl + 20,
-        borderBottomLeftRadius: borderRadius.xxl,
-        borderBottomRightRadius: borderRadius.xxl,
+        paddingBottom: spacing.xl,
+        paddingHorizontal: spacing.md,
     },
     headerContent: {
+        gap: spacing.lg,
+    },
+    greetingRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: spacing.xl,
+        alignItems: 'flex-start',
     },
-    headerLeft: {},
+    greetingText: {
+        flex: 1,
+    },
     greeting: {
         fontSize: fontSize.md,
-        color: whiteTheme.white + 'CC',
+        color: colors.white + 'CC',
+        fontWeight: fontWeight.medium,
     },
     userName: {
-        fontSize: fontSize.xxl,
-        fontWeight: fontWeight.bold,
-        color: whiteTheme.white,
+        fontSize: fontSize.xxxl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.white,
+        marginTop: 2,
     },
-    avatar: {
-        borderWidth: 3,
-        borderColor: whiteTheme.white,
-    },
-    quickStats: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        gap: spacing.sm,
-    },
-    statCard: {
-        flex: 1,
-        backgroundColor: whiteTheme.white + '15',
+    notifBtn: {
+        width: 44,
+        height: 44,
         borderRadius: borderRadius.lg,
-        padding: spacing.md,
-        alignItems: 'center',
-    },
-    statIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: borderRadius.md,
+        backgroundColor: colors.white + '20',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: spacing.xs,
+        marginTop: 4,
+    },
+    statsBanner: {
+        flexDirection: 'row',
+        backgroundColor: colors.white + '18',
+        borderRadius: borderRadius.xl,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.lg,
+    },
+    statItem: {
+        flex: 1,
+        alignItems: 'center',
     },
     statValue: {
-        fontSize: fontSize.xl,
-        fontWeight: fontWeight.bold,
-        color: whiteTheme.white,
+        fontSize: fontSize.xxl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.white,
     },
     statLabel: {
         fontSize: fontSize.xs,
-        color: whiteTheme.white + 'CC',
+        color: colors.white + 'BB',
+        marginTop: 2,
+    },
+    statDivider: {
+        width: 1,
+        backgroundColor: colors.white + '40',
+        marginVertical: 4,
+    },
+    body: {
+        padding: spacing.md,
     },
     section: {
-        padding: spacing.md,
+        marginBottom: spacing.lg,
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -308,118 +319,179 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: fontSize.lg,
         fontWeight: fontWeight.bold,
-        color: whiteTheme.text,
+        color: colors.text,
+        marginBottom: spacing.md,
     },
     seeAll: {
         fontSize: fontSize.sm,
-        color: whiteTheme.primary,
-        fontWeight: fontWeight.medium,
-    },
-    bookingCard: {
-        marginBottom: spacing.sm,
-    },
-    bookingContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    bookingInfo: {
-        flex: 1,
-        marginLeft: spacing.md,
-    },
-    bookingMentor: {
-        fontSize: fontSize.md,
+        color: colors.primary,
         fontWeight: fontWeight.semibold,
-        color: whiteTheme.text,
     },
-    bookingTime: {
-        fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
-        marginTop: 2,
-    },
-    menuGrid: {
+    // ── Quick Actions ──────────────────────────────────────
+    quickActionsGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: spacing.md,
+        gap: spacing.sm,
     },
-    menuItem: {
-        width: (width - spacing.md * 3) / 2,
-        backgroundColor: whiteTheme.surface,
+    quickAction: {
+        width: (width - spacing.md * 2 - spacing.sm * 3) / 4,
+        alignItems: 'center',
+        gap: spacing.xs,
+    },
+    quickActionIcon: {
+        width: 56,
+        height: 56,
         borderRadius: borderRadius.xl,
-        padding: spacing.md,
-        ...shadows.sm,
-    },
-    menuIconContainer: {
-        position: 'relative',
-        marginBottom: spacing.sm,
-    },
-    menuBadge: {
-        position: 'absolute',
-        top: -4,
-        right: -4,
-        backgroundColor: whiteTheme.error,
-        borderRadius: 10,
-        width: 20,
-        height: 20,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    menuBadgeText: {
-        fontSize: 10,
-        color: whiteTheme.white,
-        fontWeight: fontWeight.bold,
+    quickActionLabel: {
+        fontSize: 11,
+        color: colors.textSecondary,
+        textAlign: 'center',
+        fontWeight: fontWeight.medium,
     },
-    menuTitle: {
-        fontSize: fontSize.md,
-        fontWeight: fontWeight.semibold,
-        color: whiteTheme.text,
-    },
-    menuSubtitle: {
-        fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
-        marginTop: 2,
-    },
+    // ── Progress Card ──────────────────────────────────────
     progressCard: {
-        padding: spacing.sm,
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
+        padding: spacing.md,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        ...shadows.sm,
     },
-    progressHeader: {
+    progressCardHeader: {
         flexDirection: 'row',
         alignItems: 'center',
+        gap: spacing.sm,
         marginBottom: spacing.md,
     },
-    progressInfo: {
-        marginLeft: spacing.md,
+    progressCardIconWrap: {
+        width: 42,
+        height: 42,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.primaryBg,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    progressTitle: {
+    progressCardInfo: {
+        flex: 1,
+    },
+    progressCardTitle: {
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.semibold,
+        color: colors.text,
+    },
+    progressCardSub: {
+        fontSize: fontSize.xs,
+        color: colors.textMuted,
+        marginTop: 2,
+    },
+    progressScore: {
+        fontSize: fontSize.xl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.primary,
+    },
+    scoreBarBg: {
+        height: 6,
+        backgroundColor: colors.surfaceAlt,
+        borderRadius: borderRadius.full,
+        overflow: 'hidden',
+        marginBottom: spacing.md,
+    },
+    scoreBarFill: {
+        height: '100%',
+        backgroundColor: colors.primary,
+        borderRadius: borderRadius.full,
+    },
+    domainChips: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: spacing.xs,
+    },
+    domainChip: {
+        backgroundColor: colors.primaryBg,
+        paddingHorizontal: spacing.sm + 2,
+        paddingVertical: 4,
+        borderRadius: borderRadius.full,
+    },
+    domainChipText: {
+        fontSize: fontSize.xs,
+        fontWeight: fontWeight.medium,
+        color: colors.primary,
+    },
+    // ── Empty State Card ───────────────────────────────────
+    emptyCard: {
+        borderRadius: borderRadius.xl,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: colors.primaryBorder,
+    },
+    emptyCardGradient: {
+        paddingVertical: spacing.xl,
+        paddingHorizontal: spacing.lg,
+        alignItems: 'center',
+        gap: spacing.sm,
+    },
+    emptyCardTitle: {
         fontSize: fontSize.lg,
         fontWeight: fontWeight.bold,
-        color: whiteTheme.text,
+        color: colors.text,
+        textAlign: 'center',
     },
-    progressSubtitle: {
+    emptyCardSub: {
         fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
+        color: colors.textSecondary,
+        textAlign: 'center',
+        lineHeight: 20,
     },
-    progressBar: {
-        height: 8,
-        backgroundColor: whiteTheme.background,
-        borderRadius: 4,
+    emptyCardBtn: {
+        marginTop: spacing.sm,
+        backgroundColor: colors.primary,
+        paddingVertical: spacing.sm + 2,
+        paddingHorizontal: spacing.lg,
+        borderRadius: borderRadius.full,
+    },
+    emptyCardBtnText: {
+        color: colors.white,
+        fontWeight: fontWeight.semibold,
+        fontSize: fontSize.md,
+    },
+    // ── Mentor CTA──────────────────────────────────────────
+    mentorCTA: {
+        borderRadius: borderRadius.xl,
         overflow: 'hidden',
-        marginBottom: spacing.sm,
+        borderWidth: 1,
+        borderColor: colors.info + '30',
     },
-    progressFill: {
-        height: '100%',
-        backgroundColor: whiteTheme.accent,
-        borderRadius: 4,
+    mentorCTAInner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: spacing.md,
     },
-    progressText: {
+    mentorCTAContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing.md,
+    },
+    mentorCTAIcon: {
+        width: 52,
+        height: 52,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.info + '18',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    mentorCTATitle: {
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
+    },
+    mentorCTASub: {
         fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
-        marginBottom: spacing.md,
-    },
-    progressButton: {
-        alignSelf: 'flex-start',
-    },
-    bottomPadding: {
-        height: 100,
+        color: colors.textSecondary,
+        marginTop: 2,
     },
 });
 

@@ -4,8 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import authAPI from '../../services/authAPI';
 import { ScreenWrapper } from '../../components/layout';
 import { Button, Input } from '../../components/ui';
-import { uiTheme } from '../profile/ProfileScreen';
-import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { colors, fontSize, fontWeight, spacing, borderRadius } from '../../theme';
 
 const ResetPasswordScreen = ({ navigation, route }) => {
     const { resetToken, email, fromProfile = false } = route.params || {};
@@ -57,7 +56,7 @@ const ResetPasswordScreen = ({ navigation, route }) => {
     };
 
     return (
-        <ScreenWrapper scrollable={false} style={{ backgroundColor: uiTheme.background }}>
+        <ScreenWrapper scrollable={false} style={{ backgroundColor: colors.background }}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.container}
@@ -68,7 +67,7 @@ const ResetPasswordScreen = ({ navigation, route }) => {
                     onPress={() => navigation.goBack()}
                 >
                     <View style={styles.backCircle}>
-                        <Ionicons name="arrow-back" size={24} color={uiTheme.primary} />
+                        <Ionicons name="arrow-back" size={24} color={colors.primary} />
                     </View>
                 </TouchableOpacity>
 
@@ -90,13 +89,13 @@ const ResetPasswordScreen = ({ navigation, route }) => {
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry={!showPassword}
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                         icon={
                             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                                 <Ionicons
                                     name={showPassword ? "eye-off-outline" : "eye-outline"}
                                     size={20}
-                                    color={uiTheme.textSecondary}
+                                    color={colors.textSecondary}
                                 />
                             </TouchableOpacity>
                         }
@@ -108,12 +107,12 @@ const ResetPasswordScreen = ({ navigation, route }) => {
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
                         secureTextEntry={!showPassword}
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                         icon={
                             <Ionicons
                                 name="lock-closed-outline"
                                 size={20}
-                                color={uiTheme.textSecondary}
+                                color={colors.textSecondary}
                             />
                         }
                     />
@@ -122,7 +121,7 @@ const ResetPasswordScreen = ({ navigation, route }) => {
                         title="RESET PASSWORD"
                         onPress={handleReset}
                         loading={loading}
-                        color={uiTheme.primary}
+                        color={colors.primary}
                         style={styles.resetButton}
                     />
                 </View>
@@ -144,7 +143,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -154,12 +153,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#111827',
+        color: colors.text,
         marginBottom: 12,
     },
     subtitle: {
         fontSize: 16,
-        color: '#4B5563',
+        color: colors.textSecondary,
         lineHeight: 24,
     },
     form: {

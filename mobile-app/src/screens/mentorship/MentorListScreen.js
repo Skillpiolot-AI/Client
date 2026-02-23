@@ -1,86 +1,61 @@
-// Mentor List Screen - White Theme with Advanced Filters
+// MentorListScreen.js — Centralized-theme refactor
+// Removes local `whiteTheme` object; uses centralized theme tokens throughout.
 import React, { useState, useEffect } from 'react';
 import {
     View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput,
-    RefreshControl, Modal, ScrollView, Image, ActivityIndicator
+    RefreshControl, Modal, ScrollView, Image, ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
 import mentorshipAPI from '../../services/mentorshipAPI';
 
-// White Theme Colors
-const whiteTheme = {
-    background: '#FFFFFF',
-    surface: '#F8F9FA',
-    surfaceAlt: '#F1F3F5',
-    text: '#1A1A2E',
-    textSecondary: '#6B7280',
-    textMuted: '#9CA3AF',
-    primary: '#FF6B35',
-    primaryLight: '#FF6B3520',
-    success: '#10B981',
-    successLight: '#10B98118',
-    warning: '#F59E0B',
-    border: '#E5E7EB',
-    white: '#FFFFFF',
-    overlay: 'rgba(0,0,0,0.5)',
-};
-
-// Filter domains
 const DOMAINS = [
     'Frontend', 'Backend', 'Fullstack',
     'DevOps / Cloud', 'QA / Testing',
     'Data Science / AI', 'Data Analyst',
-    'Mobile Dev', 'System Design'
+    'Mobile Dev', 'System Design',
 ];
 
-// Mentee types / Offering
-const MENTEE_TYPES = [
-    'Fresher',
-    'Working Professional',
-    'Student',
-    'Career Switch'
+const MENTEE_TYPES = ['Fresher', 'Working Professional', 'Student', 'Career Switch'];
+
+const SORT_OPTIONS = [
+    { value: 'recommended', label: 'Recommended' },
+    { value: 'rating', label: 'Highest Rated' },
+    { value: 'experience', label: 'Most Experienced' },
 ];
 
 const MentorListScreen = ({ navigation }) => {
-    // User context - disabled for now
-    const user = null;
+    const user = null; // context disabled
+    const insets = useSafeAreaInsets();
+
     const [mentors, setMentors] = useState([]);
     const [filteredMentors, setFilteredMentors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    // Search & Filter State
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [selectedDomains, setSelectedDomains] = useState([]);
     const [selectedMenteeType, setSelectedMenteeType] = useState('');
-    const [priceRange, setPriceRange] = useState(40000);
     const [experienceRange, setExperienceRange] = useState(15);
     const [sortBy, setSortBy] = useState('recommended');
 
-    // Active filter count
-    const activeFilterCount = selectedDomains.length +
+    const activeFilterCount =
+        selectedDomains.length +
         (selectedMenteeType ? 1 : 0) +
-        (priceRange < 40000 ? 1 : 0) +
         (experienceRange < 15 ? 1 : 0);
 
-    useEffect(() => {
-        fetchMentors();
-    }, []);
+    useEffect(() => { fetchMentors(); }, []);
 
     useEffect(() => {
         filterMentors();
-    }, [searchQuery, selectedDomains, selectedMenteeType, priceRange, experienceRange, sortBy, mentors]);
+    }, [searchQuery, selectedDomains, selectedMenteeType, experienceRange, sortBy, mentors]);
 
     const fetchMentors = async () => {
         try {
             const response = await mentorshipAPI.getMentors();
-            // API returns: { mentors: [...], pagination: {...}, filters: {...} }
-            // mentorshipAPI.getMentors() returns response.data directly
-            console.log('Mentors API response:', Object.keys(response || {}));
             const mentorData = response?.mentors || response?.data?.mentors || response || [];
-            console.log('Mentor count:', mentorData.length);
             setMentors(Array.isArray(mentorData) ? mentorData : []);
         } catch (error) {
             console.log('Fetch mentors error:', error);
@@ -98,49 +73,46 @@ const MentorListScreen = ({ navigation }) => {
     const filterMentors = () => {
         let filtered = [...mentors];
 
-        // Hide self if logged in as mentor
+        // Hide self
         if (user?.id || user?._id) {
             const userId = user.id || user._id;
-            filtered = filtered.filter(mentor => {
-                const mentorUserId = mentor.userId?._id || mentor.userId || mentor._id;
-                return mentorUserId !== userId;
+            filtered = filtered.filter((m) => {
+                const mId = m.userId?._id || m.userId || m._id;
+                return mId !== userId;
             });
         }
 
-        // Search filter
+        // Search
         if (searchQuery) {
             const term = searchQuery.toLowerCase();
-            filtered = filtered.filter(mentor =>
-                (mentor.displayName || mentor.name || '').toLowerCase().includes(term) ||
-                (mentor.expertise || mentor.tagline || '').toLowerCase().includes(term) ||
-                (mentor.targetingDomains || []).some(d => d.toLowerCase().includes(term))
+            filtered = filtered.filter((m) =>
+                (m.displayName || m.name || '').toLowerCase().includes(term) ||
+                (m.expertise || m.tagline || '').toLowerCase().includes(term) ||
+                (m.targetingDomains || []).some((d) => d.toLowerCase().includes(term))
             );
         }
 
-        // Domain filter
+        // Domain
         if (selectedDomains.length > 0) {
-            filtered = filtered.filter(mentor => {
-                const mentorDomains = (mentor.targetingDomains || []).map(d => d.toLowerCase());
-                return selectedDomains.some(domain =>
-                    mentorDomains.some(d => d.includes(domain.toLowerCase()) || domain.toLowerCase().includes(d))
+            filtered = filtered.filter((m) => {
+                const mDomains = (m.targetingDomains || []).map((d) => d.toLowerCase());
+                return selectedDomains.some((domain) =>
+                    mDomains.some((d) => d.includes(domain.toLowerCase()) || domain.toLowerCase().includes(d))
                 );
             });
         }
 
-        // Mentee type filter
+        // Mentee type
         if (selectedMenteeType) {
-            filtered = filtered.filter(mentor => {
-                const types = (mentor.preferredMenteeType || []).map(t => t.toLowerCase());
-                return types.some(t => t.includes(selectedMenteeType.toLowerCase()));
+            filtered = filtered.filter((m) => {
+                const types = (m.preferredMenteeType || []).map((t) => t.toLowerCase());
+                return types.some((t) => t.includes(selectedMenteeType.toLowerCase()));
             });
         }
 
-        // Experience filter
+        // Experience
         if (experienceRange < 15) {
-            filtered = filtered.filter(mentor => {
-                const exp = parseInt(mentor.experience) || 0;
-                return exp <= experienceRange;
-            });
+            filtered = filtered.filter((m) => (parseInt(m.experience) || 0) <= experienceRange);
         }
 
         // Sort
@@ -152,7 +124,6 @@ const MentorListScreen = ({ navigation }) => {
                 filtered.sort((a, b) => (b.experience || 0) - (a.experience || 0));
                 break;
             default:
-                // Recommended - featured first
                 filtered.sort((a, b) => {
                     if (a.featured && !b.featured) return -1;
                     if (!a.featured && b.featured) return 1;
@@ -164,222 +135,198 @@ const MentorListScreen = ({ navigation }) => {
     };
 
     const toggleDomain = (domain) => {
-        setSelectedDomains(prev =>
-            prev.includes(domain)
-                ? prev.filter(d => d !== domain)
-                : [...prev, domain]
+        setSelectedDomains((prev) =>
+            prev.includes(domain) ? prev.filter((d) => d !== domain) : [...prev, domain]
         );
     };
 
     const clearAllFilters = () => {
         setSelectedDomains([]);
         setSelectedMenteeType('');
-        setPriceRange(40000);
         setExperienceRange(15);
         setSortBy('recommended');
     };
 
+    // ── Mentor card ─────────────────────────────────────────────────────────
     const renderMentorCard = ({ item: mentor }) => (
         <TouchableOpacity
+            style={styles.mentorCard}
             onPress={() => navigation.navigate('MentorDetail', { mentor })}
             activeOpacity={0.8}
         >
-            <View style={styles.mentorCard}>
-                <View style={styles.mentorHeader}>
-                    {(mentor.profileImage || mentor.avatar) ? (
-                        <Image
-                            source={{ uri: mentor.profileImage || mentor.avatar }}
-                            style={styles.avatarImage}
-                        />
-                    ) : (
-                        <View style={styles.avatarPlaceholder}>
-                            <Text style={styles.avatarText}>
-                                {(mentor.displayName || mentor.name || '?').charAt(0).toUpperCase()}
-                            </Text>
-                        </View>
-                    )}
-                    <View style={styles.mentorInfo}>
-                        <View style={styles.nameRow}>
-                            <Text style={styles.mentorName}>{mentor.displayName || mentor.name}</Text>
-                            {mentor.verified && (
-                                <Ionicons name="checkmark-circle" size={18} color={whiteTheme.primary} />
-                            )}
-                        </View>
-                        <Text style={styles.mentorTitle} numberOfLines={1}>
-                            {mentor.tagline || mentor.expertise || mentor.jobTitle}
+            <View style={styles.mentorCardHeader}>
+                {(mentor.profileImage || mentor.avatar) ? (
+                    <Image source={{ uri: mentor.profileImage || mentor.avatar }} style={styles.avatar} />
+                ) : (
+                    <View style={styles.avatarPlaceholder}>
+                        <Text style={styles.avatarInitial}>
+                            {(mentor.displayName || mentor.name || '?').charAt(0).toUpperCase()}
                         </Text>
-                        <View style={styles.ratingRow}>
-                            {mentor.averageRating > 0 ? (
-                                <>
-                                    <Ionicons name="star" size={14} color={whiteTheme.warning} />
-                                    <Text style={styles.rating}>{mentor.averageRating.toFixed(1)}</Text>
-                                    <Text style={styles.sessions}>({mentor.totalReviews || 0} reviews)</Text>
-                                </>
-                            ) : (
-                                <>
-                                    <Ionicons name="sparkles-outline" size={14} color={whiteTheme.primary} />
-                                    <Text style={[styles.rating, { color: whiteTheme.primary }]}>New</Text>
-                                </>
-                            )}
-                            <Text style={styles.sessions}>• {mentor.experience || 0} yrs</Text>
-                        </View>
+                    </View>
+                )}
+                <View style={styles.mentorInfo}>
+                    <View style={styles.nameRow}>
+                        <Text style={styles.mentorName} numberOfLines={1}>
+                            {mentor.displayName || mentor.name}
+                        </Text>
+                        {mentor.verified && (
+                            <Ionicons name="checkmark-circle" size={16} color={colors.primary} />
+                        )}
+                    </View>
+                    <Text style={styles.mentorTitle} numberOfLines={1}>
+                        {mentor.tagline || mentor.expertise || mentor.jobTitle}
+                    </Text>
+                    <View style={styles.metaRow}>
+                        {mentor.averageRating > 0 ? (
+                            <>
+                                <Ionicons name="star" size={13} color={colors.warning} />
+                                <Text style={styles.metaText}>{mentor.averageRating.toFixed(1)}</Text>
+                                <Text style={styles.metaTextMuted}>({mentor.totalReviews || 0})</Text>
+                            </>
+                        ) : (
+                            <>
+                                <Ionicons name="sparkles-outline" size={13} color={colors.primary} />
+                                <Text style={[styles.metaText, { color: colors.primary }]}>New</Text>
+                            </>
+                        )}
+                        <Text style={styles.metaTextMuted}>• {mentor.experience || 0} yrs exp</Text>
                     </View>
                 </View>
+            </View>
 
-                <Text style={styles.mentorBio} numberOfLines={2}>
-                    {mentor.bio || 'Experienced professional ready to guide you on your career journey.'}
-                </Text>
+            <Text style={styles.mentorBio} numberOfLines={2}>
+                {mentor.bio || 'Experienced professional ready to guide you on your career journey.'}
+            </Text>
 
-                <View style={styles.skillsRow}>
-                    {(mentor.targetingDomains || mentor.expertise?.split(',') || []).slice(0, 3).map((skill, index) => (
-                        <View key={index} style={styles.skillChip}>
-                            <Text style={styles.skillText}>{skill.trim()}</Text>
-                        </View>
-                    ))}
-                </View>
-
-                <View style={styles.mentorFooter}>
-                    <View style={styles.freeContainer}>
-                        <Ionicons name="gift" size={16} color={whiteTheme.success} />
-                        <Text style={styles.freeText}>FREE SESSION</Text>
+            <View style={styles.skillsRow}>
+                {(mentor.targetingDomains || mentor.expertise?.split(',') || []).slice(0, 3).map((skill, i) => (
+                    <View key={i} style={styles.skillChip}>
+                        <Text style={styles.skillText}>{skill.trim()}</Text>
                     </View>
-                    <TouchableOpacity
-                        style={styles.bookBtn}
-                        onPress={() => navigation.navigate('BookSession', { mentor })}
-                    >
-                        <Text style={styles.bookBtnText}>Book Now</Text>
-                        <Ionicons name="arrow-forward" size={16} color={whiteTheme.white} />
-                    </TouchableOpacity>
+                ))}
+            </View>
+
+            <View style={styles.cardFooter}>
+                <View style={styles.freeBadge}>
+                    <Ionicons name="gift" size={14} color={colors.success} />
+                    <Text style={styles.freeText}>FREE SESSION</Text>
                 </View>
+                <TouchableOpacity
+                    style={styles.bookBtn}
+                    onPress={() => navigation.navigate('BookSession', { mentor })}
+                    activeOpacity={0.85}
+                >
+                    <Text style={styles.bookBtnText}>Book Now</Text>
+                    <Ionicons name="arrow-forward" size={15} color={colors.white} />
+                </TouchableOpacity>
             </View>
         </TouchableOpacity>
     );
 
-    // Filter Modal
+    // ── Filter Modal ─────────────────────────────────────────────────────────
     const FilterModal = () => (
         <Modal
             visible={showFilterModal}
             animationType="slide"
-            transparent={true}
+            transparent
             onRequestClose={() => setShowFilterModal(false)}
         >
-            <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
+            <View style={styles.overlay}>
+                <View style={styles.modalSheet}>
+                    <View style={styles.modalHandle} />
                     {/* Modal Header */}
                     <View style={styles.modalHeader}>
                         <Text style={styles.modalTitle}>Filters</Text>
-                        <TouchableOpacity onPress={() => setShowFilterModal(false)}>
-                            <Ionicons name="close" size={24} color={whiteTheme.text} />
+                        <TouchableOpacity
+                            onPress={() => setShowFilterModal(false)}
+                            style={styles.modalCloseBtn}
+                        >
+                            <Ionicons name="close" size={22} color={colors.text} />
                         </TouchableOpacity>
                     </View>
 
-                    <ScrollView showsVerticalScrollIndicator={false} style={styles.modalScroll}>
+                    <ScrollView showsVerticalScrollIndicator={false} style={styles.modalBody}>
                         {/* Sort By */}
-                        <View style={styles.filterSection}>
-                            <Text style={styles.filterSectionTitle}>Sort By</Text>
-                            <View style={styles.sortOptions}>
-                                {[
-                                    { value: 'recommended', label: 'Recommended' },
-                                    { value: 'rating', label: 'Highest Rated' },
-                                    { value: 'experience', label: 'Most Experienced' },
-                                ].map((option) => (
-                                    <TouchableOpacity
-                                        key={option.value}
-                                        style={[styles.sortChip, sortBy === option.value && styles.sortChipActive]}
-                                        onPress={() => setSortBy(option.value)}
-                                    >
-                                        <Text style={[styles.sortChipText, sortBy === option.value && styles.sortChipTextActive]}>
-                                            {option.label}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                        </View>
-
-                        {/* Domain Filter */}
-                        <View style={styles.filterSection}>
-                            <Text style={styles.filterSectionTitle}>Domain</Text>
-                            <View style={styles.domainGrid}>
-                                {DOMAINS.map((domain) => (
-                                    <TouchableOpacity
-                                        key={domain}
-                                        style={[
-                                            styles.domainChip,
-                                            selectedDomains.includes(domain) && styles.domainChipActive
-                                        ]}
-                                        onPress={() => toggleDomain(domain)}
-                                    >
-                                        <Text style={[
-                                            styles.domainText,
-                                            selectedDomains.includes(domain) && styles.domainTextActive
-                                        ]}>
-                                            {domain}
-                                        </Text>
-                                        {selectedDomains.includes(domain) && (
-                                            <Ionicons name="checkmark" size={14} color={whiteTheme.white} />
-                                        )}
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                        </View>
-
-                        {/* Offering For */}
-                        <View style={styles.filterSection}>
-                            <Text style={styles.filterSectionTitle}>Offering Mentorship For</Text>
-                            <View style={styles.menteeOptions}>
+                        <Text style={styles.filterSectionTitle}>Sort By</Text>
+                        <View style={styles.chipRow}>
+                            {SORT_OPTIONS.map((opt) => (
                                 <TouchableOpacity
-                                    style={[styles.menteeChip, !selectedMenteeType && styles.menteeChipActive]}
-                                    onPress={() => setSelectedMenteeType('')}
+                                    key={opt.value}
+                                    style={[styles.filterChip, sortBy === opt.value && styles.filterChipActive]}
+                                    onPress={() => setSortBy(opt.value)}
                                 >
-                                    <Text style={[styles.menteeText, !selectedMenteeType && styles.menteeTextActive]}>
-                                        All Types
+                                    <Text style={[styles.filterChipText, sortBy === opt.value && styles.filterChipTextActive]}>
+                                        {opt.label}
                                     </Text>
                                 </TouchableOpacity>
-                                {MENTEE_TYPES.map((type) => (
+                            ))}
+                        </View>
+
+                        {/* Domain */}
+                        <Text style={styles.filterSectionTitle}>Domain</Text>
+                        <View style={styles.chipWrap}>
+                            {DOMAINS.map((domain) => {
+                                const active = selectedDomains.includes(domain);
+                                return (
+                                    <TouchableOpacity
+                                        key={domain}
+                                        style={[styles.filterChip, active && styles.filterChipActive]}
+                                        onPress={() => toggleDomain(domain)}
+                                    >
+                                        {active && <Ionicons name="checkmark" size={13} color={colors.white} />}
+                                        <Text style={[styles.filterChipText, active && styles.filterChipTextActive]}>
+                                            {domain}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
+
+                        {/* Mentee Type */}
+                        <Text style={styles.filterSectionTitle}>Offering For</Text>
+                        <View style={styles.chipWrap}>
+                            {['All Types', ...MENTEE_TYPES].map((type) => {
+                                const val = type === 'All Types' ? '' : type;
+                                const active = selectedMenteeType === val;
+                                return (
                                     <TouchableOpacity
                                         key={type}
-                                        style={[
-                                            styles.menteeChip,
-                                            selectedMenteeType === type && styles.menteeChipActive
-                                        ]}
-                                        onPress={() => setSelectedMenteeType(type)}
+                                        style={[styles.filterChip, active && styles.filterChipActive]}
+                                        onPress={() => setSelectedMenteeType(val)}
                                     >
-                                        <Text style={[
-                                            styles.menteeText,
-                                            selectedMenteeType === type && styles.menteeTextActive
-                                        ]}>
+                                        <Text style={[styles.filterChipText, active && styles.filterChipTextActive]}>
                                             {type}
                                         </Text>
                                     </TouchableOpacity>
-                                ))}
-                            </View>
+                                );
+                            })}
                         </View>
 
-                        {/* Experience Range */}
-                        <View style={styles.filterSection}>
-                            <View style={styles.rangeHeader}>
-                                <Text style={styles.filterSectionTitle}>Max Experience</Text>
-                                <Text style={styles.rangeValue}>
-                                    {experienceRange}{experienceRange === 15 ? '+' : ''} years
-                                </Text>
-                            </View>
-                            <View style={styles.rangeRow}>
-                                {[3, 5, 8, 10, 15].map((val) => (
-                                    <TouchableOpacity
-                                        key={val}
-                                        style={[styles.rangeBtn, experienceRange === val && styles.rangeBtnActive]}
-                                        onPress={() => setExperienceRange(val)}
-                                    >
-                                        <Text style={[styles.rangeBtnText, experienceRange === val && styles.rangeBtnTextActive]}>
-                                            {val}{val === 15 ? '+' : ''}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
+                        {/* Experience */}
+                        <View style={styles.filterRangeHeader}>
+                            <Text style={styles.filterSectionTitle}>Max Experience</Text>
+                            <Text style={styles.filterRangeValue}>
+                                {experienceRange}{experienceRange === 15 ? '+' : ''} yrs
+                            </Text>
                         </View>
+                        <View style={styles.chipRow}>
+                            {[3, 5, 8, 10, 15].map((val) => (
+                                <TouchableOpacity
+                                    key={val}
+                                    style={[styles.filterChip, experienceRange === val && styles.filterChipActive]}
+                                    onPress={() => setExperienceRange(val)}
+                                >
+                                    <Text style={[styles.filterChipText, experienceRange === val && styles.filterChipTextActive]}>
+                                        {val}{val === 15 ? '+' : ''} yrs
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        <View style={{ height: 16 }} />
                     </ScrollView>
 
-                    {/* Modal Footer */}
+                    {/* Footer */}
                     <View style={styles.modalFooter}>
                         <TouchableOpacity style={styles.clearBtn} onPress={clearAllFilters}>
                             <Text style={styles.clearBtnText}>Clear All</Text>
@@ -389,7 +336,7 @@ const MentorListScreen = ({ navigation }) => {
                             onPress={() => setShowFilterModal(false)}
                         >
                             <Text style={styles.applyBtnText}>
-                                Apply Filters ({filteredMentors.length})
+                                Apply ({filteredMentors.length})
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -398,121 +345,98 @@ const MentorListScreen = ({ navigation }) => {
         </Modal>
     );
 
+    // ── Empty State ───────────────────────────────────────────────────────────
+    const ListEmpty = () => (
+        <View style={styles.emptyState}>
+            <Ionicons name="people-outline" size={52} color={colors.border} />
+            <Text style={styles.emptyTitle}>No mentors found</Text>
+            <Text style={styles.emptySubtitle}>
+                {searchQuery || activeFilterCount > 0
+                    ? 'Try adjusting your search or filters'
+                    : 'Check back later for new mentors'}
+            </Text>
+            {activeFilterCount > 0 && (
+                <TouchableOpacity style={styles.clearFiltersBtn} onPress={clearAllFilters}>
+                    <Text style={styles.clearFiltersBtnText}>Clear Filters</Text>
+                </TouchableOpacity>
+            )}
+        </View>
+    );
+
+    // ── Main render ─────────────────────────────────────────────────────────
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={whiteTheme.primary} />
-                <Text style={styles.loadingText}>Loading mentors...</Text>
+            <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
+                <ActivityIndicator size="large" color={colors.primary} />
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            {/* Search Header */}
-            <View style={styles.searchHeader}>
-                <Text style={styles.headerTitle}>Find Mentors</Text>
-                <View style={styles.searchRow}>
-                    <View style={styles.searchContainer}>
-                        <Ionicons name="search-outline" size={20} color={whiteTheme.textSecondary} />
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="Search by name, skill, domain..."
-                            placeholderTextColor={whiteTheme.textMuted}
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                        />
-                        {searchQuery.length > 0 && (
-                            <TouchableOpacity onPress={() => setSearchQuery('')}>
-                                <Ionicons name="close-circle" size={20} color={whiteTheme.textSecondary} />
-                            </TouchableOpacity>
-                        )}
-                    </View>
-
-                    {/* Filter Button */}
-                    <TouchableOpacity
-                        style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
-                        onPress={() => setShowFilterModal(true)}
-                    >
-                        <Ionicons
-                            name="options-outline"
-                            size={22}
-                            color={activeFilterCount > 0 ? whiteTheme.white : whiteTheme.text}
-                        />
-                        {activeFilterCount > 0 && (
-                            <View style={styles.filterBadge}>
-                                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
-                            </View>
-                        )}
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            {/* ── Search Bar ── */}
+            <View style={styles.searchBar}>
+                <Ionicons name="search-outline" size={20} color={colors.textMuted} style={styles.searchIcon} />
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search mentors, skills..."
+                    placeholderTextColor={colors.textMuted}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    returnKeyType="search"
+                />
+                {searchQuery.length > 0 && (
+                    <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearSearchBtn}>
+                        <Ionicons name="close-circle" size={18} color={colors.textMuted} />
                     </TouchableOpacity>
-                </View>
-
-                {/* Active Filters */}
-                {(selectedDomains.length > 0 || selectedMenteeType) && (
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        style={styles.activeFilters}
-                    >
-                        {selectedDomains.map((domain) => (
-                            <TouchableOpacity
-                                key={domain}
-                                style={styles.activeFilterChip}
-                                onPress={() => toggleDomain(domain)}
-                            >
-                                <Text style={styles.activeFilterText}>{domain}</Text>
-                                <Ionicons name="close" size={14} color={whiteTheme.primary} />
-                            </TouchableOpacity>
-                        ))}
-                        {selectedMenteeType && (
-                            <TouchableOpacity
-                                style={styles.activeFilterChip}
-                                onPress={() => setSelectedMenteeType('')}
-                            >
-                                <Text style={styles.activeFilterText}>{selectedMenteeType}</Text>
-                                <Ionicons name="close" size={14} color={whiteTheme.primary} />
-                            </TouchableOpacity>
-                        )}
-                    </ScrollView>
                 )}
+                <TouchableOpacity
+                    style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
+                    onPress={() => setShowFilterModal(true)}
+                >
+                    <Ionicons
+                        name="options-outline"
+                        size={20}
+                        color={activeFilterCount > 0 ? colors.white : colors.text}
+                    />
+                    {activeFilterCount > 0 && (
+                        <View style={styles.filterBadge}>
+                            <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+                        </View>
+                    )}
+                </TouchableOpacity>
             </View>
 
-            {/* Results Count */}
-            <View style={styles.resultsHeader}>
+            {/* ── Results Count ── */}
+            <View style={styles.resultsRow}>
                 <Text style={styles.resultsCount}>
                     {filteredMentors.length} mentor{filteredMentors.length !== 1 ? 's' : ''} available
                 </Text>
+                {sortBy !== 'recommended' && (
+                    <Text style={styles.sortLabel}>
+                        Sorted: {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}
+                    </Text>
+                )}
             </View>
 
-            {/* Mentor List */}
+            {/* ── Mentor List ── */}
             <FlatList
                 data={filteredMentors}
-                keyExtractor={(item) => item._id || item.id || Math.random().toString()}
+                keyExtractor={(item) => (item._id || item.id || Math.random()).toString()}
                 renderItem={renderMentorCard}
-                contentContainerStyle={styles.list}
-                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={ListEmpty}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={whiteTheme.primary}
+                        tintColor={colors.primary}
+                        colors={[colors.primary]}
                     />
                 }
-                ListEmptyComponent={
-                    <View style={styles.emptyContainer}>
-                        <Ionicons name="people-outline" size={64} color={whiteTheme.textMuted} />
-                        <Text style={styles.emptyTitle}>No mentors found</Text>
-                        <Text style={styles.emptyText}>Try adjusting your search or filters</Text>
-                        {activeFilterCount > 0 && (
-                            <TouchableOpacity style={styles.clearFiltersBtn} onPress={clearAllFilters}>
-                                <Text style={styles.clearFiltersBtnText}>Clear Filters</Text>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                }
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.listContent}
             />
 
-            {/* Filter Modal */}
             <FilterModal />
         </View>
     );
@@ -521,150 +445,131 @@ const MentorListScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: whiteTheme.background,
+        backgroundColor: colors.background,
     },
-    searchHeader: {
-        paddingHorizontal: spacing.md,
-        paddingTop: spacing.xxl + 10,
-        paddingBottom: spacing.md,
-        backgroundColor: whiteTheme.white,
-        borderBottomWidth: 1,
-        borderBottomColor: whiteTheme.border,
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: whiteTheme.text,
-        marginBottom: spacing.md,
-    },
-    searchRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.sm,
-    },
-    searchContainer: {
+    loadingContainer: {
         flex: 1,
+        backgroundColor: colors.background,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    // ── Search ─────────────────────────────────────
+    searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: whiteTheme.surface,
-        borderRadius: borderRadius.lg,
-        paddingHorizontal: spacing.md,
-        height: 48,
+        backgroundColor: colors.surface,
+        marginHorizontal: spacing.md,
+        marginVertical: spacing.sm,
+        borderRadius: borderRadius.xl,
         borderWidth: 1,
-        borderColor: whiteTheme.border,
+        borderColor: colors.border,
+        paddingRight: spacing.sm,
+        height: 50,
+    },
+    searchIcon: {
+        paddingHorizontal: spacing.md,
     },
     searchInput: {
         flex: 1,
-        marginLeft: spacing.sm,
         fontSize: fontSize.md,
-        color: whiteTheme.text,
+        color: colors.text,
+    },
+    clearSearchBtn: {
+        padding: spacing.xs,
+        marginRight: spacing.xs,
     },
     filterBtn: {
-        width: 48,
-        height: 48,
-        backgroundColor: whiteTheme.surface,
+        width: 38,
+        height: 38,
         borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: whiteTheme.border,
+        borderColor: colors.border,
     },
     filterBtnActive: {
-        backgroundColor: whiteTheme.primary,
-        borderColor: whiteTheme.primary,
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
     },
     filterBadge: {
         position: 'absolute',
         top: -4,
         right: -4,
-        backgroundColor: whiteTheme.success,
-        width: 18,
-        height: 18,
-        borderRadius: 9,
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+        backgroundColor: colors.error,
         alignItems: 'center',
         justifyContent: 'center',
     },
     filterBadgeText: {
         fontSize: 10,
-        fontWeight: '700',
-        color: whiteTheme.white,
+        color: colors.white,
+        fontWeight: fontWeight.bold,
     },
-    activeFilters: {
-        marginTop: spacing.sm,
-    },
-    activeFilterChip: {
+    // ── Results row ────────────────────────────────
+    resultsRow: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: whiteTheme.primaryLight,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 20,
-        marginRight: spacing.xs,
-        gap: 4,
-    },
-    activeFilterText: {
-        fontSize: 13,
-        color: whiteTheme.primary,
-        fontWeight: '500',
-    },
-    resultsHeader: {
-        padding: spacing.md,
+        paddingHorizontal: spacing.md,
         paddingBottom: spacing.sm,
     },
     resultsCount: {
         fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
+        color: colors.textSecondary,
+        fontWeight: fontWeight.medium,
     },
-    list: {
-        padding: spacing.md,
-        paddingTop: 0,
+    sortLabel: {
+        fontSize: fontSize.xs,
+        color: colors.primary,
+    },
+    // ── List ───────────────────────────────────────
+    listContent: {
+        paddingHorizontal: spacing.md,
         paddingBottom: 100,
+        flexGrow: 1,
     },
+    // ── Mentor Card ────────────────────────────────
     mentorCard: {
-        marginBottom: spacing.md,
-        backgroundColor: whiteTheme.white,
-        borderRadius: 16,
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
         padding: spacing.md,
-        borderWidth: 1,
-        borderColor: whiteTheme.border,
-    },
-    mentorHeader: {
-        flexDirection: 'row',
         marginBottom: spacing.md,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        ...shadows.sm,
+        gap: spacing.sm,
     },
-    avatarImage: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        backgroundColor: whiteTheme.surface,
+    mentorCardHeader: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: spacing.md,
+    },
+    avatar: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        borderWidth: 2,
+        borderColor: colors.border,
     },
     avatarPlaceholder: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        backgroundColor: whiteTheme.primary,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: colors.primary,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    avatarText: {
+    avatarInitial: {
         fontSize: 24,
-        fontWeight: '700',
-        color: whiteTheme.white,
-    },
-    loadingContainer: {
-        flex: 1,
-        backgroundColor: whiteTheme.background,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    loadingText: {
-        marginTop: spacing.md,
-        fontSize: fontSize.md,
-        color: whiteTheme.textSecondary,
+        fontWeight: fontWeight.extrabold,
+        color: colors.white,
     },
     mentorInfo: {
         flex: 1,
-        marginLeft: spacing.md,
+        gap: 3,
     },
     nameRow: {
         flexDirection: 'row',
@@ -672,297 +577,260 @@ const styles = StyleSheet.create({
         gap: spacing.xs,
     },
     mentorName: {
-        fontSize: fontSize.lg,
-        fontWeight: '600',
-        color: whiteTheme.text,
+        flex: 1,
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
     },
     mentorTitle: {
         fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
-        marginTop: 2,
+        color: colors.textSecondary,
     },
-    ratingRow: {
+    metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: spacing.xs,
-        gap: spacing.xs,
+        gap: 4,
+        marginTop: 2,
     },
-    rating: {
+    metaText: {
         fontSize: fontSize.sm,
-        fontWeight: '600',
-        color: whiteTheme.text,
+        color: colors.text,
+        fontWeight: fontWeight.semibold,
     },
-    sessions: {
-        fontSize: fontSize.sm,
-        color: whiteTheme.textMuted,
+    metaTextMuted: {
+        fontSize: fontSize.xs,
+        color: colors.textMuted,
     },
     mentorBio: {
         fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
-        lineHeight: 20,
-        marginBottom: spacing.md,
+        color: colors.textSecondary,
+        lineHeight: 18,
     },
+    // ── Skill Chips ────────────────────────────────
     skillsRow: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: spacing.xs,
-        marginBottom: spacing.md,
     },
     skillChip: {
-        backgroundColor: whiteTheme.surface,
-        paddingHorizontal: 10,
+        backgroundColor: colors.surface,
+        paddingHorizontal: spacing.sm + 2,
         paddingVertical: 4,
-        borderRadius: 12,
+        borderRadius: borderRadius.full,
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     skillText: {
-        fontSize: 12,
-        color: whiteTheme.textSecondary,
+        fontSize: fontSize.xs,
+        color: colors.textSecondary,
+        fontWeight: fontWeight.medium,
     },
-    mentorFooter: {
+    // ── Card Footer ────────────────────────────────
+    cardFooter: {
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: spacing.md,
         borderTopWidth: 1,
-        borderTopColor: whiteTheme.border,
+        borderTopColor: colors.borderLight,
+        paddingTop: spacing.sm,
+        marginTop: spacing.xs,
     },
-    freeContainer: {
+    freeBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: whiteTheme.successLight,
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 20,
         gap: 4,
+        backgroundColor: colors.successBg,
+        paddingHorizontal: spacing.sm + 2,
+        paddingVertical: 5,
+        borderRadius: borderRadius.full,
     },
     freeText: {
-        fontSize: fontSize.sm,
-        fontWeight: '700',
-        color: whiteTheme.success,
+        fontSize: fontSize.xs,
+        color: colors.successDark,
+        fontWeight: fontWeight.bold,
     },
     bookBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: whiteTheme.primary,
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 10,
-        gap: 6,
+        gap: 4,
+        backgroundColor: colors.primary,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        borderRadius: borderRadius.lg,
+        ...shadows.xs,
     },
     bookBtnText: {
+        color: colors.white,
         fontSize: fontSize.sm,
-        fontWeight: '600',
-        color: whiteTheme.white,
+        fontWeight: fontWeight.semibold,
     },
-    emptyContainer: {
+    // ── Empty State ────────────────────────────────
+    emptyState: {
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: spacing.xxl,
+        paddingVertical: 80,
+        gap: spacing.sm,
     },
     emptyTitle: {
         fontSize: fontSize.lg,
-        fontWeight: '600',
-        color: whiteTheme.text,
-        marginTop: spacing.md,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
     },
-    emptyText: {
-        fontSize: fontSize.md,
-        color: whiteTheme.textSecondary,
-        marginTop: spacing.xs,
+    emptySubtitle: {
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
+        textAlign: 'center',
+        paddingHorizontal: spacing.xl,
     },
     clearFiltersBtn: {
-        marginTop: spacing.md,
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        backgroundColor: whiteTheme.primaryLight,
-        borderRadius: 8,
+        marginTop: spacing.sm,
+        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.sm,
+        backgroundColor: colors.primaryBg,
+        borderRadius: borderRadius.full,
+        borderWidth: 1,
+        borderColor: colors.primaryBorder,
     },
     clearFiltersBtnText: {
-        color: whiteTheme.primary,
-        fontWeight: '600',
+        color: colors.primary,
+        fontWeight: fontWeight.semibold,
+        fontSize: fontSize.sm,
     },
-
-    // Modal Styles
-    modalOverlay: {
+    // ── Filter Modal ────────────────────────────────
+    overlay: {
         flex: 1,
-        backgroundColor: whiteTheme.overlay,
+        backgroundColor: 'rgba(0,0,0,0.45)',
         justifyContent: 'flex-end',
     },
-    modalContent: {
-        backgroundColor: whiteTheme.white,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+    modalSheet: {
+        backgroundColor: colors.white,
+        borderTopLeftRadius: borderRadius.xxl,
+        borderTopRightRadius: borderRadius.xxl,
         maxHeight: '85%',
+    },
+    modalHandle: {
+        width: 40,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: colors.border,
+        alignSelf: 'center',
+        marginTop: spacing.sm,
+        marginBottom: spacing.xs,
     },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: spacing.md,
+        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.md,
         borderBottomWidth: 1,
-        borderBottomColor: whiteTheme.border,
+        borderBottomColor: colors.border,
     },
     modalTitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: whiteTheme.text,
+        fontSize: fontSize.xl,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
     },
-    modalScroll: {
-        padding: spacing.md,
+    modalCloseBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    filterSection: {
-        marginBottom: spacing.lg,
+    modalBody: {
+        paddingHorizontal: spacing.lg,
+        paddingTop: spacing.md,
     },
     filterSectionTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: whiteTheme.text,
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.semibold,
+        color: colors.text,
         marginBottom: spacing.sm,
+        marginTop: spacing.md,
     },
-    sortOptions: {
+    chipRow: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: spacing.xs,
+        gap: spacing.sm,
     },
-    sortChip: {
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        backgroundColor: whiteTheme.surface,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: whiteTheme.border,
-    },
-    sortChipActive: {
-        backgroundColor: whiteTheme.primary,
-        borderColor: whiteTheme.primary,
-    },
-    sortChipText: {
-        fontSize: 13,
-        color: whiteTheme.textSecondary,
-    },
-    sortChipTextActive: {
-        color: whiteTheme.white,
-        fontWeight: '600',
-    },
-    domainGrid: {
+    chipWrap: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: spacing.xs,
+        gap: spacing.sm,
     },
-    domainChip: {
+    filterChip: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        backgroundColor: whiteTheme.surface,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: whiteTheme.border,
         gap: 4,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        backgroundColor: colors.surface,
+        borderRadius: borderRadius.full,
+        borderWidth: 1.5,
+        borderColor: colors.border,
     },
-    domainChipActive: {
-        backgroundColor: whiteTheme.primary,
-        borderColor: whiteTheme.primary,
+    filterChipActive: {
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
     },
-    domainText: {
-        fontSize: 13,
-        color: whiteTheme.textSecondary,
+    filterChipText: {
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
+        fontWeight: fontWeight.medium,
     },
-    domainTextActive: {
-        color: whiteTheme.white,
-        fontWeight: '500',
+    filterChipTextActive: {
+        color: colors.white,
+        fontWeight: fontWeight.semibold,
     },
-    menteeOptions: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: spacing.xs,
-    },
-    menteeChip: {
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        backgroundColor: whiteTheme.surface,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: whiteTheme.border,
-    },
-    menteeChipActive: {
-        backgroundColor: whiteTheme.primary,
-        borderColor: whiteTheme.primary,
-    },
-    menteeText: {
-        fontSize: 13,
-        color: whiteTheme.textSecondary,
-    },
-    menteeTextActive: {
-        color: whiteTheme.white,
-        fontWeight: '500',
-    },
-    rangeHeader: {
+    filterRangeHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginTop: spacing.md,
         marginBottom: spacing.sm,
     },
-    rangeValue: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: whiteTheme.primary,
-    },
-    rangeRow: {
-        flexDirection: 'row',
-        gap: spacing.sm,
-    },
-    rangeBtn: {
-        flex: 1,
-        paddingVertical: 10,
-        backgroundColor: whiteTheme.surface,
-        borderRadius: 8,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: whiteTheme.border,
-    },
-    rangeBtnActive: {
-        backgroundColor: whiteTheme.primary,
-        borderColor: whiteTheme.primary,
-    },
-    rangeBtnText: {
-        fontSize: 13,
-        color: whiteTheme.textSecondary,
-    },
-    rangeBtnTextActive: {
-        color: whiteTheme.white,
-        fontWeight: '600',
+    filterRangeValue: {
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.bold,
+        color: colors.primary,
     },
     modalFooter: {
         flexDirection: 'row',
-        padding: spacing.md,
-        gap: spacing.sm,
+        gap: spacing.md,
+        padding: spacing.lg,
         borderTopWidth: 1,
-        borderTopColor: whiteTheme.border,
+        borderTopColor: colors.border,
     },
     clearBtn: {
         flex: 1,
-        paddingVertical: 14,
-        backgroundColor: whiteTheme.surface,
-        borderRadius: 12,
+        height: 50,
         alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: borderRadius.lg,
+        borderWidth: 1.5,
+        borderColor: colors.border,
     },
     clearBtnText: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: whiteTheme.textSecondary,
+        fontSize: fontSize.md,
+        color: colors.textSecondary,
+        fontWeight: fontWeight.semibold,
     },
     applyBtn: {
         flex: 2,
-        paddingVertical: 14,
-        backgroundColor: whiteTheme.primary,
-        borderRadius: 12,
+        height: 50,
         alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.primary,
+        ...shadows.primary,
     },
     applyBtnText: {
-        fontSize: 15,
-        fontWeight: '700',
-        color: whiteTheme.white,
+        fontSize: fontSize.md,
+        color: colors.white,
+        fontWeight: fontWeight.bold,
     },
 });
 

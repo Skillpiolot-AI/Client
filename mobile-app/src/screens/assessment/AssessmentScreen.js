@@ -39,10 +39,10 @@ const AssessmentScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Header title="Assessments" showBack />
+            <Header title="Assessments" />
             <ScrollView style={styles.content}>
-                <LinearGradient colors={[colors.accent + '40', colors.accent + '10']} style={styles.banner}>
-                    <Ionicons name="trophy" size={40} color={colors.accent} />
+                <LinearGradient colors={[colors.primary + '25', colors.primary + '08']} style={styles.banner}>
+                    <Ionicons name="trophy" size={40} color={colors.primary} />
                     <Text style={styles.bannerTitle}>Test Your Skills</Text>
                     <Text style={styles.bannerText}>Complete assessments to unlock personalized recommendations</Text>
                 </LinearGradient>

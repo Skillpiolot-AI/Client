@@ -1,379 +1,355 @@
-// HomeScreen - White Theme with Orange Accent
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+// HomeScreen.js — Centralized-theme refactor
+import React, { useState, useCallback } from 'react';
+import {
+    View, Text, StyleSheet, ScrollView, TouchableOpacity,
+    RefreshControl, Dimensions,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { CommonActions } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
-import { Card, Button } from '../../components/ui';
-import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { colors, spacing, fontSize, fontWeight, borderRadius, shadows } from '../../theme';
 
 const { width } = Dimensions.get('window');
 
-// White Theme Colors
-const whiteTheme = {
-    background: '#FFFFFF',
-    surface: '#F8F9FA',
-    surfaceLight: '#FFFFFF',
-    text: '#1A1A2E',
-    textSecondary: '#6B7280',
-    primary: '#FF6B35',
-    secondary: '#F7931E',
-    accent: '#10B981',
-    info: '#3B82F6',
-    border: '#E5E7EB',
-    white: '#FFFFFF',
-};
-
 const HomeScreen = ({ navigation }) => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, logout } = useAuth();
+    const insets = useSafeAreaInsets();
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        setTimeout(() => setRefreshing(false), 1000);
+    }, []);
+
+    const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
+    const isMentor = user?.role === 'mentor';
 
     const features = [
-        { icon: 'school', title: 'Career Quiz', subtitle: 'Find your path', tab: 'Career', screen: 'CareerQuiz', color: whiteTheme.primary },
-        { icon: 'people', title: 'Mentorship', subtitle: 'Get guidance', tab: 'Mentorship', screen: 'MentorList', color: whiteTheme.secondary },
-        { icon: 'document-text', title: 'Assessment', subtitle: 'Test skills', tab: 'Career', screen: 'Assessment', color: whiteTheme.accent },
-        { icon: 'bar-chart', title: 'Dashboard', subtitle: 'Track progress', tab: null, screen: 'Dashboard', color: whiteTheme.info },
+        {
+            icon: 'school-outline',
+            title: 'AI Assessment',
+            description: 'Get personalized skill gap analysis',
+            screen: isMentor ? null : 'Assessment',
+            color: colors.primary,
+            bgColor: colors.primaryBg,
+        },
+        {
+            icon: 'people-outline',
+            title: 'Find Mentors',
+            description: 'Connect with industry experts',
+            screen: 'MentorList',
+            color: colors.info,
+            bgColor: colors.infoBg,
+        },
+        {
+            icon: 'calendar-outline',
+            title: 'Sessions',
+            description: 'Manage your bookings',
+            screen: isMentor ? 'MentorDashboard' : 'MyBookings',
+            color: colors.success,
+            bgColor: colors.successBg,
+        },
+        {
+            icon: 'notifications-outline',
+            title: 'Notifications',
+            description: 'Stay up to date',
+            screen: 'Notifications',
+            color: colors.warning,
+            bgColor: colors.warningBg,
+        },
     ];
 
-    const quickActions = [
-        { icon: 'compass', title: 'Career Paths', screen: 'CareerPaths' },
-        { icon: 'book', title: 'Resources', screen: 'Resources' },
-        { icon: 'calendar', title: 'Workshops', screen: 'Workshops' },
-        { icon: 'chatbubbles', title: 'Community', screen: 'Community' },
+    const tips = [
+        { icon: '🎯', text: 'Complete your profile to attract better mentor matches' },
+        { icon: '📊', text: 'Regular assessments help track your skill growth over time' },
+        { icon: '🤝', text: 'First sessions are always free — book yours today!' },
     ];
 
     return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-            {/* Hero Section */}
-            <LinearGradient
-                colors={[whiteTheme.primary, whiteTheme.secondary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.hero}
+        <View style={styles.container}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={colors.primary}
+                        colors={[colors.primary]}
+                    />
+                }
             >
-                {/* Notification Bell Icon */}
-                <TouchableOpacity
-                    style={styles.notificationBell}
-                    onPress={() => navigation.navigate('Notifications')}
+                {/* ── Hero Header ── */}
+                <LinearGradient
+                    colors={[colors.primaryDark, colors.primary, colors.secondary]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={[styles.hero, { paddingTop: insets.top + spacing.lg }]}
                 >
-                    <Ionicons name="notifications-outline" size={24} color={whiteTheme.white} />
-                </TouchableOpacity>
+                    <View style={styles.heroTopRow}>
+                        <View>
+                            <Text style={styles.heroWelcome}>Welcome back,</Text>
+                            <Text style={styles.heroName}>{firstName} 👋</Text>
+                        </View>
+                        <TouchableOpacity
+                            style={styles.avatarBtn}
+                            onPress={() => navigation.navigate('Profile')}
+                        >
+                            <View style={styles.avatarCircle}>
+                                <Text style={styles.avatarInitial}>
+                                    {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
 
-                <View style={styles.heroContent}>
-                    <Text style={styles.heroTitle}>
-                        {isAuthenticated ? `Welcome back, ${user?.name?.split(' ')[0] || 'User'}!` : 'Discover Your Career'}
-                    </Text>
-                    <Text style={styles.heroSubtitle}>
-                        AI-powered career guidance to help you reach your full potential
-                    </Text>
-
-                    {!isAuthenticated && (
-                        <View style={styles.heroButtons}>
-                            <Button
-                                title="Get Started"
-                                variant="primary"
-                                size="lg"
-                                onPress={() => navigation.navigate('Signup')}
-                                style={[styles.heroButton, { backgroundColor: whiteTheme.white }]}
-                                textStyle={{ color: whiteTheme.primary }}
-                            />
-                            <Button
-                                title="Sign In"
-                                variant="outline"
-                                size="lg"
-                                onPress={() => navigation.navigate('Login')}
-                                style={[styles.heroButton, { borderColor: whiteTheme.white }]}
-                                textStyle={{ color: whiteTheme.white }}
-                            />
+                    {isMentor && (
+                        <View style={styles.roleBadge}>
+                            <Ionicons name="ribbon-outline" size={14} color={colors.white} />
+                            <Text style={styles.roleBadgeText}>Mentor Account</Text>
                         </View>
                     )}
-                </View>
 
-                {/* Decorative circles */}
-                <View style={[styles.circle, styles.circle1]} />
-                <View style={[styles.circle, styles.circle2]} />
-            </LinearGradient>
+                    <Text style={styles.heroTagline}>
+                        {isMentor
+                            ? 'Help others grow while building your impact'
+                            : 'Your AI-powered career growth starts here'}
+                    </Text>
+                </LinearGradient>
 
-            {/* Feature Cards */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Explore Features</Text>
-                <View style={styles.featuresGrid}>
-                    {features.map((feature, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={styles.featureCard}
-                            onPress={() => {
-                                if (feature.tab) {
-                                    navigation.dispatch(
-                                        CommonActions.navigate({
-                                            name: feature.tab,
-                                            params: { screen: feature.screen },
-                                        })
-                                    );
-                                } else {
-                                    navigation.navigate(feature.screen);
-                                }
-                            }}
-                            activeOpacity={0.8}
-                        >
-                            <LinearGradient
-                                colors={[feature.color + '20', feature.color + '10']}
-                                style={styles.featureCardGradient}
-                            >
-                                <View style={[styles.featureIcon, { backgroundColor: feature.color + '30' }]}>
-                                    <Ionicons name={feature.icon} size={24} color={feature.color} />
-                                </View>
-                                <Text style={styles.featureTitle}>{feature.title}</Text>
-                                <Text style={styles.featureSubtitle}>{feature.subtitle}</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            </View>
-
-            {/* Quick Actions */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Quick Actions</Text>
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.quickActionsScroll}
-                >
-                    {quickActions.map((action, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={styles.quickAction}
-                            onPress={() => navigation.navigate(action.screen)}
-                        >
-                            <View style={styles.quickActionIcon}>
-                                <Ionicons name={action.icon} size={24} color={whiteTheme.primary} />
-                            </View>
-                            <Text style={styles.quickActionTitle}>{action.title}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
-            </View>
-
-            {/* Stats Section */}
-            <View style={styles.section}>
-                <Card gradient gradientColors={[whiteTheme.surface, whiteTheme.surfaceLight]}>
-                    <View style={styles.statsContainer}>
-                        <View style={styles.stat}>
-                            <Text style={styles.statValue}>10K+</Text>
-                            <Text style={styles.statLabel}>Students</Text>
-                        </View>
-                        <View style={styles.statDivider} />
-                        <View style={styles.stat}>
-                            <Text style={styles.statValue}>500+</Text>
-                            <Text style={styles.statLabel}>Mentors</Text>
-                        </View>
-                        <View style={styles.statDivider} />
-                        <View style={styles.stat}>
-                            <Text style={styles.statValue}>50+</Text>
-                            <Text style={styles.statLabel}>Careers</Text>
+                <View style={styles.body}>
+                    {/* ── Feature Cards ── */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>What would you like to do?</Text>
+                        <View style={styles.featuresGrid}>
+                            {features.map((f) => (
+                                <TouchableOpacity
+                                    key={f.title}
+                                    style={styles.featureCard}
+                                    onPress={() => f.screen && navigation.navigate(f.screen)}
+                                    activeOpacity={0.8}
+                                    disabled={!f.screen}
+                                >
+                                    <View style={[styles.featureIconWrap, { backgroundColor: f.bgColor }]}>
+                                        <Ionicons name={f.icon} size={26} color={f.color} />
+                                    </View>
+                                    <Text style={styles.featureTitle}>{f.title}</Text>
+                                    <Text style={styles.featureDesc}>{f.description}</Text>
+                                </TouchableOpacity>
+                            ))}
                         </View>
                     </View>
-                </Card>
-            </View>
 
-            {/* CTA Section */}
-            {isAuthenticated && (
-                <View style={styles.section}>
-                    <Card gradient gradientColors={[whiteTheme.primary + '40', whiteTheme.secondary + '40']}>
-                        <View style={styles.ctaContent}>
-                            <Ionicons name="rocket" size={40} color={whiteTheme.primary} />
-                            <Text style={styles.ctaTitle}>Ready to level up?</Text>
-                            <Text style={styles.ctaText}>Take our career assessment and get personalized recommendations</Text>
-                            <Button
-                                title="Start Assessment"
-                                variant="gradient"
-                                size="md"
-                                onPress={() => navigation.navigate('Assessment')}
-                                style={styles.ctaButton}
-                            />
+                    {/* ── Pro Tips ── */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Tips for You</Text>
+                        <View style={styles.tipsCard}>
+                            {tips.map((tip, index) => (
+                                <View key={index} style={[styles.tipRow, index < tips.length - 1 && styles.tipDivider]}>
+                                    <Text style={styles.tipIcon}>{tip.icon}</Text>
+                                    <Text style={styles.tipText}>{tip.text}</Text>
+                                </View>
+                            ))}
                         </View>
-                    </Card>
-                </View>
-            )}
+                    </View>
 
-            <View style={styles.bottomPadding} />
-        </ScrollView>
+                    {/* ── Mentor CTA (Students only) ── */}
+                    {!isMentor && (
+                        <View style={styles.section}>
+                            <TouchableOpacity
+                                style={styles.ctaCard}
+                                onPress={() => navigation.navigate('MentorList')}
+                                activeOpacity={0.8}
+                            >
+                                <LinearGradient
+                                    colors={[colors.primary, colors.primaryDark]}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.ctaGradient}
+                                >
+                                    <View style={styles.ctaContent}>
+                                        <Text style={styles.ctaTitle}>Book a Free Session</Text>
+                                        <Text style={styles.ctaSub}>Connect with top industry mentors</Text>
+                                    </View>
+                                    <Ionicons name="arrow-forward-circle" size={36} color={colors.white + 'CC'} />
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+
+                    <View style={{ height: 100 }} />
+                </View>
+            </ScrollView>
+        </View>
     );
 };
+
+const cardWidth = (width - spacing.md * 2 - spacing.sm) / 2;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: whiteTheme.background,
+        backgroundColor: colors.background,
     },
     hero: {
-        padding: spacing.xl,
-        paddingTop: spacing.xxl + 20,
+        paddingHorizontal: spacing.md,
         paddingBottom: spacing.xxl,
-        borderBottomLeftRadius: borderRadius.xxl,
-        borderBottomRightRadius: borderRadius.xxl,
-        overflow: 'hidden',
-        position: 'relative',
+        gap: spacing.sm,
     },
-    heroContent: {
-        zIndex: 1,
-    },
-    heroTitle: {
-        fontSize: fontSize.hero,
-        fontWeight: fontWeight.bold,
-        color: whiteTheme.white,
-        marginBottom: spacing.sm,
-    },
-    heroSubtitle: {
-        fontSize: fontSize.lg,
-        color: whiteTheme.white + 'CC',
-        lineHeight: 26,
-        marginBottom: spacing.lg,
-    },
-    heroButtons: {
+    heroTopRow: {
         flexDirection: 'row',
-        gap: spacing.md,
-        marginTop: spacing.md,
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
     },
-    heroButton: {
-        flex: 1,
+    heroWelcome: {
+        fontSize: fontSize.md,
+        color: colors.white + 'BB',
+        fontWeight: fontWeight.medium,
     },
-    circle: {
-        position: 'absolute',
-        borderRadius: 1000,
-        backgroundColor: whiteTheme.white + '10',
+    heroName: {
+        fontSize: fontSize.xxxl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.white,
     },
-    circle1: {
-        width: 200,
-        height: 200,
-        top: -50,
-        right: -50,
+    avatarBtn: {
+        marginTop: 4,
     },
-    circle2: {
-        width: 150,
-        height: 150,
-        bottom: -30,
-        left: -30,
+    avatarCircle: {
+        width: 46,
+        height: 46,
+        borderRadius: 23,
+        backgroundColor: colors.white + '30',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: colors.white + '60',
     },
-    section: {
-        padding: spacing.md,
-    },
-    sectionTitle: {
+    avatarInitial: {
         fontSize: fontSize.xl,
         fontWeight: fontWeight.bold,
-        color: whiteTheme.text,
+        color: colors.white,
+    },
+    roleBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing.xs,
+        alignSelf: 'flex-start',
+        backgroundColor: colors.white + '20',
+        paddingHorizontal: spacing.sm + 2,
+        paddingVertical: 4,
+        borderRadius: borderRadius.full,
+        marginTop: spacing.xs,
+    },
+    roleBadgeText: {
+        fontSize: fontSize.xs,
+        color: colors.white,
+        fontWeight: fontWeight.semibold,
+    },
+    heroTagline: {
+        fontSize: fontSize.md,
+        color: colors.white + 'DD',
+        lineHeight: 22,
+        marginTop: spacing.xs,
+    },
+    body: {
+        padding: spacing.md,
+        marginTop: -(spacing.xl),
+    },
+    section: {
+        marginBottom: spacing.lg,
+    },
+    sectionTitle: {
+        fontSize: fontSize.lg,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
         marginBottom: spacing.md,
     },
+    // ── Feature Cards ─────────────────────────────────────
     featuresGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: spacing.md,
+        gap: spacing.sm,
     },
     featureCard: {
-        width: (width - spacing.md * 3) / 2,
+        width: cardWidth,
+        backgroundColor: colors.card,
         borderRadius: borderRadius.xl,
-        overflow: 'hidden',
-    },
-    featureCardGradient: {
         padding: spacing.md,
-        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        ...shadows.sm,
+        gap: spacing.xs,
     },
-    featureIcon: {
-        width: 48,
-        height: 48,
+    featureIconWrap: {
+        width: 52,
+        height: 52,
         borderRadius: borderRadius.lg,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: spacing.sm,
-    },
-    featureTitle: {
-        fontSize: fontSize.md,
-        fontWeight: fontWeight.semibold,
-        color: whiteTheme.text,
-    },
-    featureSubtitle: {
-        fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
-        marginTop: 2,
-    },
-    quickActionsScroll: {
-        paddingRight: spacing.md,
-    },
-    quickAction: {
-        alignItems: 'center',
-        marginRight: spacing.lg,
-    },
-    quickActionIcon: {
-        width: 56,
-        height: 56,
-        borderRadius: borderRadius.lg,
-        backgroundColor: whiteTheme.primary + '20',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: spacing.xs,
     },
-    quickActionTitle: {
-        fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
+    featureTitle: {
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
     },
-    statsContainer: {
+    featureDesc: {
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
+        lineHeight: 18,
+    },
+    // ── Tips Card ─────────────────────────────────────────
+    tipsCard: {
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        overflow: 'hidden',
+        ...shadows.sm,
+    },
+    tipRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: spacing.md,
+        padding: spacing.md,
+    },
+    tipDivider: {
+        borderBottomWidth: 1,
+        borderBottomColor: colors.borderLight,
+    },
+    tipIcon: {
+        fontSize: 20,
+    },
+    tipText: {
+        flex: 1,
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
+        lineHeight: 20,
+    },
+    // ── CTA Card ──────────────────────────────────────────
+    ctaCard: {
+        borderRadius: borderRadius.xl,
+        overflow: 'hidden',
+        ...shadows.primary,
+    },
+    ctaGradient: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-around',
-        paddingVertical: spacing.sm,
-    },
-    stat: {
-        alignItems: 'center',
-    },
-    statValue: {
-        fontSize: fontSize.xxl,
-        fontWeight: fontWeight.bold,
-        color: whiteTheme.primary,
-    },
-    statLabel: {
-        fontSize: fontSize.sm,
-        color: whiteTheme.textSecondary,
-        marginTop: 2,
-    },
-    statDivider: {
-        width: 1,
-        height: 40,
-        backgroundColor: whiteTheme.border,
+        justifyContent: 'space-between',
+        padding: spacing.lg,
     },
     ctaContent: {
-        alignItems: 'center',
-        padding: spacing.md,
+        flex: 1,
     },
     ctaTitle: {
         fontSize: fontSize.xl,
-        fontWeight: fontWeight.bold,
-        color: whiteTheme.text,
-        marginTop: spacing.md,
+        fontWeight: fontWeight.extrabold,
+        color: colors.white,
     },
-    ctaText: {
-        fontSize: fontSize.md,
-        color: whiteTheme.textSecondary,
-        textAlign: 'center',
-        marginTop: spacing.xs,
-        marginBottom: spacing.lg,
-    },
-    ctaButton: {
-        width: '100%',
-    },
-    bottomPadding: {
-        height: 100,
-    },
-    notificationBell: {
-        position: 'absolute',
-        top: spacing.xl,
-        right: spacing.lg,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 10,
+    ctaSub: {
+        fontSize: fontSize.sm,
+        color: colors.white + 'CC',
+        marginTop: 4,
     },
 });
 

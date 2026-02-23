@@ -1,29 +1,20 @@
-// Profile/Settings Screen Redesign
+// Profile/Settings Screen — Centralized-theme refactor
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Switch, Linking } from 'react-native';
+import {
+    View, Text, StyleSheet, ScrollView, TouchableOpacity,
+    Alert, Switch, Linking,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
-import { Avatar, Button, Input } from '../../components/ui';
-import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { Avatar, Button, Input, ThemePicker } from '../../components/ui';
+import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
 import authAPI from '../../services/authAPI';
-
-// UI Reference Theme Colors
-export const uiTheme = {
-    primary: '#1A237E', // Navy Blue from reference
-    background: '#FFFFFF',
-    surface: '#F8F9FA',
-    text: '#000000',
-    textSecondary: '#4B5563',
-    textMuted: '#9CA3AF',
-    border: '#E5E7EB',
-    helpBg: '#EEF6F6', // Light teal/blue for help box
-    white: '#FFFFFF',
-    error: '#EF4444',
-};
 
 const ProfileScreen = ({ navigation }) => {
     const { user, logout, updateUser } = useAuth();
-    const [view, setView] = useState('settings'); // 'settings' or 'edit'
+    const insets = useSafeAreaInsets();
+    const [view, setView] = useState('settings'); // 'settings' | 'edit'
     const [loading, setLoading] = useState(false);
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [formData, setFormData] = useState({
@@ -53,193 +44,231 @@ const ProfileScreen = ({ navigation }) => {
         ]);
     };
 
-    const handleWhatsApp = () => {
-        const phone = '+911234567890'; // Example phone
-        Linking.openURL(`whatsapp://send?phone=${phone}&text=Hello, I have a query regarding SkillPilot.`);
+    const handleChangePassword = () => {
+        Alert.alert(
+            'Change Password',
+            'We will send a verification code to your email. Proceed?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Send Code',
+                    onPress: async () => {
+                        setLoading(true);
+                        try {
+                            await authAPI.forgotPassword(user.email);
+                            navigation.navigate('OtpVerification', {
+                                email: user.email,
+                                fromProfile: true,
+                            });
+                        } catch (err) {
+                            const data = err.response?.data;
+                            const msg = data?.message || data?.error || err.message || 'Failed to send code';
+                            Alert.alert('Error', msg);
+                        } finally {
+                            setLoading(false);
+                        }
+                    },
+                },
+            ]
+        );
     };
 
+    // ── Edit Profile View ─────────────────────────
     if (view === 'edit') {
         return (
-            <View style={styles.container}>
-                <View style={styles.headerEdit}>
-                    <TouchableOpacity onPress={() => setView('settings')}>
-                        <Ionicons name="arrow-back" size={24} color={uiTheme.primary} />
+            <View style={[styles.container, { paddingTop: insets.top }]}>
+                {/* Header */}
+                <View style={styles.editHeader}>
+                    <TouchableOpacity
+                        style={styles.backBtn}
+                        onPress={() => setView('settings')}
+                        activeOpacity={0.75}
+                    >
+                        <Ionicons name="chevron-back" size={22} color={colors.text} />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitleEdit}>User Profile</Text>
-                    <View style={{ width: 24 }} />
+                    <Text style={styles.editHeaderTitle}>Edit Profile</Text>
+                    <View style={styles.placeholder} />
                 </View>
 
-                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                    <View style={styles.avatarContainerEdit}>
-                        <View>
-                            <Avatar source={user?.profileImage} name={user?.name} size="xxxl" />
-                            <TouchableOpacity style={styles.cameraBadge}>
-                                <Ionicons name="camera-outline" size={16} color={uiTheme.textSecondary} />
-                            </TouchableOpacity>
-                        </View>
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.editScrollContent}>
+                    {/* Avatar */}
+                    <View style={styles.editAvatarWrap}>
+                        <Avatar source={user?.profileImage} name={user?.name} size="xxxl" />
+                        <TouchableOpacity style={styles.cameraBadge} activeOpacity={0.8}>
+                            <Ionicons name="camera-outline" size={15} color={colors.textSecondary} />
+                        </TouchableOpacity>
                     </View>
 
-                    <View style={styles.formContainer}>
+                    {/* Form */}
+                    <View style={styles.formSection}>
                         <Input
                             label="First Name"
                             value={formData.firstName}
                             onChangeText={(v) => setFormData({ ...formData, firstName: v })}
                             placeholder="John"
-                            focusedColor={uiTheme.primary}
+                            icon="person-outline"
                         />
                         <Input
                             label="Last Name"
                             value={formData.lastName}
                             onChangeText={(v) => setFormData({ ...formData, lastName: v })}
                             placeholder="Doe"
-                            focusedColor={uiTheme.primary}
+                            icon="person-outline"
                         />
                         <Input
-                            label="E-Mail"
+                            label="Email"
                             value={formData.email}
                             onChangeText={(v) => setFormData({ ...formData, email: v })}
                             keyboardType="email-address"
-                            placeholder="johndoe@gmail.com"
-                            focusedColor={uiTheme.primary}
+                            placeholder="john@example.com"
+                            icon="mail-outline"
+                            autoCapitalize="none"
                         />
                         <Input
-                            label="Mobile"
+                            label="Phone"
                             value={formData.phone}
                             onChangeText={(v) => setFormData({ ...formData, phone: v })}
                             keyboardType="phone-pad"
-                            placeholder="+91-123456789"
-                            focusedColor={uiTheme.primary}
+                            placeholder="+91 9876543210"
+                            icon="call-outline"
                         />
                     </View>
 
                     <Button
-                        title="SAVE"
+                        title="Save Changes"
                         variant="primary"
                         onPress={handleSave}
                         loading={loading}
-                        color={uiTheme.primary}
+                        size="lg"
                         style={styles.saveBtn}
-                        textStyle={styles.saveBtnText}
                     />
                 </ScrollView>
             </View>
         );
     }
 
-    return (
-        <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.mainTitle}>Settings</Text>
+    // ── Settings View ─────────────────────────────
+    const menuItems = [
+        {
+            icon: 'person-circle-outline',
+            label: 'User Profile',
+            onPress: () => setView('edit'),
+            show: true,
+        },
+        {
+            icon: 'briefcase-outline',
+            label: 'Mentor Settings',
+            onPress: () => navigation.navigate('EditMentorProfile'),
+            show: user?.role === 'Mentor',
+        },
+        {
+            icon: 'lock-closed-outline',
+            label: 'Change Password',
+            onPress: handleChangePassword,
+            show: true,
+        },
+        {
+            icon: 'help-circle-outline',
+            label: 'FAQs',
+            onPress: () => {},
+            show: true,
+        },
+    ].filter((item) => item.show);
 
-                {/* User Info Card */}
+    return (
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+            >
+                <Text style={styles.pageTitle}>Settings</Text>
+
+                {/* User card */}
                 <View style={styles.userCard}>
-                    <View style={styles.userCardLeft}>
-                        <Avatar source={user?.profileImage} name={user?.name} size="lg" />
-                        <View style={styles.userInfo}>
-                            <Text style={styles.welcomeLabel}>Welcome</Text>
-                            <Text style={styles.userName}>Mr. {user?.name}</Text>
-                        </View>
+                    <Avatar source={user?.profileImage} name={user?.name} size="lg" />
+                    <View style={styles.userInfo}>
+                        <Text style={styles.welcomeLabel}>Welcome back</Text>
+                        <Text style={styles.userName} numberOfLines={1}>
+                            {user?.name || user?.email?.split('@')[0]}
+                        </Text>
+                        {user?.role && (
+                            <View style={styles.rolePill}>
+                                <Text style={styles.roleText}>{user.role}</Text>
+                            </View>
+                        )}
                     </View>
-                    <TouchableOpacity onPress={handleLogout}>
-                        <Ionicons name="log-out-outline" size={24} color={uiTheme.primary} />
+                    <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn} activeOpacity={0.75}>
+                        <Ionicons name="log-out-outline" size={22} color={colors.error} />
                     </TouchableOpacity>
                 </View>
 
-                {/* Settings Menu */}
-                <View style={styles.menuContainer}>
-                    <TouchableOpacity style={styles.menuRow} onPress={() => setView('edit')}>
-                        <View style={styles.menuRowLeft}>
-                            <Ionicons name="person-circle-outline" size={22} color={uiTheme.textSecondary} />
-                            <Text style={styles.menuLabel}>User Profile</Text>
-                        </View>
-                        <Ionicons name="chevron-forward" size={20} color={uiTheme.primary} />
-                    </TouchableOpacity>
-
-                    {user?.role === 'Mentor' && (
-                        <TouchableOpacity style={styles.menuRow} onPress={() => navigation.navigate('EditMentorProfile')}>
+                {/* Menu */}
+                <View style={styles.menuCard}>
+                    {menuItems.map((item, index) => (
+                        <TouchableOpacity
+                            key={item.label}
+                            style={[
+                                styles.menuRow,
+                                index < menuItems.length - 1 && styles.menuRowBorder,
+                            ]}
+                            onPress={item.onPress}
+                            activeOpacity={0.7}
+                        >
                             <View style={styles.menuRowLeft}>
-                                <Ionicons name="briefcase-outline" size={22} color={uiTheme.textSecondary} />
-                                <Text style={styles.menuLabel}>Mentor Settings</Text>
+                                <View style={styles.menuIconWrap}>
+                                    <Ionicons name={item.icon} size={20} color={colors.primary} />
+                                </View>
+                                <Text style={styles.menuLabel}>{item.label}</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color={uiTheme.primary} />
+                            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
                         </TouchableOpacity>
-                    )}
+                    ))}
+                </View>
 
-                    <TouchableOpacity
-                        style={styles.menuRow}
-                        onPress={async () => {
-                            try {
-                                Alert.alert(
-                                    'Change Password',
-                                    'We will send a verification code to your email to change your password. Proceed?',
-                                    [
-                                        { text: 'Cancel', style: 'cancel' },
-                                        {
-                                            text: 'Send Code',
-                                            onPress: async () => {
-                                                setLoading(true);
-                                                try {
-                                                    await authAPI.forgotPassword(user.email);
-                                                    navigation.navigate('OtpVerification', {
-                                                        email: user.email,
-                                                        fromProfile: true
-                                                    });
-                                                } catch (err) {
-                                                    const data = err.response?.data;
-                                                    const errorMessage = data?.message || data?.error || err.message || 'Failed to send verification code';
-                                                    const diagnosticCode = data?.errorCode ? ` [Code: ${data.errorCode}]` : '';
-                                                    const technicalDetail = err.response ? ` (Status: ${err.response.status}${diagnosticCode})` : ' (Network Error)';
-
-                                                    Alert.alert(
-                                                        'Error',
-                                                        `${errorMessage}${technicalDetail}\n\n${data?.emailResponse || ''}`.trim()
-                                                    );
-                                                } finally {
-                                                    setLoading(false);
-                                                }
-                                            }
-                                        }
-                                    ]
-                                );
-                            } catch (err) {
-                                Alert.alert('Error', 'Something went wrong');
-                            }
-                        }}
-                    >
-                        <View style={styles.menuRowLeft}>
-                            <Ionicons name="lock-closed-outline" size={22} color={uiTheme.textSecondary} />
-                            <Text style={styles.menuLabel}>Change Password</Text>
-                        </View>
-                        <Ionicons name="chevron-forward" size={20} color={uiTheme.primary} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.menuRow}>
-                        <View style={styles.menuRowLeft}>
-                            <Ionicons name="help-circle-outline" size={22} color={uiTheme.textSecondary} />
-                            <Text style={styles.menuLabel}>FAQs</Text>
-                        </View>
-                        <Ionicons name="chevron-forward" size={20} color={uiTheme.primary} />
-                    </TouchableOpacity>
-
+                {/* Notifications Toggle */}
+                <View style={styles.menuCard}>
                     <View style={styles.menuRow}>
                         <View style={styles.menuRowLeft}>
-                            <Ionicons name="notifications-outline" size={22} color={uiTheme.textSecondary} />
-                            <Text style={styles.menuLabel}>Push Notification</Text>
+                            <View style={styles.menuIconWrap}>
+                                <Ionicons name="notifications-outline" size={20} color={colors.primary} />
+                            </View>
+                            <Text style={styles.menuLabel}>Push Notifications</Text>
                         </View>
                         <Switch
                             value={notificationsEnabled}
                             onValueChange={setNotificationsEnabled}
-                            trackColor={{ false: '#D1D5DB', true: '#4ADE80' }}
-                            thumbColor={uiTheme.white}
+                            trackColor={{ false: colors.border, true: colors.success }}
+                            thumbColor={colors.white}
                         />
                     </View>
                 </View>
 
-                {/* Help Box */}
+                {/* Theme Picker */}
+                <ThemePicker />
 
+                {/* Help box */}
+                <View style={styles.helpCard}>
+                    <Ionicons name="chatbubbles-outline" size={28} color={colors.primary} />
+                    <Text style={styles.helpTitle}>Need help?</Text>
+                    <Text style={styles.helpText}>
+                        Contact our support team on WhatsApp for quick assistance.
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() =>
+                            Linking.openURL(
+                                'whatsapp://send?phone=+911234567890&text=Hello, I have a query regarding SkillPilot.'
+                            )
+                        }
+                        style={styles.whatsappBtn}
+                        activeOpacity={0.8}
+                    >
+                        <Ionicons name="logo-whatsapp" size={18} color={colors.white} />
+                        <Text style={styles.whatsappBtnText}>Chat on WhatsApp</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={{ height: 100 }} />
             </ScrollView>
-
-            {/* Bottom Nav Mock (Placeholder to match UI reference) */}
         </View>
     );
 };
@@ -247,153 +276,195 @@ const ProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: uiTheme.background,
+        backgroundColor: colors.background,
     },
     scrollContent: {
-        paddingHorizontal: 24,
-        paddingTop: 60,
+        paddingHorizontal: spacing.md,
+        paddingTop: spacing.md,
     },
-    mainTitle: {
-        fontSize: 32,
-        fontWeight: '700',
-        color: uiTheme.text,
-        marginBottom: 30,
+    pageTitle: {
+        fontSize: fontSize.xxxl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.text,
+        marginBottom: spacing.lg,
     },
+    // ── User Card ─────────────────────────────────
     userCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 12,
-        marginBottom: 30,
-    },
-    userCardLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        gap: spacing.md,
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
+        padding: spacing.md,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        marginBottom: spacing.md,
+        ...shadows.sm,
     },
     userInfo: {
-        marginLeft: 16,
+        flex: 1,
+        gap: 3,
     },
     welcomeLabel: {
-        fontSize: 12,
-        color: uiTheme.textMuted,
-        marginBottom: 2,
+        fontSize: fontSize.xs,
+        color: colors.textMuted,
     },
     userName: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: uiTheme.text,
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
     },
-    menuContainer: {
-        backgroundColor: uiTheme.white,
-        borderRadius: 16,
-        marginBottom: 40,
+    rolePill: {
+        alignSelf: 'flex-start',
+        backgroundColor: colors.primaryBg,
+        paddingHorizontal: spacing.sm,
+        paddingVertical: 2,
+        borderRadius: borderRadius.full,
+        marginTop: 2,
+    },
+    roleText: {
+        fontSize: fontSize.xs,
+        color: colors.primary,
+        fontWeight: fontWeight.semibold,
+    },
+    logoutBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.errorBg,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    // ── Menu Card ─────────────────────────────────
+    menuCard: {
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        marginBottom: spacing.md,
+        ...shadows.sm,
+        overflow: 'hidden',
     },
     menuRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 16,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.md,
+    },
+    menuRowBorder: {
         borderBottomWidth: 1,
-        borderBottomColor: '#F3F4F6',
+        borderBottomColor: colors.borderLight,
     },
     menuRowLeft: {
         flexDirection: 'row',
         alignItems: 'center',
+        gap: spacing.md,
+    },
+    menuIconWrap: {
+        width: 36,
+        height: 36,
+        borderRadius: borderRadius.md,
+        backgroundColor: colors.primaryBg,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     menuLabel: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: uiTheme.text,
-        marginLeft: 16,
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.medium,
+        color: colors.text,
     },
-    helpBox: {
-        backgroundColor: uiTheme.helpBg,
-        borderRadius: 16,
-        padding: 24,
+    // ── Help Card ─────────────────────────────────
+    helpCard: {
+        backgroundColor: colors.infoBg,
+        borderRadius: borderRadius.xl,
+        padding: spacing.lg,
         alignItems: 'center',
+        gap: spacing.sm,
+        borderWidth: 1,
+        borderColor: colors.info + '25',
+    },
+    helpTitle: {
+        fontSize: fontSize.lg,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
     },
     helpText: {
-        fontSize: 14,
-        color: uiTheme.text,
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
         textAlign: 'center',
         lineHeight: 20,
-        marginBottom: 12,
-        fontWeight: '500',
     },
-    whatsappLink: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: uiTheme.primary,
-        textDecorationLine: 'underline',
-    },
-    bottomNavMock: {
+    whatsappBtn: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
         alignItems: 'center',
-        paddingVertical: 12,
-        borderTopWidth: 1,
-        borderTopColor: '#F3F4F6',
-        backgroundColor: uiTheme.white,
-        paddingBottom: 30,
+        gap: spacing.xs,
+        backgroundColor: '#25D366',
+        paddingVertical: spacing.sm + 2,
+        paddingHorizontal: spacing.lg,
+        borderRadius: borderRadius.full,
+        marginTop: spacing.xs,
     },
-    navItem: {
-        alignItems: 'center',
+    whatsappBtnText: {
+        color: colors.white,
+        fontWeight: fontWeight.semibold,
+        fontSize: fontSize.md,
     },
-    navLabel: {
-        fontSize: 10,
-        color: uiTheme.textMuted,
-        marginTop: 4,
-    },
-    navLabelActive: {
-        fontSize: 10,
-        color: uiTheme.primary,
-        marginTop: 4,
-        fontWeight: '600',
-    },
-    // Edit View Styles
-    headerEdit: {
+    // ── Edit View ─────────────────────────────────
+    editHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingTop: 60,
-        paddingBottom: 20,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.md,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
     },
-    headerTitleEdit: {
-        fontSize: 18,
-        fontWeight: '700',
-        color: uiTheme.text,
+    editHeaderTitle: {
+        fontSize: fontSize.lg,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
     },
-    avatarContainerEdit: {
-        alignItems: 'center',
-        marginVertical: 30,
-    },
-    cameraBadge: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        backgroundColor: uiTheme.white,
-        width: 30,
-        height: 30,
-        borderRadius: 15,
+    backBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: uiTheme.border,
-        elevation: 2,
+        borderColor: colors.border,
     },
-    formContainer: {
-        marginBottom: 30,
+    placeholder: {
+        width: 40,
+    },
+    editScrollContent: {
+        padding: spacing.md,
+    },
+    editAvatarWrap: {
+        alignItems: 'center',
+        paddingVertical: spacing.xl,
+        position: 'relative',
+    },
+    cameraBadge: {
+        position: 'absolute',
+        bottom: spacing.xl,
+        right: '40%',
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: colors.white,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colors.border,
+        ...shadows.xs,
+    },
+    formSection: {
+        marginBottom: spacing.md,
     },
     saveBtn: {
-        borderRadius: 30,
-        height: 56,
-        marginBottom: 40,
-    },
-    saveBtnText: {
-        fontSize: 16,
-        fontWeight: '800',
-        letterSpacing: 1,
+        marginBottom: spacing.xxl,
     },
 });
 

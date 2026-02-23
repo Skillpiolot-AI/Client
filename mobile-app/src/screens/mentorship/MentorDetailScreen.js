@@ -1,26 +1,11 @@
-// Mentor Detail Screen - Modern White Theme
+// MentorDetailScreen.js — Centralized-theme refactor
 import React from 'react';
 import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity,
-    Image, SafeAreaView, Dimensions, Share
+    Image, SafeAreaView, Share,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
-
-const { width } = Dimensions.get('window');
-
-const uiTheme = {
-    primary: '#FF6B35',
-    primaryLight: '#FF6B3515',
-    secondary: '#1A1A2E',
-    background: '#FFFFFF',
-    surface: '#F8F9FA',
-    text: '#1A1A2E',
-    textSecondary: '#6B7280',
-    border: '#E5E7EB',
-    white: '#FFFFFF',
-    success: '#10B981',
-};
+import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
 
 const MentorDetailScreen = ({ route, navigation }) => {
     const { mentor } = route.params;
@@ -31,26 +16,24 @@ const MentorDetailScreen = ({ route, navigation }) => {
                 message: `Check out ${mentor.displayName || mentor.name} on SkillPilot! A ${mentor.tagline || mentor.jobTitle} with ${mentor.experience} years of experience.`,
             });
         } catch (error) {
-            console.log('Error sharing:', error);
+            console.log('Share error:', error);
         }
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* Header */}
+            {/* ── Header ── */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={24} color={uiTheme.text} />
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn} activeOpacity={0.75}>
+                    <Ionicons name="arrow-back" size={22} color={colors.text} />
                 </TouchableOpacity>
-                <View style={styles.headerActions}>
-                    <TouchableOpacity onPress={handleShare} style={styles.actionBtn}>
-                        <Ionicons name="share-social-outline" size={22} color={uiTheme.text} />
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity onPress={handleShare} style={styles.iconBtn} activeOpacity={0.75}>
+                    <Ionicons name="share-social-outline" size={22} color={colors.text} />
+                </TouchableOpacity>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                {/* Profile Header Card */}
+                {/* ── Profile Card ── */}
                 <View style={styles.profileCard}>
                     <View style={styles.avatarContainer}>
                         {(mentor.profileImage || mentor.avatar) ? (
@@ -67,7 +50,7 @@ const MentorDetailScreen = ({ route, navigation }) => {
                         )}
                         {mentor.badge === 'verified' && (
                             <View style={styles.verifiedBadge}>
-                                <Ionicons name="checkmark-circle" size={18} color={uiTheme.primary} />
+                                <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
                             </View>
                         )}
                     </View>
@@ -76,27 +59,28 @@ const MentorDetailScreen = ({ route, navigation }) => {
                     <Text style={styles.tagline}>{mentor.tagline || mentor.jobTitle}</Text>
 
                     <View style={styles.statsRow}>
-                        <View style={styles.statItem}>
-                            <Text style={styles.statValue}>{mentor.averageRating?.toFixed(1) || '0.0'}</Text>
-                            <View style={styles.ratingRow}>
-                                <Ionicons name="star" size={12} color="#F59E0B" />
-                                <Text style={styles.statLabel}>Rating</Text>
-                            </View>
-                        </View>
-                        <View style={styles.divider} />
-                        <View style={styles.statItem}>
-                            <Text style={styles.statValue}>{mentor.totalReviews || 0}</Text>
-                            <Text style={styles.statLabel}>Reviews</Text>
-                        </View>
-                        <View style={styles.divider} />
-                        <View style={styles.statItem}>
-                            <Text style={styles.statValue}>{mentor.experience || 0}+</Text>
-                            <Text style={styles.statLabel}>Years Exp</Text>
-                        </View>
+                        {[
+                            { value: mentor.averageRating?.toFixed(1) || '0.0', label: 'Rating', icon: 'star', iconColor: '#F59E0B' },
+                            { value: mentor.totalReviews || 0, label: 'Reviews' },
+                            { value: `${mentor.experience || 0}+`, label: 'Yrs Exp' },
+                        ].map((stat, i) => (
+                            <React.Fragment key={i}>
+                                {i > 0 && <View style={styles.statDivider} />}
+                                <View style={styles.statItem}>
+                                    <View style={styles.statValueRow}>
+                                        {stat.icon && (
+                                            <Ionicons name={stat.icon} size={13} color={stat.iconColor} />
+                                        )}
+                                        <Text style={styles.statValue}>{stat.value}</Text>
+                                    </View>
+                                    <Text style={styles.statLabel}>{stat.label}</Text>
+                                </View>
+                            </React.Fragment>
+                        ))}
                     </View>
                 </View>
 
-                {/* About Section */}
+                {/* ── About ── */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>About</Text>
                     <Text style={styles.bio}>
@@ -104,26 +88,26 @@ const MentorDetailScreen = ({ route, navigation }) => {
                     </Text>
                 </View>
 
-                {/* Expertise Section */}
+                {/* ── Expertise ── */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Expertise</Text>
                     <View style={styles.chipContainer}>
-                        {(mentor.expertise || mentor.targetingDomains || []).map((skill, index) => (
-                            <View key={index} style={styles.chip}>
+                        {(mentor.expertise || mentor.targetingDomains || []).map((skill, i) => (
+                            <View key={i} style={styles.chip}>
                                 <Text style={styles.chipText}>{skill.trim()}</Text>
                             </View>
                         ))}
                     </View>
                 </View>
 
-                {/* Companies Worked */}
-                {mentor.companiesWorked && mentor.companiesWorked.length > 0 && (
+                {/* ── Companies ── */}
+                {mentor.companiesWorked?.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Worked At</Text>
                         <View style={styles.chipContainer}>
-                            {mentor.companiesWorked.map((company, index) => (
-                                <View key={index} style={[styles.chip, styles.companyChip]}>
-                                    <Ionicons name="business-outline" size={14} color={uiTheme.textSecondary} style={{ marginRight: 4 }} />
+                            {mentor.companiesWorked.map((company, i) => (
+                                <View key={i} style={[styles.chip, styles.companyChip]}>
+                                    <Ionicons name="business-outline" size={13} color={colors.textSecondary} />
                                     <Text style={styles.chipText}>{company}</Text>
                                 </View>
                             ))}
@@ -131,45 +115,44 @@ const MentorDetailScreen = ({ route, navigation }) => {
                     </View>
                 )}
 
-                {/* Pricing / Session Info */}
+                {/* ── Pricing Card ── */}
                 <View style={[styles.section, styles.pricingCard]}>
                     <View style={styles.pricingHeader}>
                         <View>
-                            <Text style={styles.pricingTitle}>Mentorship Setting</Text>
+                            <Text style={styles.pricingTitle}>Mentorship Settings</Text>
                             <Text style={styles.pricingSubtitle}>
                                 {mentor.isFree ? 'Promotional pricing active' : 'Standard session rates'}
                             </Text>
                         </View>
-                        <View style={styles.priceContainer}>
+                        <View style={styles.priceBadge}>
                             <Text style={styles.priceValue}>{mentor.isFree ? 'FREE' : 'Paid'}</Text>
                         </View>
                     </View>
 
-                    <View style={styles.featureRow}>
-                        <Ionicons name="time-outline" size={20} color={uiTheme.primary} />
-                        <Text style={styles.featureText}>{mentor.sessionDuration || 60} Min Sessions</Text>
-                    </View>
-                    <View style={styles.featureRow}>
-                        <Ionicons name="videocam-outline" size={20} color={uiTheme.primary} />
-                        <Text style={styles.featureText}>1-on-1 Personalized Guidance</Text>
-                    </View>
-                    <View style={styles.featureRow}>
-                        <Ionicons name="chatbubbles-outline" size={20} color={uiTheme.primary} />
-                        <Text style={styles.featureText}>Unlimited Support for Mentees</Text>
-                    </View>
+                    {[
+                        { icon: 'time-outline', text: `${mentor.sessionDuration || 60} Min Sessions` },
+                        { icon: 'videocam-outline', text: '1-on-1 Personalized Guidance' },
+                        { icon: 'chatbubbles-outline', text: 'Unlimited Support for Mentees' },
+                    ].map((row, i) => (
+                        <View key={i} style={styles.featureRow}>
+                            <Ionicons name={row.icon} size={19} color={colors.primary} />
+                            <Text style={styles.featureText}>{row.text}</Text>
+                        </View>
+                    ))}
                 </View>
 
-                <View style={{ height: 100 }} />
+                <View style={{ height: 110 }} />
             </ScrollView>
 
-            {/* Bottom Action */}
+            {/* ── Footer CTA ── */}
             <View style={styles.footer}>
                 <TouchableOpacity
                     style={styles.bookBtn}
                     onPress={() => navigation.navigate('BookSession', { mentor })}
+                    activeOpacity={0.85}
                 >
                     <Text style={styles.bookBtnText}>Book a Free Session</Text>
-                    <Ionicons name="arrow-forward" size={20} color={uiTheme.white} />
+                    <Ionicons name="arrow-forward" size={20} color={colors.white} />
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -179,84 +162,79 @@ const MentorDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: uiTheme.background,
+        backgroundColor: colors.background,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingHorizontal: spacing.md,
-        paddingTop: spacing.sm,
-        height: 60,
-        alignItems: 'center',
+        paddingVertical: spacing.sm,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
     },
-    backBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: uiTheme.surface,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    headerActions: {
-        flexDirection: 'row',
-        gap: spacing.sm,
-    },
-    actionBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: uiTheme.surface,
+    iconBtn: {
+        width: 42,
+        height: 42,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     scrollContent: {
         paddingHorizontal: spacing.md,
         paddingTop: spacing.md,
     },
+    // ── Profile Card ──────────────────────────────
     profileCard: {
         alignItems: 'center',
-        paddingVertical: spacing.lg,
-        backgroundColor: uiTheme.surface,
-        borderRadius: 24,
-        marginBottom: spacing.xl,
+        paddingVertical: spacing.xl,
+        backgroundColor: colors.surface,
+        borderRadius: borderRadius.xxl,
+        marginBottom: spacing.lg,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
     },
     avatarContainer: {
         position: 'relative',
         marginBottom: spacing.md,
     },
     avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 96,
+        height: 96,
+        borderRadius: 48,
         borderWidth: 4,
-        borderColor: uiTheme.white,
+        borderColor: colors.white,
+        ...shadows.md,
     },
     avatarPlaceholder: {
-        backgroundColor: uiTheme.primary,
+        backgroundColor: colors.primary,
         alignItems: 'center',
         justifyContent: 'center',
     },
     avatarInitial: {
-        fontSize: 40,
-        fontWeight: '700',
-        color: uiTheme.white,
+        fontSize: 38,
+        fontWeight: fontWeight.extrabold,
+        color: colors.white,
     },
     verifiedBadge: {
         position: 'absolute',
         bottom: 0,
         right: 0,
-        backgroundColor: uiTheme.white,
+        backgroundColor: colors.white,
         borderRadius: 12,
         padding: 2,
+        ...shadows.xs,
     },
     name: {
         fontSize: fontSize.xl,
-        fontWeight: '700',
-        color: uiTheme.text,
+        fontWeight: fontWeight.extrabold,
+        color: colors.text,
     },
     tagline: {
         fontSize: fontSize.md,
-        color: uiTheme.textSecondary,
+        color: colors.textSecondary,
         marginTop: 4,
         textAlign: 'center',
         paddingHorizontal: spacing.xl,
@@ -264,46 +242,47 @@ const styles = StyleSheet.create({
     statsRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: spacing.xl,
+        marginTop: spacing.lg,
         paddingHorizontal: spacing.xl,
         width: '100%',
         justifyContent: 'space-around',
     },
     statItem: {
         alignItems: 'center',
+        gap: 3,
+    },
+    statValueRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
     },
     statValue: {
         fontSize: fontSize.lg,
-        fontWeight: '700',
-        color: uiTheme.text,
+        fontWeight: fontWeight.extrabold,
+        color: colors.text,
     },
     statLabel: {
-        fontSize: 12,
-        color: uiTheme.textSecondary,
-        marginTop: 2,
+        fontSize: fontSize.xs,
+        color: colors.textSecondary,
     },
-    ratingRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 2,
-    },
-    divider: {
+    statDivider: {
         width: 1,
-        height: 30,
-        backgroundColor: uiTheme.border,
+        height: 32,
+        backgroundColor: colors.border,
     },
+    // ── Content Sections ──────────────────────────
     section: {
-        marginBottom: spacing.xl,
+        marginBottom: spacing.lg,
     },
     sectionTitle: {
         fontSize: fontSize.lg,
-        fontWeight: '700',
-        color: uiTheme.text,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
         marginBottom: spacing.md,
     },
     bio: {
         fontSize: fontSize.md,
-        color: uiTheme.textSecondary,
+        color: colors.textSecondary,
         lineHeight: 24,
     },
     chipContainer: {
@@ -312,28 +291,30 @@ const styles = StyleSheet.create({
         gap: spacing.sm,
     },
     chip: {
-        backgroundColor: uiTheme.surface,
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        borderRadius: 12,
+        backgroundColor: colors.surface,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        borderRadius: borderRadius.full,
         borderWidth: 1,
-        borderColor: uiTheme.border,
+        borderColor: colors.border,
     },
     companyChip: {
         flexDirection: 'row',
         alignItems: 'center',
+        gap: spacing.xs,
     },
     chipText: {
-        fontSize: 14,
-        color: uiTheme.text,
-        fontWeight: '500',
+        fontSize: fontSize.sm,
+        color: colors.text,
+        fontWeight: fontWeight.medium,
     },
+    // ── Pricing Card ──────────────────────────────
     pricingCard: {
-        backgroundColor: uiTheme.primaryLight,
+        backgroundColor: colors.primaryBg,
         padding: spacing.lg,
-        borderRadius: 20,
+        borderRadius: borderRadius.xxl,
         borderWidth: 1,
-        borderColor: uiTheme.primary + '20',
+        borderColor: colors.primaryBorder,
     },
     pricingHeader: {
         flexDirection: 'row',
@@ -343,24 +324,24 @@ const styles = StyleSheet.create({
     },
     pricingTitle: {
         fontSize: fontSize.md,
-        fontWeight: '700',
-        color: uiTheme.primary,
+        fontWeight: fontWeight.bold,
+        color: colors.primary,
     },
     pricingSubtitle: {
-        fontSize: 12,
-        color: uiTheme.textSecondary,
+        fontSize: fontSize.xs,
+        color: colors.textSecondary,
         marginTop: 2,
     },
-    priceContainer: {
-        backgroundColor: uiTheme.primary,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 8,
+    priceBadge: {
+        backgroundColor: colors.primary,
+        paddingHorizontal: spacing.sm + 2,
+        paddingVertical: 5,
+        borderRadius: borderRadius.md,
     },
     priceValue: {
-        color: uiTheme.white,
-        fontWeight: '700',
-        fontSize: 12,
+        color: colors.white,
+        fontWeight: fontWeight.bold,
+        fontSize: fontSize.sm,
     },
     featureRow: {
         flexDirection: 'row',
@@ -369,39 +350,36 @@ const styles = StyleSheet.create({
         marginBottom: spacing.sm,
     },
     featureText: {
-        fontSize: 14,
-        color: uiTheme.text,
-        fontWeight: '500',
+        fontSize: fontSize.md,
+        color: colors.text,
+        fontWeight: fontWeight.medium,
     },
+    // ── Footer ────────────────────────────────────
     footer: {
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
         padding: spacing.md,
-        paddingBottom: 30,
-        backgroundColor: uiTheme.white,
+        paddingBottom: spacing.xl + spacing.xs,
+        backgroundColor: colors.white,
         borderTopWidth: 1,
-        borderTopColor: uiTheme.border,
+        borderTopColor: colors.border,
     },
     bookBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: uiTheme.primary,
+        backgroundColor: colors.primary,
         height: 56,
-        borderRadius: 16,
+        borderRadius: borderRadius.xl,
         gap: spacing.sm,
-        elevation: 4,
-        shadowColor: uiTheme.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
+        ...shadows.primary,
     },
     bookBtnText: {
-        color: uiTheme.white,
+        color: colors.white,
         fontSize: fontSize.lg,
-        fontWeight: '700',
+        fontWeight: fontWeight.bold,
     },
 });
 

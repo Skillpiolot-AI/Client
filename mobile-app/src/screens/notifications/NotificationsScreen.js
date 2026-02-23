@@ -1,327 +1,389 @@
-// NotificationsScreen - User announcements and notifications
-import React, { useState, useEffect, useCallback } from 'react';
+// NotificationsScreen.js — Phase 3: Real API data via NotificationContext + type filters + deep-link
+import React, { useState, useCallback } from 'react';
 import {
     View, Text, StyleSheet, FlatList, TouchableOpacity,
-    RefreshControl, ActivityIndicator
+    RefreshControl, Animated,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { fontSize, spacing } from '../../theme';
-import api from '../../services/api';
+import { useNotifications, NOTIF_META } from '../../context/NotificationContext';
+import { Loading } from '../../components/ui';
+import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
 
-// White Theme Colors
-const whiteTheme = {
-    background: '#FFFFFF',
-    surface: '#F8F9FA',
-    text: '#1A1A2E',
-    textSecondary: '#6B7280',
-    textMuted: '#9CA3AF',
-    primary: '#FF6B35',
-    primaryLight: '#FF6B3520',
-    success: '#10B981',
-    warning: '#F59E0B',
-    error: '#EF4444',
-    border: '#E5E7EB',
-    white: '#FFFFFF',
+// ── Filter tabs ───────────────────────────────────────────────────────────────
+const FILTERS = ['All', 'Unread', 'Booking', 'Assessment', 'Mentor', 'System'];
+
+const timeAgo = (iso) => {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60_000);
+    if (mins < 1)  return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24)  return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
 };
 
+// ── Notification Card ─────────────────────────────────────────────────────────
+const NotifCard = ({ item, onPress }) => {
+    const meta = NOTIF_META[item.type] || NOTIF_META.default;
+    return (
+        <TouchableOpacity
+            style={[styles.card, !item.read && styles.cardUnread]}
+            onPress={() => onPress(item)}
+            activeOpacity={0.78}
+        >
+            {!item.read && <View style={styles.unreadDot} />}
+            <View style={[styles.iconWrap, { backgroundColor: meta.color + '18' }]}>
+                <Ionicons name={meta.icon} size={22} color={meta.color} />
+            </View>
+            <View style={styles.cardBody}>
+                <View style={styles.cardTop}>
+                    <Text style={[styles.cardTitle, !item.read && styles.cardTitleUnread]} numberOfLines={1}>
+                        {item.title}
+                    </Text>
+                    <Text style={styles.cardTime}>{timeAgo(item.createdAt)}</Text>
+                </View>
+                <Text style={styles.cardMsg} numberOfLines={2}>{item.message}</Text>
+            </View>
+        </TouchableOpacity>
+    );
+};
+
+// ── Main Screen ───────────────────────────────────────────────────────────────
 const NotificationsScreen = ({ navigation }) => {
-    const [announcements, setAnnouncements] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { notifications, unreadCount, loading, markRead, markAllRead, refresh } = useNotifications();
+    const [activeFilter, setActiveFilter] = useState('All');
     const [refreshing, setRefreshing] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
 
-    useEffect(() => {
-        fetchAnnouncements();
-        fetchUnreadCount();
-    }, []);
-
-    const fetchAnnouncements = async () => {
-        try {
-            const response = await api.get('/announcements/my');
-            setAnnouncements(response.data?.announcements || []);
-        } catch (error) {
-            console.log('Error fetching announcements:', error);
-        } finally {
-            setLoading(false);
+    // ── Deep-link routing by type ─────────────────────────────────────────────
+    const handlePress = useCallback(async (item) => {
+        if (!item.read) await markRead(item._id);
+        switch (item.type) {
+            case 'booking':    navigation.navigate('Mentorship', { screen: 'MyBookings' }); break;
+            case 'assessment': navigation.navigate('Career',     { screen: 'Assessment' }); break;
+            case 'mentor':     navigation.navigate('Mentorship', { screen: 'MentorList' }); break;
+            default: break; // stay on screen for system/reminder
         }
-    };
-
-    const fetchUnreadCount = async () => {
-        try {
-            const response = await api.get('/announcements/unread-count');
-            setUnreadCount(response.data?.unreadCount || 0);
-        } catch (error) {
-            console.log('Error fetching unread count:', error);
-        }
-    };
+    }, [markRead, navigation]);
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
-        await fetchAnnouncements();
-        await fetchUnreadCount();
+        await refresh();
         setRefreshing(false);
-    }, []);
+    }, [refresh]);
 
-    const markAsRead = async (id) => {
-        try {
-            await api.post(`/announcements/${id}/read`);
-            setAnnouncements(prev =>
-                prev.map(ann => ann._id === id ? { ...ann, isRead: true } : ann)
-            );
-            if (unreadCount > 0) setUnreadCount(prev => prev - 1);
-        } catch (error) {
-            console.log('Error marking as read:', error);
-        }
-    };
+    // ── Filter logic ──────────────────────────────────────────────────────────
+    const filtered = notifications.filter((n) => {
+        if (activeFilter === 'All')    return true;
+        if (activeFilter === 'Unread') return !n.read;
+        return n.type === activeFilter.toLowerCase();
+    });
 
-    const formatDate = (dateStr) => {
-        if (!dateStr) return '';
-        const date = new Date(dateStr);
-        const now = new Date();
-        const diffMs = now - date;
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMs / 3600000);
-        const diffDays = Math.floor(diffMs / 86400000);
+    // ── Empty state ────────────────────────────────────────────────────────────
+    const renderEmpty = () => (
+        <View style={styles.emptyWrap}>
+            <Ionicons name="notifications-off-outline" size={56} color={colors.textMuted} />
+            <Text style={styles.emptyTitle}>No notifications</Text>
+            <Text style={styles.emptySub}>
+                {activeFilter === 'All'
+                    ? "You're all caught up!"
+                    : `No ${activeFilter.toLowerCase()} notifications yet.`}
+            </Text>
+        </View>
+    );
 
-        if (diffMins < 60) return `${diffMins}m ago`;
-        if (diffHours < 24) return `${diffHours}h ago`;
-        if (diffDays < 7) return `${diffDays}d ago`;
-        return date.toLocaleDateString();
-    };
-
-    const getTypeIcon = (type) => {
-        switch (type) {
-            case 'urgent': return { name: 'alert-circle', color: whiteTheme.error };
-            case 'important': return { name: 'warning', color: whiteTheme.warning };
-            case 'update': return { name: 'refresh-circle', color: whiteTheme.success };
-            case 'event': return { name: 'calendar', color: whiteTheme.primary };
-            default: return { name: 'megaphone', color: whiteTheme.primary };
-        }
-    };
-
-    const renderAnnouncement = ({ item }) => {
-        const typeIcon = getTypeIcon(item.type);
-        const isUnread = !item.isRead;
-
-        return (
-            <TouchableOpacity
-                style={[styles.card, isUnread && styles.cardUnread]}
-                onPress={() => markAsRead(item._id)}
-                activeOpacity={0.7}
-            >
-                <View style={styles.cardHeader}>
-                    <View style={[styles.iconContainer, { backgroundColor: `${typeIcon.color}20` }]}>
-                        <Ionicons name={typeIcon.name} size={20} color={typeIcon.color} />
-                    </View>
-                    <View style={styles.cardInfo}>
-                        <Text style={styles.cardTitle} numberOfLines={2}>{item.subject}</Text>
-                        <Text style={styles.cardTime}>{formatDate(item.sentAt)}</Text>
-                    </View>
-                    {isUnread && <View style={styles.unreadDot} />}
-                </View>
-                <Text style={styles.cardDescription} numberOfLines={3}>
-                    {item.shortDescription || item.description}
-                </Text>
-                {item.type && (
-                    <View style={styles.typeBadge}>
-                        <Text style={styles.typeBadgeText}>
-                            {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-                        </Text>
-                    </View>
-                )}
-            </TouchableOpacity>
-        );
-    };
-
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={whiteTheme.primary} />
-                <Text style={styles.loadingText}>Loading notifications...</Text>
-            </View>
-        );
-    }
+    if (loading) return <Loading fullScreen text="Loading notifications…" />;
 
     return (
-        <View style={styles.container}>
-            {/* Header */}
+        <SafeAreaView style={styles.container} edges={['top']}>
+            {/* ── Header ── */}
             <View style={styles.header}>
-                <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-                    <Ionicons name="chevron-back" size={24} color={whiteTheme.text} />
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                    <Ionicons name="arrow-back" size={22} color={colors.text} />
                 </TouchableOpacity>
-                <View style={styles.headerCenter}>
-                    <Text style={styles.headerTitle}>Notifications</Text>
-                    {unreadCount > 0 && (
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{unreadCount}</Text>
-                        </View>
-                    )}
-                </View>
-                <View style={{ width: 44 }} />
+                <Text style={styles.headerTitle}>Notifications</Text>
+                {unreadCount > 0 && (
+                    <TouchableOpacity onPress={markAllRead} style={styles.markAllBtn}>
+                        <Text style={styles.markAllText}>Mark all read</Text>
+                    </TouchableOpacity>
+                )}
             </View>
 
-            {/* List */}
+            {/* Unread summary chip */}
+            {unreadCount > 0 && (
+                <View style={styles.summaryRow}>
+                    <View style={styles.summaryChip}>
+                        <View style={styles.liveDot} />
+                        <Text style={styles.summaryText}>
+                            {unreadCount} unread notification{unreadCount > 1 ? 's' : ''}
+                        </Text>
+                    </View>
+                </View>
+            )}
+
+            {/* ── Filter tabs ── */}
+            <View>
+                <FlatList
+                    data={FILTERS}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(f) => f}
+                    contentContainerStyle={styles.filterList}
+                    renderItem={({ item: f }) => {
+                        const isActive = f === activeFilter;
+                        const count = f === 'Unread'
+                            ? unreadCount
+                            : f === 'All'
+                            ? notifications.length
+                            : notifications.filter((n) => n.type === f.toLowerCase()).length;
+                        return (
+                            <TouchableOpacity
+                                style={[styles.filterTab, isActive && styles.filterTabActive]}
+                                onPress={() => setActiveFilter(f)}
+                                activeOpacity={0.75}
+                            >
+                                <Text style={[styles.filterLabel, isActive && styles.filterLabelActive]}>
+                                    {f}
+                                </Text>
+                                {count > 0 && (
+                                    <View style={[styles.filterBadge, isActive && styles.filterBadgeActive]}>
+                                        <Text style={[styles.filterBadgeText, isActive && styles.filterBadgeTextActive]}>
+                                            {count}
+                                        </Text>
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        );
+                    }}
+                />
+            </View>
+
+            {/* ── Notification list ── */}
             <FlatList
-                data={announcements}
+                data={filtered}
                 keyExtractor={(item) => item._id}
-                renderItem={renderAnnouncement}
-                contentContainerStyle={styles.list}
+                renderItem={({ item }) => <NotifCard item={item} onPress={handlePress} />}
+                contentContainerStyle={[styles.list, !filtered.length && styles.listEmpty]}
+                ListEmptyComponent={renderEmpty}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={whiteTheme.primary}
+                        tintColor={colors.primary}
+                        colors={[colors.primary]}
                     />
                 }
-                ListEmptyComponent={
-                    <View style={styles.empty}>
-                        <Ionicons name="notifications-off-outline" size={64} color={whiteTheme.textMuted} />
-                        <Text style={styles.emptyTitle}>No Notifications</Text>
-                        <Text style={styles.emptyText}>You're all caught up!</Text>
-                    </View>
-                }
             />
-        </View>
+        </SafeAreaView>
     );
 };
 
+// ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: whiteTheme.background,
+        backgroundColor: colors.background,
     },
-    loadingContainer: {
-        flex: 1,
-        backgroundColor: whiteTheme.background,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    loadingText: {
-        marginTop: spacing.md,
-        fontSize: fontSize.md,
-        color: whiteTheme.textSecondary,
-    },
+    // Header
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingTop: 60,
-        paddingBottom: 16,
-        backgroundColor: whiteTheme.white,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm + 2,
+        backgroundColor: colors.white,
         borderBottomWidth: 1,
-        borderBottomColor: whiteTheme.border,
+        borderBottomColor: colors.border,
     },
     backBtn: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        backgroundColor: whiteTheme.surface,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    headerCenter: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: whiteTheme.text,
-    },
-    badge: {
-        backgroundColor: whiteTheme.error,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 10,
-    },
-    badgeText: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: whiteTheme.white,
-    },
-    list: {
-        padding: spacing.md,
-        paddingBottom: 100,
-    },
-    card: {
-        backgroundColor: whiteTheme.white,
-        borderRadius: 16,
-        padding: spacing.md,
-        marginBottom: spacing.md,
-        borderWidth: 1,
-        borderColor: whiteTheme.border,
-    },
-    cardUnread: {
-        backgroundColor: `${whiteTheme.primary}08`,
-        borderColor: `${whiteTheme.primary}30`,
-    },
-    cardHeader: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: spacing.sm,
-    },
-    iconContainer: {
         width: 40,
         height: 40,
-        borderRadius: 12,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: 12,
+        marginRight: spacing.sm,
     },
-    cardInfo: {
+    headerTitle: {
+        flex: 1,
+        fontSize: fontSize.xl,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
+    },
+    markAllBtn: {
+        paddingHorizontal: spacing.sm,
+        paddingVertical: spacing.xs,
+    },
+    markAllText: {
+        fontSize: fontSize.sm,
+        color: colors.primary,
+        fontWeight: fontWeight.semibold,
+    },
+    // Summary chip
+    summaryRow: {
+        paddingHorizontal: spacing.md,
+        paddingTop: spacing.sm,
+    },
+    summaryChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        backgroundColor: colors.primaryBg,
+        borderRadius: borderRadius.full,
+        paddingHorizontal: spacing.sm + 2,
+        paddingVertical: 5,
+        gap: spacing.xs,
+    },
+    liveDot: {
+        width: 7,
+        height: 7,
+        borderRadius: 4,
+        backgroundColor: colors.primary,
+    },
+    summaryText: {
+        fontSize: fontSize.xs,
+        fontWeight: fontWeight.semibold,
+        color: colors.primary,
+    },
+    // Filter tabs
+    filterList: {
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        gap: spacing.sm,
+    },
+    filterTab: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.xs + 2,
+        borderRadius: borderRadius.full,
+        backgroundColor: colors.surface,
+        borderWidth: 1,
+        borderColor: colors.border,
+        gap: spacing.xs,
+    },
+    filterTabActive: {
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
+    },
+    filterLabel: {
+        fontSize: fontSize.sm,
+        fontWeight: fontWeight.medium,
+        color: colors.textSecondary,
+    },
+    filterLabelActive: {
+        color: colors.white,
+        fontWeight: fontWeight.semibold,
+    },
+    filterBadge: {
+        backgroundColor: colors.border,
+        borderRadius: borderRadius.full,
+        paddingHorizontal: 6,
+        paddingVertical: 1,
+        minWidth: 20,
+        alignItems: 'center',
+    },
+    filterBadgeActive: {
+        backgroundColor: colors.white + '35',
+    },
+    filterBadgeText: {
+        fontSize: 10,
+        fontWeight: fontWeight.bold,
+        color: colors.textSecondary,
+    },
+    filterBadgeTextActive: {
+        color: colors.white,
+    },
+    // List
+    list: {
+        paddingHorizontal: spacing.md,
+        paddingTop: spacing.sm,
+        paddingBottom: spacing.xl,
+    },
+    listEmpty: {
         flex: 1,
     },
-    cardTitle: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: whiteTheme.text,
-        marginBottom: 4,
+    // Notification card
+    card: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
+        padding: spacing.md,
+        marginBottom: spacing.sm,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        gap: spacing.sm,
+        position: 'relative',
+        ...shadows.xs,
     },
-    cardTime: {
-        fontSize: 12,
-        color: whiteTheme.textMuted,
+    cardUnread: {
+        backgroundColor: colors.primaryBg,
+        borderColor: colors.primaryBorder,
     },
     unreadDot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: whiteTheme.primary,
+        position: 'absolute',
+        top: spacing.md,
+        right: spacing.md,
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: colors.primary,
     },
-    cardDescription: {
-        fontSize: 14,
-        color: whiteTheme.textSecondary,
+    iconWrap: {
+        width: 46,
+        height: 46,
+        borderRadius: borderRadius.lg,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+    },
+    cardBody: {
+        flex: 1,
+        gap: 3,
+    },
+    cardTop: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        gap: spacing.xs,
+    },
+    cardTitle: {
+        flex: 1,
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.medium,
+        color: colors.text,
+    },
+    cardTitleUnread: {
+        fontWeight: fontWeight.bold,
+    },
+    cardTime: {
+        fontSize: fontSize.xs,
+        color: colors.textMuted,
+        flexShrink: 0,
+    },
+    cardMsg: {
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
         lineHeight: 20,
     },
-    typeBadge: {
-        alignSelf: 'flex-start',
-        marginTop: spacing.sm,
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        backgroundColor: whiteTheme.surface,
-        borderRadius: 12,
-    },
-    typeBadgeText: {
-        fontSize: 11,
-        color: whiteTheme.textSecondary,
-        fontWeight: '500',
-    },
-    empty: {
+    // Empty
+    emptyWrap: {
+        flex: 1,
         alignItems: 'center',
-        padding: spacing.xxl,
+        justifyContent: 'center',
+        gap: spacing.sm,
+        paddingTop: 80,
     },
     emptyTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: whiteTheme.text,
-        marginTop: spacing.md,
+        fontSize: fontSize.xl,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
     },
-    emptyText: {
-        fontSize: 14,
-        color: whiteTheme.textSecondary,
-        marginTop: 6,
+    emptySub: {
+        fontSize: fontSize.md,
+        color: colors.textSecondary,
+        textAlign: 'center',
     },
 });
 

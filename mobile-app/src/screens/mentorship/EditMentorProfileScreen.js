@@ -4,8 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import mentorshipAPI from '../../services/mentorshipAPI';
 import { Button, Input, Avatar } from '../../components/ui';
-import { uiTheme } from '../profile/ProfileScreen';
-import { spacing, fontSize, borderRadius } from '../../theme';
+import { colors, spacing, fontSize, borderRadius, fontWeight, shadows } from '../../theme';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -121,7 +120,7 @@ const EditMentorProfileScreen = ({ navigation }) => {
                     <View>
                         <Avatar source={user?.mentorProfile?.profileImage || user?.profileImage} name={formData.displayName} size="xxxl" />
                         <TouchableOpacity style={styles.cameraBadge}>
-                            <Ionicons name="camera-outline" size={16} color={uiTheme.textSecondary} />
+                            <Ionicons name="camera-outline" size={16} color={colors.textSecondary} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -134,14 +133,14 @@ const EditMentorProfileScreen = ({ navigation }) => {
                         value={formData.displayName}
                         onChangeText={(v) => setFormData({ ...formData, displayName: v })}
                         placeholder="e.g. Naufal Gerald"
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                     />
                     <Input
                         label="Tagline"
                         value={formData.tagline}
                         onChangeText={(v) => setFormData({ ...formData, tagline: v })}
                         placeholder="e.g. Expert in AI & ML"
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                     />
                     <Input
                         label="Bio"
@@ -150,7 +149,7 @@ const EditMentorProfileScreen = ({ navigation }) => {
                         placeholder="Tell us about your experience..."
                         multiline
                         numberOfLines={4}
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                     />
                 </View>
 
@@ -161,21 +160,21 @@ const EditMentorProfileScreen = ({ navigation }) => {
                         value={formData.expertise}
                         onChangeText={(v) => setFormData({ ...formData, expertise: v })}
                         placeholder="React, Node.js, Python"
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                     />
                     <Input
                         label="Targeting Domains"
                         value={formData.targetingDomains}
                         onChangeText={(v) => setFormData({ ...formData, targetingDomains: v })}
                         placeholder="Frontend, Backend, Fullstack"
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                     />
                     <Input
                         label="Languages"
                         value={formData.languages}
                         onChangeText={(v) => setFormData({ ...formData, languages: v })}
                         placeholder="English, Hindi"
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                     />
                 </View>
 
@@ -212,7 +211,7 @@ const EditMentorProfileScreen = ({ navigation }) => {
                         onChangeText={(v) => setFormData({ ...formData, sessionsPerWeek: v })}
                         keyboardType="numeric"
                         placeholder="5"
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                     />
                 </View>
 
@@ -223,7 +222,7 @@ const EditMentorProfileScreen = ({ navigation }) => {
                         value={formData.linkedIn}
                         onChangeText={(v) => setFormData({ ...formData, linkedIn: v })}
                         placeholder="https://linkedin.com/in/..."
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                         icon="logo-linkedin"
                     />
                     <Input
@@ -231,7 +230,7 @@ const EditMentorProfileScreen = ({ navigation }) => {
                         value={formData.github}
                         onChangeText={(v) => setFormData({ ...formData, github: v })}
                         placeholder="https://github.com/..."
-                        focusedColor={uiTheme.primary}
+                        focusedColor={colors.primary}
                         icon="logo-github"
                     />
                 </View>
@@ -254,7 +253,7 @@ const EditMentorProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: uiTheme.background,
+        backgroundColor: colors.background,
     },
     header: {
         flexDirection: 'row',
@@ -263,7 +262,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 60,
         paddingBottom: 20,
-        backgroundColor: uiTheme.white,
+        backgroundColor: colors.white,
     },
     backBtn: {
         width: 44,
@@ -275,19 +274,19 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: uiTheme.text,
+        color: colors.text,
     },
     scrollContent: {
         paddingHorizontal: 24,
         paddingTop: 10,
     },
     progressCard: {
-        backgroundColor: uiTheme.white,
+        backgroundColor: colors.white,
         borderRadius: 20,
         padding: 20,
         marginBottom: 30,
         borderWidth: 1,
-        borderColor: uiTheme.border,
+        borderColor: colors.border,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -303,28 +302,28 @@ const styles = StyleSheet.create({
     progressLabel: {
         fontSize: 14,
         fontWeight: '700',
-        color: uiTheme.text,
+        color: colors.text,
     },
     progressValue: {
         fontSize: 14,
         fontWeight: '800',
-        color: uiTheme.primary,
+        color: colors.primary,
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: colors.surfaceAlt,
         borderRadius: 4,
         marginBottom: 12,
         overflow: 'hidden',
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#3B82F6', // Blue like the reference
+        backgroundColor: colors.primary, // Primary accent
         borderRadius: 4,
     },
     progressSubtext: {
         fontSize: 12,
-        color: uiTheme.textSecondary,
+        color: colors.textSecondary,
     },
     avatarContainer: {
         alignItems: 'center',
@@ -334,14 +333,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         right: 0,
-        backgroundColor: uiTheme.white,
+        backgroundColor: colors.white,
         width: 32,
         height: 32,
         borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: uiTheme.border,
+        borderColor: colors.border,
         elevation: 2,
     },
     formSection: {
@@ -350,14 +349,14 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: uiTheme.text,
+        color: colors.text,
         marginBottom: 20,
     },
     saveBtn: {
         borderRadius: 30,
         height: 56,
         marginBottom: 20,
-        backgroundColor: '#3B82F6', // Using blue for the main action button as in reference
+        backgroundColor: colors.primary,
     },
     saveBtnText: {
         fontSize: 16,
@@ -367,7 +366,7 @@ const styles = StyleSheet.create({
     inputLabel: {
         fontSize: 14,
         fontWeight: '500',
-        color: uiTheme.textSecondary,
+        color: colors.textSecondary,
         marginBottom: 8,
     },
     menteeTypeRow: {
@@ -380,21 +379,21 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: 20,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: colors.surface,
         borderWidth: 1,
-        borderColor: uiTheme.border,
+        borderColor: colors.border,
     },
     typeChipActive: {
-        backgroundColor: '#3B82F6',
-        borderColor: '#3B82F6',
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
     },
     typeChipText: {
         fontSize: 12,
-        color: uiTheme.textSecondary,
+        color: colors.textSecondary,
         fontWeight: '500',
     },
     typeChipTextActive: {
-        color: '#FFFFFF',
+        color: colors.white,
     },
 });
 

@@ -1,44 +1,53 @@
-// My Bookings Screen - White Theme
+// MyBookingsScreen.js — Centralized-theme refactor
+// Removes local `whiteTheme`; uses centralized theme tokens throughout.
 import React, { useState, useEffect } from 'react';
 import {
     View, Text, StyleSheet, FlatList, TouchableOpacity,
-    RefreshControl, Alert, Image, ActivityIndicator, Linking
+    RefreshControl, Alert, Image, ActivityIndicator, Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
+import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
 import mentorshipAPI from '../../services/mentorshipAPI';
 
-// White Theme Colors
-const whiteTheme = {
-    background: '#FFFFFF',
-    surface: '#F8F9FA',
-    text: '#1A1A2E',
-    textSecondary: '#6B7280',
-    textMuted: '#9CA3AF',
-    primary: '#FF6B35',
-    primaryLight: '#FF6B3520',
-    success: '#10B981',
-    successLight: '#10B98120',
-    warning: '#F59E0B',
-    warningLight: '#F59E0B20',
-    error: '#EF4444',
-    errorLight: '#EF444420',
-    border: '#E5E7EB',
-    white: '#FFFFFF',
+const STATUS_COLORS = {
+    confirmed: { bg: colors.successBg, text: colors.successDark },
+    pending:   { bg: colors.warningBg, text: colors.warningDark },
+    cancelled: { bg: colors.errorBg,   text: colors.errorDark },
+    completed: { bg: colors.primaryBg, text: colors.primary },
+};
+
+const FILTERS = ['all', 'confirmed', 'pending', 'completed', 'cancelled'];
+
+const getStatusStyle = (status) =>
+    STATUS_COLORS[status?.toLowerCase()] || { bg: colors.surface, text: colors.textSecondary };
+
+const formatDate = (dateStr) => {
+    if (!dateStr) return 'TBD';
+    return new Date(dateStr).toLocaleDateString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+    });
+};
+
+const formatTime = (dateStr) => {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleTimeString('en-US', {
+        hour: '2-digit', minute: '2-digit', hour12: true,
+    });
 };
 
 const MyBookingsScreen = ({ navigation }) => {
     const { user } = useAuth();
+    const insets = useSafeAreaInsets();
     const isMentor = user?.role === 'Mentor';
+
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [filter, setFilter] = useState('all');
 
-    useEffect(() => {
-        fetchBookings();
-    }, []);
+    useEffect(() => { fetchBookings(); }, []);
 
     const fetchBookings = async () => {
         try {
@@ -46,14 +55,10 @@ const MyBookingsScreen = ({ navigation }) => {
             const response = isMentor
                 ? await mentorshipAPI.getMentorSessions()
                 : await mentorshipAPI.getMyBookings();
-
-            // API returns: { bookings: [...] } or just array
-            console.log(`${isMentor ? 'Mentor' : 'Student'} Bookings response keys:`, Object.keys(response || {}));
             const bookingData = response?.bookings || response?.data?.bookings || response || [];
-            console.log(`${isMentor ? 'Mentor' : 'Student'} Bookings count:`, bookingData.length);
             setBookings(Array.isArray(bookingData) ? bookingData : []);
         } catch (error) {
-            console.log(`Fetch ${isMentor ? 'mentor' : 'my'} bookings error:`, error);
+            console.log('Fetch bookings error:', error);
         } finally {
             setLoading(false);
         }
@@ -67,246 +72,252 @@ const MyBookingsScreen = ({ navigation }) => {
 
     const filteredBookings = filter === 'all'
         ? bookings
-        : bookings.filter(b => b.status?.toLowerCase() === filter);
+        : bookings.filter((b) => b.status?.toLowerCase() === filter);
 
-    const getStatusStyle = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'confirmed':
-                return { bg: whiteTheme.successLight, color: whiteTheme.success };
-            case 'pending':
-                return { bg: whiteTheme.warningLight, color: whiteTheme.warning };
-            case 'cancelled':
-                return { bg: whiteTheme.errorLight, color: whiteTheme.error };
-            case 'completed':
-                return { bg: whiteTheme.primaryLight, color: whiteTheme.primary };
-            default:
-                return { bg: whiteTheme.surface, color: whiteTheme.textSecondary };
-        }
-    };
-
-    const formatDate = (dateStr) => {
-        if (!dateStr) return 'TBD';
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('en-US', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
-    };
-
-    const formatTime = (dateStr) => {
-        if (!dateStr) return '';
-        const date = new Date(dateStr);
-        return date.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-    };
-
-    const handleCancel = async (id) => {
-        Alert.alert(
-            'Cancel Booking',
-            'Are you sure you want to cancel this booking?',
-            [
-                { text: 'No', style: 'cancel' },
-                {
-                    text: 'Yes, Cancel',
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await mentorshipAPI.cancelBooking(id);
-                            Alert.alert('Success', 'Booking cancelled successfully');
-                            fetchBookings();
-                        } catch (error) {
-                            Alert.alert('Error', 'Could not cancel booking');
-                        }
+    const handleCancel = (id) => {
+        Alert.alert('Cancel Booking', 'Are you sure you want to cancel this booking?', [
+            { text: 'No', style: 'cancel' },
+            {
+                text: 'Yes, Cancel',
+                style: 'destructive',
+                onPress: async () => {
+                    try {
+                        await mentorshipAPI.cancelBooking(id);
+                        Alert.alert('Cancelled', 'Booking cancelled successfully');
+                        fetchBookings();
+                    } catch (err) {
+                        Alert.alert('Error', err?.response?.data?.error || 'Failed to cancel booking');
                     }
-                }
-            ]
-        );
+                },
+            },
+        ]);
     };
 
-    const handleJoinMeeting = (link) => {
-        if (link) {
-            Linking.openURL(link);
+    const handleJoin = (meetingLink) => {
+        if (meetingLink) {
+            Linking.openURL(meetingLink);
         } else {
-            Alert.alert('No Link', 'Meeting link is not available yet');
+            Alert.alert('Link Unavailable', 'The meeting link will be available closer to your session time.');
         }
     };
 
-    const renderBooking = ({ item }) => {
-        const statusStyle = getStatusStyle(item.status);
-
-        // Backend populates: 
-        // For Students: mentorId (User) and mentorProfileId (Profile)
-        // For Mentors: userId (User who booked)
-        const displayUser = isMentor ? (item.userId || {}) : (item.mentorProfileId || item.mentorId || item.mentor || {});
-        const displayName = isMentor ? (displayUser.name || 'Student') : (displayUser.displayName || displayUser.name || 'Mentor');
-        const displayImage = isMentor ? displayUser.imageUrl : (displayUser.profileImage || displayUser.imageUrl);
-
-        // Use scheduledAt field (from backend) or fallback to date/time
-        const sessionDate = item.scheduledAt || item.date;
+    // ── Booking Card ─────────────────────────────────────────────────────────
+    const renderBookingCard = ({ item: booking }) => {
+        const status = booking.status?.toLowerCase();
+        const statusStyle = getStatusStyle(status);
+        const isUpcoming = status === 'confirmed' || status === 'pending';
+        const otherPerson = isMentor
+            ? booking.menteeId || booking.student
+            : booking.mentorProfile || booking.mentor;
 
         return (
-            <View style={styles.card}>
-                {/* Mentor Info Row */}
-                <View style={styles.row}>
-                    {displayImage ? (
-                        <Image source={{ uri: displayImage }} style={styles.avatar} />
+            <View style={styles.bookingCard}>
+                {/* Card Header */}
+                <View style={styles.cardHeader}>
+                    {(otherPerson?.profileImage || otherPerson?.avatar) ? (
+                        <Image
+                            source={{ uri: otherPerson.profileImage || otherPerson.avatar }}
+                            style={styles.personAvatar}
+                        />
                     ) : (
-                        <View style={styles.avatarPlaceholder}>
-                            <Text style={styles.avatarText}>
-                                {displayName.charAt(0).toUpperCase()}
+                        <View style={styles.personAvatarPlaceholder}>
+                            <Text style={styles.personAvatarInitial}>
+                                {(otherPerson?.name || otherPerson?.displayName || '?').charAt(0).toUpperCase()}
                             </Text>
                         </View>
                     )}
-
-                    <View style={styles.info}>
-                        <Text style={styles.name}>{displayName}</Text>
-                        <View style={styles.dateRow}>
-                            <Ionicons name="calendar-outline" size={14} color={whiteTheme.textSecondary} />
-                            <Text style={styles.dateText}>{formatDate(sessionDate)}</Text>
-                        </View>
-                        <View style={styles.dateRow}>
-                            <Ionicons name="time-outline" size={14} color={whiteTheme.textSecondary} />
-                            <Text style={styles.dateText}>
-                                {formatTime(sessionDate)} • {item.duration || 60} min
-                            </Text>
-                        </View>
+                    <View style={styles.cardHeaderInfo}>
+                        <Text style={styles.personName} numberOfLines={1}>
+                            {otherPerson?.displayName || otherPerson?.name || (isMentor ? 'Student' : 'Mentor')}
+                        </Text>
+                        <Text style={styles.sessionTitle} numberOfLines={1}>
+                            {booking.remark || booking.topics?.[0] || (isMentor ? 'Mentoring Session' : 'Career Guidance')}
+                        </Text>
                     </View>
-
-                    {/* Status Badge */}
-                    <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}>
-                        <Text style={[styles.statusText, { color: statusStyle.color }]}>
-                            {item.status?.charAt(0).toUpperCase() + item.status?.slice(1) || 'Pending'}
+                    <View style={[styles.statusPill, { backgroundColor: statusStyle.bg }]}>
+                        <Text style={[styles.statusText, { color: statusStyle.text }]}>
+                            {booking.status || 'Unknown'}
                         </Text>
                     </View>
                 </View>
 
-                {/* Booking ID */}
-                {item.bookingId && (
-                    <View style={styles.bookingIdRow}>
-                        <Ionicons name="ticket-outline" size={14} color={whiteTheme.textMuted} />
-                        <Text style={styles.bookingId}>ID: {item.bookingId}</Text>
+                {/* Session Details */}
+                <View style={styles.detailsContainer}>
+                    <View style={styles.detailRow}>
+                        <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
+                        <Text style={styles.detailText}>{formatDate(booking.scheduledAt)}</Text>
                     </View>
-                )}
-
-                {/* Topics if any */}
-                {item.topics && item.topics.length > 0 && (
-                    <View style={styles.topicsRow}>
-                        <Text style={styles.topicsLabel}>Topics:</Text>
-                        <Text style={styles.topicsText} numberOfLines={1}>
-                            {item.topics.join(', ')}
-                        </Text>
-                    </View>
-                )}
-
-                {/* Action Buttons */}
-                <View style={styles.actions}>
-                    {(item.status === 'confirmed' || item.status === 'pending') && item.meetingLink && (
-                        <TouchableOpacity
-                            style={styles.joinBtn}
-                            onPress={() => handleJoinMeeting(item.meetingLink)}
-                        >
-                            <Ionicons name="videocam" size={18} color={whiteTheme.white} />
-                            <Text style={styles.joinBtnText}>Join Meeting</Text>
-                        </TouchableOpacity>
+                    {booking.scheduledAt && (
+                        <View style={styles.detailRow}>
+                            <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
+                            <Text style={styles.detailText}>
+                                {formatTime(booking.scheduledAt)}
+                                {booking.duration && ` · ${booking.duration} min`}
+                            </Text>
+                        </View>
                     )}
-
-                    {item.status === 'pending' && (
-                        <TouchableOpacity
-                            style={styles.cancelBtn}
-                            onPress={() => handleCancel(item._id)}
-                        >
-                            <Text style={styles.cancelBtnText}>Cancel</Text>
-                        </TouchableOpacity>
+                    {booking.meetingLink && (
+                        <View style={styles.detailRow}>
+                            <Ionicons name="videocam-outline" size={16} color={colors.textSecondary} />
+                            <Text style={styles.detailText}>Meeting link available</Text>
+                        </View>
                     )}
-
-                    {item.status === 'completed' && !item.rating && (
-                        <TouchableOpacity
-                            style={styles.rateBtn}
-                            onPress={() => navigation.navigate('RateMentor', { booking: item })}
-                        >
-                            <Ionicons name="star-outline" size={16} color={whiteTheme.primary} />
-                            <Text style={styles.rateBtnText}>Rate Session</Text>
-                        </TouchableOpacity>
+                    {booking.bookingId && (
+                        <View style={styles.detailRow}>
+                            <Ionicons name="receipt-outline" size={16} color={colors.textSecondary} />
+                            <Text style={[styles.detailText, styles.bookingId]}>#{booking.bookingId}</Text>
+                        </View>
                     )}
                 </View>
+
+                {/* Actions */}
+                {isUpcoming && (
+                    <View style={styles.actionRow}>
+                        {booking.meetingLink && (
+                            <TouchableOpacity
+                                style={styles.joinBtn}
+                                onPress={() => handleJoin(booking.meetingLink)}
+                                activeOpacity={0.85}
+                            >
+                                <Ionicons name="videocam" size={16} color={colors.white} />
+                                <Text style={styles.joinBtnText}>Join Session</Text>
+                            </TouchableOpacity>
+                        )}
+                        {!isMentor && status === 'pending' && (
+                            <TouchableOpacity
+                                style={styles.cancelBtn}
+                                onPress={() => handleCancel(booking._id || booking.id)}
+                                activeOpacity={0.75}
+                            >
+                                <Text style={styles.cancelBtnText}>Cancel</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                )}
             </View>
         );
     };
 
-    // Loading state
+    // ── Empty State ─────────────────────────────────────────────────────────
+    const ListEmpty = () => (
+        <View style={styles.emptyState}>
+            <Ionicons name="calendar-outline" size={52} color={colors.border} />
+            <Text style={styles.emptyTitle}>
+                No {filter === 'all' ? '' : filter} bookings found
+            </Text>
+            <Text style={styles.emptySubtitle}>
+                {isMentor
+                    ? 'Your upcoming sessions from students will appear here'
+                    : 'Book your first free mentorship session to get started'}
+            </Text>
+            {!isMentor && filter === 'all' && (
+                <TouchableOpacity
+                    style={styles.bookNowBtn}
+                    onPress={() => navigation.navigate('MentorList')}
+                    activeOpacity={0.85}
+                >
+                    <Text style={styles.bookNowBtnText}>Find a Mentor</Text>
+                </TouchableOpacity>
+            )}
+        </View>
+    );
+
+    // ── Loading ─────────────────────────────────────────────────────────────
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={whiteTheme.primary} />
-                <Text style={styles.loadingText}>Loading bookings...</Text>
+            <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
+                <ActivityIndicator size="large" color={colors.primary} />
             </View>
         );
     }
 
+    // ── Stats Banner ────────────────────────────────────────────────────────
+    const totalCount = bookings.length;
+    const upcomingCount = bookings.filter(
+        (b) => b.status?.toLowerCase() === 'confirmed' || b.status?.toLowerCase() === 'pending'
+    ).length;
+
     return (
-        <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-                    <Ionicons name="chevron-back" size={24} color={whiteTheme.text} />
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            {/* ── Page Header ── */}
+            <View style={styles.pageHeader}>
+                <Text style={styles.pageTitle}>
+                    {isMentor ? 'Mentor Sessions' : 'My Bookings'}
+                </Text>
+                <TouchableOpacity style={styles.refreshIconBtn} onPress={fetchBookings}>
+                    <Ionicons name="refresh-outline" size={20} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>{isMentor ? 'My Sessions' : 'My Bookings'}</Text>
-                <View style={{ width: 44 }} />
             </View>
 
-            {/* Filter Tabs */}
-            <View style={styles.filters}>
-                {['all', 'pending', 'confirmed', 'completed'].map((f) => (
-                    <TouchableOpacity
-                        key={f}
-                        style={[styles.filterBtn, filter === f && styles.filterActive]}
-                        onPress={() => setFilter(f)}
-                    >
-                        <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>
-                            {f.charAt(0).toUpperCase() + f.slice(1)}
+            {/* ── Stats ── */}
+            {totalCount > 0 && (
+                <View style={styles.statsRow}>
+                    <View style={[styles.statBox, { borderTopColor: colors.primary }]}>
+                        <Text style={styles.statValue}>{totalCount}</Text>
+                        <Text style={styles.statLabel}>Total</Text>
+                    </View>
+                    <View style={[styles.statBox, { borderTopColor: colors.success }]}>
+                        <Text style={styles.statValue}>{upcomingCount}</Text>
+                        <Text style={styles.statLabel}>Upcoming</Text>
+                    </View>
+                    <View style={[styles.statBox, { borderTopColor: colors.info }]}>
+                        <Text style={styles.statValue}>
+                            {bookings.filter((b) => b.status?.toLowerCase() === 'completed').length}
                         </Text>
-                    </TouchableOpacity>
-                ))}
+                        <Text style={styles.statLabel}>Completed</Text>
+                    </View>
+                </View>
+            )}
+
+            {/* ── Filter Tabs ── */}
+            <View style={styles.filterTabsWrap}>
+                <FlatList
+                    horizontal
+                    data={FILTERS}
+                    keyExtractor={(f) => f}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.filterTabs}
+                    renderItem={({ item: f }) => {
+                        const count = f === 'all'
+                            ? bookings.length
+                            : bookings.filter((b) => b.status?.toLowerCase() === f).length;
+                        const active = filter === f;
+                        return (
+                            <TouchableOpacity
+                                style={[styles.filterTab, active && styles.filterTabActive]}
+                                onPress={() => setFilter(f)}
+                                activeOpacity={0.75}
+                            >
+                                <Text style={[styles.filterTabText, active && styles.filterTabTextActive]}>
+                                    {f.charAt(0).toUpperCase() + f.slice(1)}
+                                </Text>
+                                <View style={[styles.filterTabBadge, active && styles.filterTabBadgeActive]}>
+                                    <Text style={[styles.filterTabBadgeText, active && styles.filterTabBadgeTextActive]}>
+                                        {count}
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                        );
+                    }}
+                />
             </View>
 
-            {/* Bookings List */}
+            {/* ── Bookings List ── */}
             <FlatList
                 data={filteredBookings}
-                keyExtractor={(item) => item._id || item.bookingId || Math.random().toString()}
-                renderItem={renderBooking}
-                contentContainerStyle={styles.list}
-                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => (item._id || item.id || Math.random()).toString()}
+                renderItem={renderBookingCard}
+                ListEmptyComponent={ListEmpty}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={whiteTheme.primary}
+                        tintColor={colors.primary}
+                        colors={[colors.primary]}
                     />
                 }
-                ListEmptyComponent={
-                    <View style={styles.empty}>
-                        <Ionicons name="calendar-outline" size={64} color={whiteTheme.textMuted} />
-                        <Text style={styles.emptyTitle}>No Sessions Found</Text>
-                        <Text style={styles.emptyText}>
-                            {isMentor
-                                ? "You don't have any booked sessions with students yet."
-                                : "You haven't booked any sessions yet."}
-                        </Text>
-                        {!isMentor && (
-                            <TouchableOpacity
-                                style={styles.browseBtn}
-                                onPress={() => navigation.navigate('MentorList')}
-                            >
-                                <Text style={styles.browseBtnText}>Browse Mentors</Text>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                }
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.listContent}
             />
         </View>
     );
@@ -315,234 +326,272 @@ const MyBookingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: whiteTheme.background,
+        backgroundColor: colors.background,
     },
     loadingContainer: {
         flex: 1,
-        backgroundColor: whiteTheme.background,
-        alignItems: 'center',
+        backgroundColor: colors.background,
         justifyContent: 'center',
-    },
-    loadingText: {
-        marginTop: spacing.md,
-        fontSize: fontSize.md,
-        color: whiteTheme.textSecondary,
-    },
-    header: {
-        flexDirection: 'row',
         alignItems: 'center',
+    },
+    // ── Page Header ────────────────────────────────
+    pageHeader: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingTop: 60,
-        paddingBottom: 16,
-        backgroundColor: whiteTheme.white,
-        borderBottomWidth: 1,
-        borderBottomColor: whiteTheme.border,
+        alignItems: 'center',
+        paddingHorizontal: spacing.md,
+        paddingTop: spacing.md,
+        paddingBottom: spacing.sm,
     },
-    backBtn: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        backgroundColor: whiteTheme.surface,
+    pageTitle: {
+        fontSize: fontSize.xxxl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.text,
+    },
+    refreshIconBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colors.border,
     },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: whiteTheme.text,
-    },
-    filters: {
+    // ── Stats Row ───────────────────────────────────
+    statsRow: {
         flexDirection: 'row',
-        padding: spacing.md,
         gap: spacing.sm,
-        backgroundColor: whiteTheme.white,
+        paddingHorizontal: spacing.md,
+        marginBottom: spacing.sm,
     },
-    filterBtn: {
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        backgroundColor: whiteTheme.surface,
-        borderRadius: 20,
+    statBox: {
+        flex: 1,
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
+        padding: spacing.sm,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        borderTopWidth: 3,
+        ...shadows.xs,
     },
-    filterActive: {
-        backgroundColor: whiteTheme.primary,
+    statValue: {
+        fontSize: fontSize.xl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.text,
     },
-    filterText: {
-        fontSize: 13,
-        color: whiteTheme.textSecondary,
-        fontWeight: '500',
+    statLabel: {
+        fontSize: fontSize.xs,
+        color: colors.textSecondary,
+        marginTop: 2,
     },
-    filterTextActive: {
-        color: whiteTheme.white,
+    // ── Filter Tabs ─────────────────────────────────
+    filterTabsWrap: {
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
     },
-    list: {
+    filterTabs: {
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        gap: spacing.xs,
+    },
+    filterTab: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        borderRadius: borderRadius.full,
+        borderWidth: 1.5,
+        borderColor: colors.border,
+        backgroundColor: colors.surface,
+    },
+    filterTabActive: {
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
+    },
+    filterTabText: {
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
+        fontWeight: fontWeight.medium,
+    },
+    filterTabTextActive: {
+        color: colors.white,
+        fontWeight: fontWeight.semibold,
+    },
+    filterTabBadge: {
+        backgroundColor: colors.border,
+        borderRadius: borderRadius.full,
+        minWidth: 18,
+        height: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 4,
+    },
+    filterTabBadgeActive: {
+        backgroundColor: 'rgba(255,255,255,0.3)',
+    },
+    filterTabBadgeText: {
+        fontSize: 11,
+        color: colors.textSecondary,
+        fontWeight: fontWeight.bold,
+    },
+    filterTabBadgeTextActive: {
+        color: colors.white,
+    },
+    // ── List ─────────────────────────────────────────
+    listContent: {
         padding: spacing.md,
         paddingBottom: 100,
+        flexGrow: 1,
     },
-    card: {
-        backgroundColor: whiteTheme.white,
-        borderRadius: 16,
+    // ── Booking Card ──────────────────────────────────
+    bookingCard: {
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
         padding: spacing.md,
         marginBottom: spacing.md,
         borderWidth: 1,
-        borderColor: whiteTheme.border,
+        borderColor: colors.cardBorder,
+        ...shadows.sm,
+        gap: spacing.md,
     },
-    row: {
+    cardHeader: {
         flexDirection: 'row',
         alignItems: 'flex-start',
+        gap: spacing.md,
     },
-    avatar: {
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        backgroundColor: whiteTheme.surface,
+    personAvatar: {
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        borderWidth: 2,
+        borderColor: colors.border,
     },
-    avatarPlaceholder: {
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        backgroundColor: whiteTheme.primary,
+    personAvatarPlaceholder: {
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        backgroundColor: colors.primary,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    avatarText: {
-        fontSize: 22,
-        fontWeight: '700',
-        color: whiteTheme.white,
+    personAvatarInitial: {
+        fontSize: 20,
+        fontWeight: fontWeight.extrabold,
+        color: colors.white,
     },
-    info: {
+    cardHeaderInfo: {
         flex: 1,
-        marginLeft: spacing.md,
+        gap: 3,
     },
-    name: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: whiteTheme.text,
-        marginBottom: 4,
+    personName: {
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
     },
-    dateRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        marginTop: 2,
+    sessionTitle: {
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
     },
-    dateText: {
-        fontSize: 13,
-        color: whiteTheme.textSecondary,
-    },
-    statusBadge: {
-        paddingHorizontal: 10,
+    statusPill: {
+        paddingHorizontal: spacing.sm,
         paddingVertical: 4,
-        borderRadius: 12,
+        borderRadius: borderRadius.full,
     },
     statusText: {
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: fontSize.xs,
+        fontWeight: fontWeight.bold,
+        textTransform: 'capitalize',
     },
-    bookingIdRow: {
+    // ── Details ───────────────────────────────────────
+    detailsContainer: {
+        backgroundColor: colors.surface,
+        borderRadius: borderRadius.lg,
+        padding: spacing.md,
+        gap: spacing.sm,
+    },
+    detailRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
-        marginTop: spacing.sm,
-        paddingTop: spacing.sm,
-        borderTopWidth: 1,
-        borderTopColor: whiteTheme.border,
+        gap: spacing.sm,
+    },
+    detailText: {
+        fontSize: fontSize.sm,
+        color: colors.text,
+        fontWeight: fontWeight.medium,
     },
     bookingId: {
-        fontSize: 12,
-        color: whiteTheme.textMuted,
+        color: colors.textMuted,
+        fontFamily: 'monospace',
     },
-    topicsRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 8,
-    },
-    topicsLabel: {
-        fontSize: 13,
-        color: whiteTheme.textSecondary,
-        marginRight: 6,
-    },
-    topicsText: {
-        flex: 1,
-        fontSize: 13,
-        color: whiteTheme.text,
-    },
-    actions: {
+    // ── Action Row ────────────────────────────────────
+    actionRow: {
         flexDirection: 'row',
         gap: spacing.sm,
-        marginTop: spacing.md,
-        paddingTop: spacing.md,
-        borderTopWidth: 1,
-        borderTopColor: whiteTheme.border,
     },
     joinBtn: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
-        backgroundColor: whiteTheme.success,
-        paddingVertical: 12,
-        borderRadius: 10,
+        gap: spacing.xs,
+        backgroundColor: colors.primary,
+        paddingVertical: spacing.sm + 2,
+        borderRadius: borderRadius.lg,
+        ...shadows.primary,
     },
     joinBtnText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: whiteTheme.white,
+        color: colors.white,
+        fontWeight: fontWeight.semibold,
+        fontSize: fontSize.md,
     },
     cancelBtn: {
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        backgroundColor: whiteTheme.errorLight,
-        borderRadius: 10,
+        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.sm + 2,
+        borderRadius: borderRadius.lg,
+        borderWidth: 1,
+        borderColor: colors.error,
     },
     cancelBtnText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: whiteTheme.error,
+        color: colors.error,
+        fontWeight: fontWeight.semibold,
+        fontSize: fontSize.md,
     },
-    rateBtn: {
+    // ── Empty State ────────────────────────────────────
+    emptyState: {
         flex: 1,
-        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
-        backgroundColor: whiteTheme.primaryLight,
-        paddingVertical: 12,
-        borderRadius: 10,
-    },
-    rateBtnText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: whiteTheme.primary,
-    },
-    empty: {
-        alignItems: 'center',
-        padding: spacing.xxl,
+        paddingVertical: 80,
+        gap: spacing.sm,
     },
     emptyTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: whiteTheme.text,
-        marginTop: spacing.md,
-    },
-    emptyText: {
-        fontSize: 14,
-        color: whiteTheme.textSecondary,
-        marginTop: 6,
+        fontSize: fontSize.lg,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
         textAlign: 'center',
     },
-    browseBtn: {
-        marginTop: spacing.lg,
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        backgroundColor: whiteTheme.primary,
-        borderRadius: 10,
+    emptySubtitle: {
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
+        textAlign: 'center',
+        paddingHorizontal: spacing.xl,
+        lineHeight: 20,
     },
-    browseBtnText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: whiteTheme.white,
+    bookNowBtn: {
+        marginTop: spacing.md,
+        backgroundColor: colors.primary,
+        paddingHorizontal: spacing.xl,
+        paddingVertical: spacing.md,
+        borderRadius: borderRadius.full,
+        ...shadows.primary,
+    },
+    bookNowBtnText: {
+        color: colors.white,
+        fontWeight: fontWeight.bold,
+        fontSize: fontSize.md,
     },
 });
 

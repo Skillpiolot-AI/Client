@@ -58,7 +58,7 @@ export const registerForPushNotifications = async () => {
             name: 'Announcements',
             importance: Notifications.AndroidImportance.MAX,
             vibrationPattern: [0, 250, 250, 250],
-            lightColor: '#FF6B35',
+            lightColor: '#4F46E5',
         });
     }
 

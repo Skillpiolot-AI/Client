@@ -1,16 +1,22 @@
+// MentorDashboardScreen.js — Centralized-theme refactor
+// Removes import of uiTheme from ProfileScreen; uses centralized colors directly.
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import {
+    View, Text, StyleSheet, ScrollView, TouchableOpacity,
+    Dimensions, ActivityIndicator,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
+import { LineChart } from 'react-native-chart-kit';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import mentorshipAPI from '../../services/mentorshipAPI';
-import { uiTheme } from '../profile/ProfileScreen'; // Reusing theme colors for consistency
-import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
 
 const screenWidth = Dimensions.get('window').width;
 
 const MentorDashboardScreen = ({ navigation }) => {
     const { user } = useAuth();
+    const insets = useSafeAreaInsets();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState(null);
     const [graphData, setGraphData] = useState([]);
@@ -23,7 +29,7 @@ const MentorDashboardScreen = ({ navigation }) => {
         try {
             const [statsRes, graphRes] = await Promise.all([
                 mentorshipAPI.getDashboardStats(),
-                mentorshipAPI.getActivityGraph()
+                mentorshipAPI.getActivityGraph(),
             ]);
             setStats(statsRes);
             setGraphData(graphRes);
@@ -36,321 +42,382 @@ const MentorDashboardScreen = ({ navigation }) => {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#1A237E" />
+            <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={styles.loadingText}>Loading dashboard...</Text>
             </View>
         );
     }
 
     const chartConfig = {
-        backgroundGradientFrom: '#FFFFFF',
-        backgroundGradientTo: '#FFFFFF',
-        color: (opacity = 1) => `rgba(26, 35, 126, ${opacity})`,
+        backgroundGradientFrom: colors.surface,
+        backgroundGradientTo: colors.surface,
+        color: (opacity = 1) => `rgba(79, 70, 229, ${opacity})`, // #4F46E5 = primary
         labelColor: (opacity = 1) => `rgba(107, 114, 128, ${opacity})`,
-        strokeWidth: 2,
+        strokeWidth: 2.5,
         barPercentage: 0.5,
         useShadowColorFromDataset: false,
         decimalPlaces: 0,
     };
 
     const lineChartData = {
-        labels: graphData.map(d => d.day),
+        labels: graphData.length > 0 ? graphData.map((d) => d.day) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         datasets: [{
-            data: graphData.map(d => d.count),
-            color: (opacity = 1) => `rgba(26, 35, 126, ${opacity})`,
-            strokeWidth: 2
-        }]
+            data: graphData.length > 0 ? graphData.map((d) => d.count) : [0, 1, 0, 2, 1],
+            color: (opacity = 1) => `rgba(79, 70, 229, ${opacity})`,
+            strokeWidth: 2.5,
+        }],
     };
 
+    const sessionKPIs = [
+        {
+            icon: 'calendar-outline',
+            label: 'Upcoming',
+            sub: 'Sessions',
+            value: stats?.upcomingSessions || 0,
+            bg: colors.primaryBg,
+            iconColor: colors.primary,
+        },
+        {
+            icon: 'checkmark-done',
+            label: 'Completed',
+            sub: 'Overall',
+            value: stats?.completedSessions || 0,
+            bg: colors.successBg,
+            iconColor: colors.success,
+        },
+    ];
+
+    const activityKPIs = [
+        { icon: 'call-outline', label: 'Avg / Day', value: stats?.avgCallsPerDay || 0, color: colors.primary },
+        { icon: 'calendar-outline', label: 'This Week', value: stats?.weekSessions || 0, color: colors.info },
+        { icon: 'calendar', label: 'This Month', value: stats?.monthSessions || 0, color: colors.secondary },
+    ];
+
     return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-            <View style={styles.header}>
-                <View>
-                    <Text style={styles.title}>Dashboard</Text>
-                    <Text style={styles.subtitle}>Welcome back, {user?.name.split(' ')[0]}!</Text>
-                </View>
-                <TouchableOpacity style={styles.bellIcon}>
-                    <Ionicons name="notifications-outline" size={24} color="#000" />
-                    <View style={styles.dot} />
-                </TouchableOpacity>
-            </View>
-
-            {/* Session Stats Section */}
-            <Text style={styles.sectionTitle}>Session Stats</Text>
-            <View style={styles.kpiRow}>
-                <View style={[styles.kpiCard, { backgroundColor: '#E8EAF6' }]}>
-                    <View style={styles.iconCircle}>
-                        <Ionicons name="calendar-outline" size={20} color="#1A237E" />
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {/* ── Header ── */}
+                <View style={styles.header}>
+                    <View>
+                        <Text style={styles.headerTitle}>Dashboard</Text>
+                        <Text style={styles.headerSub}>
+                            Welcome back, {user?.name?.split(' ')[0] || 'Mentor'}!
+                        </Text>
                     </View>
-                    <Text style={styles.kpiValue}>{stats?.upcomingSessions || 0}</Text>
-                    <Text style={styles.kpiLabel}>Upcoming</Text>
-                    <Text style={styles.kpiSubLabel}>Sessions</Text>
+                    <TouchableOpacity
+                        style={styles.bellBtn}
+                        onPress={() => navigation.navigate('Notifications')}
+                    >
+                        <Ionicons name="notifications-outline" size={22} color={colors.text} />
+                        <View style={styles.notifDot} />
+                    </TouchableOpacity>
                 </View>
-                <View style={[styles.kpiCard, { backgroundColor: '#FFF9C4' }]}>
-                    <View style={[styles.iconCircle, { backgroundColor: '#FBC02D' }]}>
-                        <Ionicons name="checkmark-done" size={20} color="#FFF" />
-                    </View>
-                    <Text style={styles.kpiValue}>{stats?.completedSessions || 0}</Text>
-                    <Text style={styles.kpiLabel}>Completed</Text>
-                    <Text style={styles.kpiSubLabel}>Overall</Text>
-                </View>
-            </View>
 
-            {/* Activity KPI */}
-            <Text style={styles.sectionTitle}>Activity KPI</Text>
-            <View style={styles.kpiGrid}>
-                <View style={[styles.kpiBox, { backgroundColor: '#1A237E' }]}>
-                    <Ionicons name="call-outline" size={24} color="#FFF" />
-                    <Text style={styles.kpiBoxLabel}>Avg.Call Per Day</Text>
-                    <Text style={styles.kpiBoxValue}>{stats?.avgCallsPerDay || 0}</Text>
+                {/* ── Session Stats ── */}
+                <Text style={styles.sectionTitle}>Session Stats</Text>
+                <View style={styles.kpiRow}>
+                    {sessionKPIs.map((kpi) => (
+                        <View key={kpi.label} style={[styles.kpiCard, { backgroundColor: kpi.bg }]}>
+                            <View style={[styles.kpiIconCircle, { backgroundColor: kpi.iconColor + '20' }]}>
+                                <Ionicons name={kpi.icon} size={22} color={kpi.iconColor} />
+                            </View>
+                            <Text style={styles.kpiValue}>{kpi.value}</Text>
+                            <Text style={styles.kpiLabel}>{kpi.label}</Text>
+                            <Text style={styles.kpiSub}>{kpi.sub}</Text>
+                        </View>
+                    ))}
                 </View>
-                <View style={[styles.kpiBox, { backgroundColor: '#1E88E5' }]}>
-                    <Ionicons name="calendar-outline" size={24} color="#FFF" />
-                    <Text style={styles.kpiBoxLabel}>This Week</Text>
-                    <Text style={styles.kpiBoxValue}>{stats?.weekSessions || 0}</Text>
-                </View>
-                <View style={[styles.kpiBox, { backgroundColor: '#4FC3F7' }]}>
-                    <Ionicons name="calendar" size={24} color="#FFF" />
-                    <Text style={styles.kpiBoxLabel}>This Month</Text>
-                    <Text style={styles.kpiBoxValue}>{stats?.monthSessions || 0}</Text>
-                </View>
-            </View>
 
-            {/* Performance Graph */}
-            <View style={styles.chartContainer}>
-                <View style={styles.chartHeader}>
+                {/* ── Activity KPI ── */}
+                <Text style={styles.sectionTitle}>Activity KPI</Text>
+                <View style={styles.activityGrid}>
+                    {activityKPIs.map((kpi) => (
+                        <View key={kpi.label} style={[styles.activityBox, { borderTopColor: kpi.color }]}>
+                            <View style={[styles.activityIconWrap, { backgroundColor: kpi.color + '15' }]}>
+                                <Ionicons name={kpi.icon} size={22} color={kpi.color} />
+                            </View>
+                            <Text style={styles.activityValue}>{kpi.value}</Text>
+                            <Text style={styles.activityLabel}>{kpi.label}</Text>
+                        </View>
+                    ))}
+                </View>
+
+                {/* ── Activity Chart ── */}
+                <View style={styles.chartCard}>
                     <Text style={styles.chartTitle}>Your Activities</Text>
+                    <LineChart
+                        data={lineChartData}
+                        width={screenWidth - spacing.md * 2 - spacing.md * 2}
+                        height={170}
+                        chartConfig={chartConfig}
+                        bezier
+                        style={styles.chart}
+                        withInnerLines={false}
+                        withOuterLines={false}
+                        withVerticalLines={false}
+                        withHorizontalLines={true}
+                        withDots={true}
+                        withShadow={false}
+                    />
                 </View>
-                <LineChart
-                    data={lineChartData}
-                    width={screenWidth - 48}
-                    height={180}
-                    chartConfig={chartConfig}
-                    bezier
-                    style={styles.chart}
-                    withInnerLines={false}
-                    withOuterLines={false}
-                    withVerticalLines={false}
-                    withHorizontalLines={true}
-                />
-            </View>
 
-            {/* Recent Sessions Heading */}
-            <View style={styles.sectionHeaderRow}>
-                <Text style={styles.sectionTitle}>Sessions</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('MyBookings')}>
-                    <Text style={styles.viewAllText}>View All</Text>
-                </TouchableOpacity>
-            </View>
-
-            <View style={styles.sessionsPlaceholder}>
-                <View style={styles.placeholderRow}>
-                    <Ionicons name="calendar-outline" size={32} color="#6B7280" />
-                    <View style={styles.placeholderContent}>
-                        <Text style={styles.placeholderTitle}>Track all your mentor sessions</Text>
-                        <Text style={styles.placeholderSub}>View history and upcoming student calls</Text>
+                {/* ── Sessions Link ── */}
+                <View style={styles.sectionHeaderRow}>
+                    <Text style={styles.sectionTitle}>Sessions</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('MyBookings')}>
+                        <Text style={styles.viewAll}>View All</Text>
+                    </TouchableOpacity>
+                </View>
+                <TouchableOpacity
+                    style={styles.sessionsRow}
+                    onPress={() => navigation.navigate('MyBookings')}
+                    activeOpacity={0.8}
+                >
+                    <View style={styles.sessionsIconWrap}>
+                        <Ionicons name="calendar-outline" size={24} color={colors.primary} />
                     </View>
-                    <Ionicons name="chevron-forward" size={24} color="#6B7280" />
-                </View>
-            </View>
+                    <View style={styles.sessionsText}>
+                        <Text style={styles.sessionsTitle}>Track all your mentor sessions</Text>
+                        <Text style={styles.sessionsSub}>View history and upcoming student calls</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+                </TouchableOpacity>
 
-            {/* Growth Section Mock (Matching Reference) */}
-            <View style={styles.growthCard}>
-                <View style={styles.growthText}>
-                    <Ionicons name="sparkles" size={20} color="#1A237E" />
-                    <Text style={styles.growthMessage}>AI suggests focusing more on Frontend topics this week.</Text>
+                {/* ── AI Suggestion ── */}
+                <View style={styles.aiCard}>
+                    <View style={styles.aiCardInner}>
+                        <Ionicons name="sparkles" size={20} color={colors.primary} />
+                        <Text style={styles.aiMessage}>
+                            AI suggests focusing more on Frontend topics this week to better serve your mentees.
+                        </Text>
+                    </View>
                 </View>
-            </View>
 
-            <View style={{ height: 100 }} />
-        </ScrollView>
+                <View style={{ height: 100 }} />
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
-        paddingHorizontal: 24,
+        backgroundColor: colors.background,
+        paddingHorizontal: spacing.md,
     },
     loadingContainer: {
         flex: 1,
+        backgroundColor: colors.background,
         justifyContent: 'center',
         alignItems: 'center',
+        gap: spacing.md,
     },
+    loadingText: {
+        fontSize: fontSize.md,
+        color: colors.textSecondary,
+    },
+    // ── Header ────────────────────────────────────
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 60,
-        marginBottom: 30,
+        marginTop: spacing.md,
+        marginBottom: spacing.lg,
     },
-    title: {
-        fontSize: 24,
-        fontWeight: '800',
-        color: '#000',
+    headerTitle: {
+        fontSize: fontSize.xxxl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.text,
     },
-    subtitle: {
-        fontSize: 14,
-        color: '#6B7280',
+    headerSub: {
+        fontSize: fontSize.sm,
+        color: colors.textSecondary,
         marginTop: 2,
     },
-    bellIcon: {
+    bellBtn: {
         width: 44,
         height: 44,
-        borderRadius: 22,
-        backgroundColor: '#F3F4F6',
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.border,
     },
-    dot: {
+    notifDot: {
         position: 'absolute',
-        top: 12,
-        right: 12,
+        top: 10,
+        right: 10,
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: '#EF4444',
+        backgroundColor: colors.error,
         borderWidth: 1.5,
-        borderColor: '#F3F4F6',
+        borderColor: colors.white,
     },
+    // ── Section Titles ─────────────────────────────
     sectionTitle: {
-        fontSize: 18,
-        fontWeight: '700',
-        color: '#000',
-        marginBottom: 16,
-    },
-    kpiRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 24,
-    },
-    kpiCard: {
-        width: (screenWidth - 60) / 2,
-        padding: 20,
-        borderRadius: 20,
-    },
-    iconCircle: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: '#FFF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    kpiValue: {
-        fontSize: 24,
-        fontWeight: '800',
-        color: '#000',
-    },
-    kpiLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#374151',
-        marginTop: 4,
-    },
-    kpiSubLabel: {
-        fontSize: 12,
-        color: '#6B7280',
-    },
-    kpiGrid: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 30,
-    },
-    kpiBox: {
-        width: (screenWidth - 64) / 3,
-        padding: 16,
-        borderRadius: 16,
-        alignItems: 'center',
-    },
-    kpiBoxLabel: {
-        fontSize: 10,
-        color: 'rgba(255,255,255,0.8)',
-        marginTop: 8,
-        textAlign: 'center',
-    },
-    kpiBoxValue: {
-        fontSize: 18,
-        fontWeight: '800',
-        color: '#FFF',
-        marginTop: 4,
-    },
-    chartContainer: {
-        backgroundColor: '#F9FAFB',
-        borderRadius: 24,
-        padding: 20,
-        marginBottom: 20,
-    },
-    chartHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    chartTitle: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: '#000',
-    },
-    chart: {
-        marginVertical: 8,
-        borderRadius: 16,
-    },
-    growthCard: {
-        backgroundColor: '#1A237E',
-        borderRadius: 16,
-        padding: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    growthText: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 8,
-    },
-    growthMessage: {
-        color: '#FFF',
-        fontSize: 12,
-        marginLeft: 10,
-        fontWeight: '500',
-        flex: 1,
+        fontSize: fontSize.lg,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
+        marginBottom: spacing.md,
     },
     sectionHeaderRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: spacing.md,
+        marginTop: spacing.xs,
     },
-    viewAllText: {
-        fontSize: 14,
-        color: '#1A237E',
-        fontWeight: '600',
+    viewAll: {
+        fontSize: fontSize.sm,
+        color: colors.primary,
+        fontWeight: fontWeight.semibold,
     },
-    sessionsPlaceholder: {
-        backgroundColor: '#F3F4F6',
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 24,
+    // ── Session KPI Row ────────────────────────────
+    kpiRow: {
+        flexDirection: 'row',
+        gap: spacing.sm,
+        marginBottom: spacing.lg,
     },
-    placeholderRow: {
+    kpiCard: {
+        flex: 1,
+        padding: spacing.md,
+        borderRadius: borderRadius.xl,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+    },
+    kpiIconCircle: {
+        width: 42,
+        height: 42,
+        borderRadius: borderRadius.lg,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: spacing.sm,
+    },
+    kpiValue: {
+        fontSize: fontSize.xxl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.text,
+    },
+    kpiLabel: {
+        fontSize: fontSize.sm,
+        fontWeight: fontWeight.semibold,
+        color: colors.textSecondary,
+        marginTop: 2,
+    },
+    kpiSub: {
+        fontSize: fontSize.xs,
+        color: colors.textMuted,
+    },
+    // ── Activity KPI Grid ──────────────────────────
+    activityGrid: {
+        flexDirection: 'row',
+        gap: spacing.sm,
+        marginBottom: spacing.lg,
+    },
+    activityBox: {
+        flex: 1,
+        backgroundColor: colors.card,
+        padding: spacing.md,
+        borderRadius: borderRadius.xl,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        borderTopWidth: 3,
+        alignItems: 'center',
+        ...shadows.sm,
+    },
+    activityIconWrap: {
+        width: 42,
+        height: 42,
+        borderRadius: borderRadius.lg,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: spacing.sm,
+    },
+    activityValue: {
+        fontSize: fontSize.xl,
+        fontWeight: fontWeight.extrabold,
+        color: colors.text,
+    },
+    activityLabel: {
+        fontSize: 11,
+        color: colors.textSecondary,
+        marginTop: 2,
+        textAlign: 'center',
+    },
+    // ── Chart ─────────────────────────────────────
+    chartCard: {
+        backgroundColor: colors.surface,
+        borderRadius: borderRadius.xxl,
+        padding: spacing.md,
+        marginBottom: spacing.lg,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+    },
+    chartTitle: {
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
+        marginBottom: spacing.md,
+    },
+    chart: {
+        borderRadius: borderRadius.lg,
+    },
+    // ── Sessions Row ──────────────────────────────
+    sessionsRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        gap: spacing.md,
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
+        padding: spacing.md,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
+        marginBottom: spacing.lg,
+        ...shadows.xs,
     },
-    placeholderContent: {
+    sessionsIconWrap: {
+        width: 44,
+        height: 44,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.primaryBg,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    sessionsText: {
         flex: 1,
-        marginLeft: 12,
     },
-    placeholderTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#000',
+    sessionsTitle: {
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.semibold,
+        color: colors.text,
     },
-    placeholderSub: {
-        fontSize: 12,
-        color: '#6B7280',
+    sessionsSub: {
+        fontSize: fontSize.xs,
+        color: colors.textSecondary,
         marginTop: 2,
+    },
+    // ── AI Card ───────────────────────────────────
+    aiCard: {
+        backgroundColor: colors.primaryBg,
+        borderRadius: borderRadius.xl,
+        padding: spacing.md,
+        borderWidth: 1,
+        borderColor: colors.primaryBorder,
+    },
+    aiCardInner: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: spacing.sm,
+    },
+    aiMessage: {
+        flex: 1,
+        fontSize: fontSize.sm,
+        color: colors.text,
+        lineHeight: 20,
+        fontWeight: fontWeight.medium,
     },
 });
 

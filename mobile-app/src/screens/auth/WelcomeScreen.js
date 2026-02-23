@@ -1,18 +1,19 @@
-// Welcome Screen - Orange Hero with White Background
+// Welcome Screen — Dark Theme
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { colors, fontSize, fontWeight, spacing, borderRadius } from '../../theme';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const WelcomeScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <StatusBar barStyle="light-content" />
 
-            {/* Orange Hero Section */}
+            {/* Dark Indigo Hero Section */}
             <LinearGradient
-                colors={['#FF6B35', '#F7931E']}
+                colors={['#4F46E5', '#3730A3']}
                 style={styles.heroSection}
             >
                 {/* Decorative Stars */}
@@ -21,7 +22,7 @@ const WelcomeScreen = ({ navigation }) => {
                 <Text style={[styles.star, styles.star3]}>+</Text>
                 <Text style={[styles.star, styles.star4]}>+</Text>
 
-                {/* Cloud decorations */}
+                {/* Cloud / blob decorations */}
                 <View style={styles.cloudContainer}>
                     <View style={styles.cloud} />
                     <View style={[styles.cloud, styles.cloud2]} />
@@ -38,24 +39,18 @@ const WelcomeScreen = ({ navigation }) => {
                 <Text style={styles.appName}>SkillPilot</Text>
             </LinearGradient>
 
-            {/* White Content Section */}
+            {/* Dark Content Section */}
             <View style={styles.contentSection}>
-                <Text style={styles.title}>Unlock Your Career{'\n'}Potential</Text>
+                <Text style={styles.title}>{'Unlock Your Career\nPotential'}</Text>
                 <Text style={styles.subtitle}>
                     Get personalized mentorship, career guidance, and skill assessments to achieve your dreams.
                 </Text>
 
-                <TouchableOpacity
-                    style={styles.loginButton}
-                    onPress={() => navigation.navigate('Login')}
-                >
+                <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Login')}>
                     <Text style={styles.loginButtonText}>Log in</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.signupButton}
-                    onPress={() => navigation.navigate('Signup')}
-                >
+                <TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate('Signup')}>
                     <Text style={styles.signupButtonText}>Create Account</Text>
                 </TouchableOpacity>
             </View>
@@ -69,7 +64,7 @@ const WelcomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.background,
     },
     heroSection: {
         flex: 0.55,
@@ -82,7 +77,7 @@ const styles = StyleSheet.create({
     },
     star: {
         position: 'absolute',
-        color: 'rgba(255,255,255,0.8)',
+        color: 'rgba(255,255,255,0.55)',
         fontSize: 16,
         top: 80,
         left: 30,
@@ -112,7 +107,7 @@ const styles = StyleSheet.create({
     cloud: {
         width: 80,
         height: 40,
-        backgroundColor: 'rgba(255,200,150,0.5)',
+        backgroundColor: 'rgba(255,255,255,0.08)',
         borderRadius: 20,
     },
     cloud2: {
@@ -126,61 +121,61 @@ const styles = StyleSheet.create({
         marginTop: 40,
     },
     appName: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#FFFFFF',
-        marginTop: 20,
+        fontSize: fontSize.xxxl,
+        fontWeight: fontWeight.bold,
+        color: colors.white,
+        marginTop: spacing.md,
         letterSpacing: 1,
     },
     contentSection: {
         flex: 0.45,
-        paddingHorizontal: 32,
-        paddingTop: 40,
+        paddingHorizontal: spacing.xl,
+        paddingTop: spacing.xl,
         alignItems: 'center',
     },
     title: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#1A1A2E',
+        fontSize: fontSize.xxxl,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
         textAlign: 'center',
         lineHeight: 36,
-        marginBottom: 16,
+        marginBottom: spacing.md,
     },
     subtitle: {
-        fontSize: 15,
-        color: '#6B7280',
+        fontSize: fontSize.md,
+        color: colors.textSecondary,
         textAlign: 'center',
         lineHeight: 22,
-        marginBottom: 32,
+        marginBottom: spacing.xl,
     },
     loginButton: {
         width: '100%',
-        backgroundColor: '#FF6B35',
-        borderRadius: 16,
+        backgroundColor: colors.primary,
+        borderRadius: borderRadius.xl,
         height: 56,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 16,
+        marginBottom: spacing.md,
     },
     loginButtonText: {
-        color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: '600',
+        color: colors.white,
+        fontSize: fontSize.lg,
+        fontWeight: fontWeight.semibold,
     },
     signupButton: {
         width: '100%',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
+        backgroundColor: colors.surface,
+        borderRadius: borderRadius.xl,
         height: 56,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 2,
-        borderColor: '#E5E7EB',
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     signupButtonText: {
-        color: '#1A1A2E',
-        fontSize: 18,
-        fontWeight: '600',
+        color: colors.text,
+        fontSize: fontSize.lg,
+        fontWeight: fontWeight.semibold,
     },
     bottomIndicator: {
         position: 'absolute',
@@ -189,7 +184,7 @@ const styles = StyleSheet.create({
         marginLeft: -40,
         width: 80,
         height: 5,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: colors.surfaceAlt,
         borderRadius: 3,
     },
 });

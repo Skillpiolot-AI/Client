@@ -4,8 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import authAPI from '../../services/authAPI';
 import { ScreenWrapper } from '../../components/layout';
 import { Button } from '../../components/ui';
-import { uiTheme } from '../profile/ProfileScreen';
-import { fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { colors, fontSize, fontWeight, spacing, borderRadius } from '../../theme';
 
 const OtpVerificationScreen = ({ navigation, route }) => {
     const { email, purpose = 'password_reset', fromProfile = false } = route.params || {};
@@ -88,7 +87,7 @@ const OtpVerificationScreen = ({ navigation, route }) => {
     };
 
     return (
-        <ScreenWrapper scrollable={false} style={{ backgroundColor: uiTheme.background }}>
+        <ScreenWrapper scrollable={false} style={{ backgroundColor: colors.background }}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.container}
@@ -99,7 +98,7 @@ const OtpVerificationScreen = ({ navigation, route }) => {
                     onPress={() => navigation.goBack()}
                 >
                     <View style={styles.backCircle}>
-                        <Ionicons name="arrow-back" size={24} color={uiTheme.primary} />
+                        <Ionicons name="arrow-back" size={24} color={colors.primary} />
                     </View>
                 </TouchableOpacity>
 
@@ -156,7 +155,7 @@ const OtpVerificationScreen = ({ navigation, route }) => {
                         title="VERIFY OTP"
                         onPress={handleVerify}
                         loading={loading}
-                        color={uiTheme.primary}
+                        color={colors.primary}
                         style={styles.verifyButton}
                     />
                 </View>
@@ -177,7 +176,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#F3F4F6',
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -189,13 +188,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#111827',
+        color: colors.text,
         textAlign: 'center',
         marginBottom: 16,
     },
     subtitle: {
         fontSize: 14,
-        color: '#4B5563',
+        color: colors.textSecondary,
         textAlign: 'center',
         lineHeight: 22,
         marginBottom: 40,
@@ -211,20 +210,20 @@ const styles = StyleSheet.create({
         width: 48,
         height: 56,
         borderRadius: 28, // Using circular inputs as per UI image
-        backgroundColor: '#F9FAFB',
+        backgroundColor: colors.surface,
         borderWidth: 1,
-        borderColor: '#E5E7EB',
+        borderColor: colors.border,
         fontSize: 20,
         fontWeight: '700',
-        color: '#111827',
+        color: colors.text,
         textAlign: 'center',
     },
     otpInputFilled: {
-        borderColor: '#E5E7EB',
-        backgroundColor: '#F9FAFB',
+        borderColor: colors.border,
+        backgroundColor: colors.surface,
     },
     otpInputActive: {
-        borderColor: uiTheme.primary,
+        borderColor: colors.primary,
         borderWidth: 2,
     },
     resendContainer: {
@@ -234,12 +233,12 @@ const styles = StyleSheet.create({
     },
     resendText: {
         fontSize: 14,
-        color: '#4B5563',
+        color: colors.textSecondary,
     },
     resendLink: {
         fontSize: 14,
         fontWeight: '700',
-        color: uiTheme.primary,
+        color: colors.primary,
         marginLeft: 6,
         textDecorationLine: 'underline',
     },

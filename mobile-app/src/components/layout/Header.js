@@ -1,44 +1,69 @@
-// Header Component
+// Header Layout Component
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, fontSize, fontWeight, spacing } from '../../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
 
 const Header = ({
     title,
     subtitle,
-    showBack = false,
+    onBack,
+    rightComponent,
     rightIcon,
-    onRightIconPress,
+    onRightPress,
     transparent = false,
     style,
+    titleStyle,
+    showBorder = true,
 }) => {
-    const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
 
     return (
-        <View style={[styles.header, transparent && styles.transparent, style]}>
-            <View style={styles.left}>
-                {showBack && (
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() => navigation.goBack()}
-                    >
-                        <Ionicons name="chevron-back" size={28} color={colors.text} />
+        <View
+            style={[
+                styles.header,
+                { paddingTop: Math.max(insets.top, spacing.md) },
+                transparent && styles.transparent,
+                !transparent && showBorder && styles.bordered,
+                style,
+            ]}
+        >
+            {/* Left: Back button or spacer */}
+            <View style={styles.sideContainer}>
+                {onBack ? (
+                    <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.75}>
+                        <Ionicons name="chevron-back" size={22} color={colors.text} />
                     </TouchableOpacity>
+                ) : (
+                    <View style={styles.placeholder} />
                 )}
             </View>
 
-            <View style={styles.center}>
-                {title && <Text style={styles.title} numberOfLines={1}>{title}</Text>}
-                {subtitle && <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>}
+            {/* Center: Title + Subtitle */}
+            <View style={styles.titleContainer}>
+                {title ? (
+                    <Text style={[styles.title, titleStyle]} numberOfLines={1}>
+                        {title}
+                    </Text>
+                ) : null}
+                {subtitle ? (
+                    <Text style={styles.subtitle} numberOfLines={1}>
+                        {subtitle}
+                    </Text>
+                ) : null}
             </View>
 
-            <View style={styles.right}>
-                {rightIcon && (
-                    <TouchableOpacity style={styles.rightButton} onPress={onRightIconPress}>
-                        {rightIcon}
+            {/* Right: Custom component or icon button */}
+            <View style={styles.sideContainer}>
+                {rightComponent ? (
+                    rightComponent
+                ) : rightIcon ? (
+                    <TouchableOpacity onPress={onRightPress} style={styles.iconButton} activeOpacity={0.75}>
+                        <Ionicons name={rightIcon} size={22} color={colors.text} />
                     </TouchableOpacity>
+                ) : (
+                    <View style={styles.placeholder} />
                 )}
             </View>
         </View>
@@ -49,47 +74,58 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.sm,
+        paddingBottom: spacing.md,
         backgroundColor: colors.background,
+    },
+    bordered: {
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
     },
     transparent: {
         backgroundColor: 'transparent',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 10,
     },
-    left: {
+    sideContainer: {
         width: 44,
-        alignItems: 'flex-start',
+        alignItems: 'center',
     },
-    center: {
+    placeholder: {
+        width: 44,
+        height: 44,
+    },
+    backButton: {
+        width: 40,
+        height: 40,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    iconButton: {
+        width: 40,
+        height: 40,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    titleContainer: {
         flex: 1,
         alignItems: 'center',
     },
-    right: {
-        width: 44,
-        alignItems: 'flex-end',
-    },
-    backButton: {
-        padding: spacing.xs,
-        marginLeft: -spacing.xs,
-    },
-    rightButton: {
-        padding: spacing.xs,
-        marginRight: -spacing.xs,
-    },
     title: {
         fontSize: fontSize.lg,
-        fontWeight: fontWeight.semibold,
+        fontWeight: fontWeight.bold,
         color: colors.text,
     },
     subtitle: {
-        fontSize: fontSize.sm,
+        fontSize: fontSize.xs,
         color: colors.textSecondary,
-        marginTop: 2,
+        marginTop: 1,
     },
 });
 

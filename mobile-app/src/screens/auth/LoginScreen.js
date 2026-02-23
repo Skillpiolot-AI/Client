@@ -1,26 +1,27 @@
-// Login Screen - Clean White Theme with Orange Accent
+// Login Screen — Dark Theme
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import {
+    View, Text, StyleSheet, TouchableOpacity, TextInput,
+    KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useGoogleAuth, getGoogleUserInfo } from '../../hooks';
 import authAPI from '../../services/authAPI';
+import { colors, fontSize, fontWeight, spacing, borderRadius } from '../../theme';
 
 const LoginScreen = ({ navigation }) => {
     const { login } = useAuth();
     const { signInWithGoogle, isReady, response } = useGoogleAuth();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail]               = useState('');
+    const [password, setPassword]         = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading]           = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError]               = useState('');
 
-    // Handle Google Sign-In response
     useEffect(() => {
-        if (response?.type === 'success') {
-            handleGoogleResponse(response);
-        }
+        if (response?.type === 'success') handleGoogleResponse(response);
     }, [response]);
 
     const handleGoogleResponse = async (response) => {
@@ -28,14 +29,9 @@ const LoginScreen = ({ navigation }) => {
             setGoogleLoading(true);
             const { authentication } = response;
             if (authentication?.accessToken) {
-                // Get user info from Google
-                const userInfo = await getGoogleUserInfo(authentication.accessToken);
-                // Send to backend for authentication
+                await getGoogleUserInfo(authentication.accessToken);
                 const result = await authAPI.googleAuth(authentication.idToken || authentication.accessToken);
-                if (result.token) {
-                    // Success - user is now logged in
-                    setError('');
-                }
+                if (result.token) setError('');
             }
         } catch (err) {
             setError(err.message || 'Google sign-in failed');
@@ -44,22 +40,14 @@ const LoginScreen = ({ navigation }) => {
         }
     };
 
-    const handleGoogleSignIn = async () => {
-        setError('');
-        await signInWithGoogle();
-    };
+    const handleGoogleSignIn = async () => { setError(''); await signInWithGoogle(); };
 
     const handleLogin = async () => {
-        if (!email || !password) {
-            setError('Please fill in all fields');
-            return;
-        }
+        if (!email || !password) { setError('Please fill in all fields'); return; }
         setLoading(true);
         setError('');
         const result = await login(email, password);
-        if (!result.success) {
-            setError(result.error);
-        }
+        if (!result.success) setError(result.error);
         setLoading(false);
     };
 
@@ -68,16 +56,10 @@ const LoginScreen = ({ navigation }) => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
         >
-            <ScrollView
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* Back Button */}
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                >
-                    <Ionicons name="chevron-back" size={24} color="#1A1A2E" />
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                    <Ionicons name="chevron-back" size={24} color={colors.text} />
                 </TouchableOpacity>
 
                 {/* Header */}
@@ -89,7 +71,7 @@ const LoginScreen = ({ navigation }) => {
                 {/* Error Message */}
                 {error ? (
                     <View style={styles.errorBox}>
-                        <Ionicons name="alert-circle" size={18} color="#EF4444" />
+                        <Ionicons name="alert-circle" size={18} color={colors.error} />
                         <Text style={styles.errorText}>{error}</Text>
                     </View>
                 ) : null}
@@ -100,7 +82,7 @@ const LoginScreen = ({ navigation }) => {
                     <TextInput
                         style={styles.input}
                         placeholder="Your email"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={email}
                         onChangeText={setEmail}
                         autoCapitalize="none"
@@ -114,40 +96,31 @@ const LoginScreen = ({ navigation }) => {
                     <TextInput
                         style={styles.input}
                         placeholder="Your password"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry={!showPassword}
                     />
-                    <TouchableOpacity
-                        onPress={() => setShowPassword(!showPassword)}
-                        style={styles.eyeIcon}
-                    >
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                         <Ionicons
                             name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                             size={20}
-                            color="#9CA3AF"
+                            color={colors.textMuted}
                         />
                     </TouchableOpacity>
                 </View>
 
                 {/* Forgot Password */}
-                <TouchableOpacity
-                    style={styles.forgotBtn}
-                    onPress={() => navigation.navigate('ForgotPassword')}
-                >
+                <TouchableOpacity style={styles.forgotBtn} onPress={() => navigation.navigate('ForgotPassword')}>
                     <Text style={styles.forgotText}>Forgot Password?</Text>
                 </TouchableOpacity>
 
-                {/* Connect Button */}
-                <TouchableOpacity
-                    style={styles.connectButton}
-                    onPress={handleLogin}
-                    disabled={loading}
-                >
-                    <Text style={styles.connectButtonText}>
-                        {loading ? 'Connecting...' : 'Connect'}
-                    </Text>
+                {/* Login Button */}
+                <TouchableOpacity style={styles.connectButton} onPress={handleLogin} disabled={loading}>
+                    {loading
+                        ? <ActivityIndicator color={colors.white} />
+                        : <Text style={styles.connectButtonText}>Connect</Text>
+                    }
                 </TouchableOpacity>
 
                 {/* Divider */}
@@ -178,7 +151,7 @@ const LoginScreen = ({ navigation }) => {
                     <Text style={styles.socialButtonText}>Sign in with Facebook</Text>
                 </TouchableOpacity>
 
-                {/* Privacy Policy */}
+                {/* Privacy */}
                 <Text style={styles.privacyText}>
                     For more information, please see our <Text style={styles.link}>Privacy policy</Text>.
                 </Text>
@@ -198,154 +171,160 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.background,
     },
     scrollContent: {
-        padding: 24,
+        padding: spacing.lg,
         paddingTop: 60,
     },
     backButton: {
         width: 44,
         height: 44,
-        borderRadius: 12,
-        backgroundColor: '#F5F5F7',
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 32,
+        marginBottom: spacing.xl,
     },
     title: {
-        fontSize: 32,
-        fontWeight: '700',
-        color: '#1A1A2E',
-        marginBottom: 8,
+        fontSize: fontSize.hero,
+        fontWeight: fontWeight.bold,
+        color: colors.text,
+        marginBottom: spacing.sm,
     },
     subtitle: {
-        fontSize: 15,
-        color: '#6B7280',
-        marginBottom: 32,
+        fontSize: fontSize.md,
+        color: colors.textSecondary,
+        marginBottom: spacing.xl,
+        lineHeight: 22,
     },
     link: {
-        color: '#FF6B35',
-        fontWeight: '600',
+        color: colors.primary,
+        fontWeight: fontWeight.semibold,
     },
     errorBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FEE2E2',
-        padding: 12,
-        borderRadius: 12,
-        marginBottom: 20,
-        gap: 8,
+        backgroundColor: colors.errorBg,
+        padding: spacing.md,
+        borderRadius: borderRadius.lg,
+        marginBottom: spacing.md,
+        gap: spacing.sm,
+        borderWidth: 1,
+        borderColor: colors.error + '40',
     },
     errorText: {
-        color: '#EF4444',
-        fontSize: 14,
+        color: colors.error,
+        fontSize: fontSize.sm,
         flex: 1,
     },
     label: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#374151',
-        marginBottom: 8,
+        fontSize: fontSize.sm,
+        fontWeight: fontWeight.medium,
+        color: colors.textSecondary,
+        marginBottom: spacing.sm,
     },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
+        backgroundColor: colors.surface,
+        borderRadius: borderRadius.lg,
         borderWidth: 1,
-        borderColor: '#E5E7EB',
-        marginBottom: 20,
+        borderColor: colors.border,
+        marginBottom: spacing.md,
         height: 52,
-        paddingHorizontal: 16,
+        paddingHorizontal: spacing.md,
     },
     input: {
         flex: 1,
-        fontSize: 16,
-        color: '#1A1A2E',
+        fontSize: fontSize.md,
+        color: colors.text,
     },
     eyeIcon: {
         padding: 4,
     },
     forgotBtn: {
         alignSelf: 'flex-end',
-        marginBottom: 24,
-        marginTop: -8,
+        marginBottom: spacing.lg,
+        marginTop: -spacing.sm,
     },
     forgotText: {
-        fontSize: 14,
-        color: '#FF6B35',
-        fontWeight: '600',
+        fontSize: fontSize.sm,
+        color: colors.primary,
+        fontWeight: fontWeight.semibold,
     },
     connectButton: {
-        backgroundColor: '#FF6B35',
-        borderRadius: 12,
+        backgroundColor: colors.primary,
+        borderRadius: borderRadius.lg,
         height: 52,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 24,
+        marginBottom: spacing.lg,
     },
     connectButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '600',
+        color: colors.white,
+        fontSize: fontSize.md,
+        fontWeight: fontWeight.semibold,
     },
     divider: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: spacing.lg,
     },
     dividerLine: {
         flex: 1,
         height: 1,
-        backgroundColor: '#E5E7EB',
+        backgroundColor: colors.border,
     },
     dividerText: {
-        marginHorizontal: 16,
-        fontSize: 14,
-        color: '#9CA3AF',
+        marginHorizontal: spacing.md,
+        fontSize: fontSize.sm,
+        color: colors.textMuted,
     },
     socialButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
+        backgroundColor: colors.surface,
+        borderRadius: borderRadius.lg,
         height: 52,
         borderWidth: 1,
-        borderColor: '#E5E7EB',
-        marginBottom: 12,
+        borderColor: colors.border,
+        marginBottom: spacing.sm,
         gap: 10,
+    },
+    socialButtonDisabled: {
+        opacity: 0.5,
     },
     googleIcon: {
         fontSize: 18,
-        fontWeight: '700',
+        fontWeight: fontWeight.bold,
         color: '#EA4335',
     },
     socialButtonText: {
-        fontSize: 15,
-        color: '#374151',
-        fontWeight: '500',
+        fontSize: fontSize.md,
+        color: colors.text,
+        fontWeight: fontWeight.medium,
     },
     privacyText: {
-        fontSize: 13,
-        color: '#9CA3AF',
+        fontSize: fontSize.sm,
+        color: colors.textMuted,
         textAlign: 'center',
-        marginTop: 16,
-        marginBottom: 24,
+        marginTop: spacing.md,
+        marginBottom: spacing.lg,
     },
     signupRow: {
         flexDirection: 'row',
         justifyContent: 'center',
     },
     signupText: {
-        fontSize: 15,
-        color: '#6B7280',
+        fontSize: fontSize.md,
+        color: colors.textSecondary,
     },
     signupLink: {
-        fontSize: 15,
-        color: '#FF6B35',
-        fontWeight: '600',
+        fontSize: fontSize.md,
+        color: colors.primary,
+        fontWeight: fontWeight.semibold,
     },
 });
 
