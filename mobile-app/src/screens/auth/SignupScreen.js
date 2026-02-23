@@ -1,345 +1,182 @@
-// Signup Screen — Dark Theme
-import React, { useState } from 'react';
+// SignupScreen.js — Wave design registration with role selection
+import React, { useState, useRef, useEffect } from 'react';
 import {
     View, Text, StyleSheet, TouchableOpacity, TextInput,
-    KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
+    KeyboardAvoidingView, Platform, ScrollView, Animated,
+    Dimensions, ActivityIndicator, StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
-import { colors, fontSize, fontWeight, spacing, borderRadius } from '../../theme';
 
-const SignupScreen = ({ navigation }) => {
+const { height } = Dimensions.get('window');
+const BRAND = '#5B5FEF';
+
+export default function SignupScreen({ navigation }) {
     const { signup } = useAuth();
-    const [name, setName]                       = useState('');
-    const [email, setEmail]                     = useState('');
-    const [password, setPassword]               = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [showPassword, setShowPassword]       = useState(false);
-    const [loading, setLoading]                 = useState(false);
-    const [error, setError]                     = useState('');
-    const [success, setSuccess]                 = useState(false);
+    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPass, setConfirmPass] = useState('');
+    const [role, setRole] = useState('User');
+    const [showPass, setShowPass] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const fadeIn = useRef(new Animated.Value(0)).current;
+    const slideUp = useRef(new Animated.Value(30)).current;
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(fadeIn, { toValue: 1, duration: 600, useNativeDriver: true }),
+            Animated.timing(slideUp, { toValue: 0, duration: 500, delay: 100, useNativeDriver: true }),
+        ]).start();
+    }, []);
 
     const handleSignup = async () => {
-        if (!name || !email || !password || !confirmPassword) {
-            setError('Please fill in all fields'); return;
-        }
-        if (password !== confirmPassword) {
-            setError('Passwords do not match'); return;
-        }
-        if (password.length < 6) {
-            setError('Password must be at least 6 characters'); return;
-        }
+        if (!name || !username || !email || !password) { setError('Please fill in all fields'); return; }
+        if (password !== confirmPass) { setError('Passwords do not match'); return; }
+        if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
         setLoading(true);
         setError('');
-        const result = await signup({ name, email, password, confirmPassword });
-        if (result.success) {
-            setSuccess(true);
-        } else {
-            setError(result.error);
-        }
+        const result = await signup({ name, username, email: email.toLowerCase(), password, confirmPassword: confirmPass, role });
         setLoading(false);
+        if (result.success) {
+            navigation.navigate('VerifyEmail', { email: email.toLowerCase() });
+        } else {
+            setError(result.error || 'Signup failed');
+        }
     };
 
-    if (success) {
-        return (
-            <View style={styles.successContainer}>
-                <View style={styles.successIcon}>
-                    <Ionicons name="checkmark-circle" size={80} color={colors.success} />
-                </View>
-                <Text style={styles.successTitle}>Account Created!</Text>
-                <Text style={styles.successText}>
-                    We've sent a verification email to {email}. Please verify to continue.
-                </Text>
-                <TouchableOpacity style={styles.connectButton} onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.connectButtonText}>Go to Login</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
+    const RoleBtn = ({ label, icon, value }) => (
+        <TouchableOpacity
+            style={[styles.roleBtn, role === value && styles.roleBtnActive]}
+            onPress={() => setRole(value)}
+        >
+            <Ionicons name={icon} size={18} color={role === value ? '#fff' : BRAND} />
+            <Text style={[styles.roleBtnText, role === value && { color: '#fff' }]}>{label}</Text>
+        </TouchableOpacity>
+    );
 
     return (
         <KeyboardAvoidingView
+            style={styles.root}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
         >
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                {/* Back Button */}
-                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                    <Ionicons name="chevron-back" size={24} color={colors.text} />
+            <StatusBar barStyle="light-content" backgroundColor={BRAND} />
+            <View style={styles.top}>
+                {[160, 120, 80].map((r, i) => (
+                    <View key={i} style={[styles.ring, { width: r * 2, height: r * 2, borderRadius: r, opacity: 0.07 + i * 0.04 }]} />
+                ))}
+                <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+                    <Ionicons name="arrow-back" size={22} color="#fff" />
                 </TouchableOpacity>
+                <View style={styles.topContent}>
+                    <Ionicons name="rocket" size={26} color="#fff" />
+                    <Text style={styles.topTitle}>Create Account</Text>
+                </View>
+            </View>
+            <View style={styles.waveBox}><View style={styles.waveCurve} /></View>
 
-                {/* Header */}
-                <Text style={styles.title}>Create Account</Text>
-                <Text style={styles.subtitle}>Join us to unlock your career potential.</Text>
+            <ScrollView style={styles.bottom} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                <Animated.View style={{ opacity: fadeIn, transform: [{ translateY: slideUp }] }}>
+                    <Text style={styles.heading}>Sign up</Text>
+                    <View style={styles.headingUnderline} />
 
-                {/* Error Message */}
-                {error ? (
-                    <View style={styles.errorBox}>
-                        <Ionicons name="alert-circle" size={18} color={colors.error} />
-                        <Text style={styles.errorText}>{error}</Text>
+                    {/* Role selector */}
+                    <Text style={styles.label}>I am a</Text>
+                    <View style={styles.roleRow}>
+                        <RoleBtn label="Student" icon="school-outline" value="User" />
+                        <RoleBtn label="Mentor" icon="people-outline" value="Mentor" />
                     </View>
-                ) : null}
 
-                {/* Name Input */}
-                <Text style={styles.label}>Full Name</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Your full name"
-                        placeholderTextColor={colors.textMuted}
-                        value={name}
-                        onChangeText={setName}
-                    />
-                </View>
+                    {error ? (
+                        <View style={styles.errorBox}>
+                            <Ionicons name="alert-circle-outline" size={16} color="#EF4444" />
+                            <Text style={styles.errorText}>{error}</Text>
+                        </View>
+                    ) : null}
 
-                {/* Email Input */}
-                <Text style={styles.label}>Email</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Your email"
-                        placeholderTextColor={colors.textMuted}
-                        value={email}
-                        onChangeText={setEmail}
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                    />
-                </View>
+                    {/* Fields */}
+                    {[
+                        { label: 'Full Name', icon: 'person-outline', value: name, setter: setName, placeholder: 'Your full name' },
+                        { label: 'Username', icon: 'at-outline', value: username, setter: setUsername, placeholder: 'Choose a username' },
+                        { label: 'Email', icon: 'mail-outline', value: email, setter: setEmail, placeholder: 'your@email.com', keyboardType: 'email-address' },
+                    ].map((f, i) => (
+                        <View key={i}>
+                            <Text style={styles.label}>{f.label}</Text>
+                            <View style={styles.inputRow}>
+                                <Ionicons name={f.icon} size={18} color="#9CA3AF" />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder={f.placeholder}
+                                    placeholderTextColor="#9CA3AF"
+                                    autoCapitalize="none"
+                                    keyboardType={f.keyboardType || 'default'}
+                                    value={f.value}
+                                    onChangeText={f.setter}
+                                />
+                            </View>
+                        </View>
+                    ))}
 
-                {/* Password Input */}
-                <Text style={styles.label}>Password</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Create a password"
-                        placeholderTextColor={colors.textMuted}
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry={!showPassword}
-                    />
-                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                        <Ionicons
-                            name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-                            size={20}
-                            color={colors.textMuted}
-                        />
+                    <Text style={styles.label}>Password</Text>
+                    <View style={styles.inputRow}>
+                        <Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" />
+                        <TextInput style={styles.input} placeholder="min. 6 characters" placeholderTextColor="#9CA3AF" secureTextEntry={!showPass} value={password} onChangeText={setPassword} />
+                        <TouchableOpacity onPress={() => setShowPass(!showPass)}>
+                            <Ionicons name={showPass ? 'eye-off-outline' : 'eye-outline'} size={18} color="#9CA3AF" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <Text style={styles.label}>Confirm Password</Text>
+                    <View style={styles.inputRow}>
+                        <Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" />
+                        <TextInput style={styles.input} placeholder="repeat password" placeholderTextColor="#9CA3AF" secureTextEntry value={confirmPass} onChangeText={setConfirmPass} />
+                    </View>
+
+                    <TouchableOpacity
+                        style={[styles.signupBtn, loading && { opacity: 0.7 }]}
+                        onPress={handleSignup}
+                        disabled={loading}
+                    >
+                        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.signupBtnText}>Create Account</Text>}
                     </TouchableOpacity>
-                </View>
 
-                {/* Confirm Password Input */}
-                <Text style={styles.label}>Confirm Password</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Confirm your password"
-                        placeholderTextColor={colors.textMuted}
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                        secureTextEntry={!showPassword}
-                    />
-                </View>
-
-                {/* Create Account Button */}
-                <TouchableOpacity style={styles.connectButton} onPress={handleSignup} disabled={loading}>
-                    {loading
-                        ? <ActivityIndicator color={colors.white} />
-                        : <Text style={styles.connectButtonText}>Create Account</Text>
-                    }
-                </TouchableOpacity>
-
-                {/* Divider */}
-                <View style={styles.divider}>
-                    <View style={styles.dividerLine} />
-                    <Text style={styles.dividerText}>Or</Text>
-                    <View style={styles.dividerLine} />
-                </View>
-
-                {/* Social Signup */}
-                <TouchableOpacity style={styles.socialButton}>
-                    <Text style={styles.googleIcon}>G</Text>
-                    <Text style={styles.socialButtonText}>Sign up with Google</Text>
-                </TouchableOpacity>
-
-                {/* Login Link */}
-                <View style={styles.loginRow}>
-                    <Text style={styles.loginText}>Already have an account? </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                        <Text style={styles.loginLink}>Log In</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Login')} style={{ marginTop: 16, marginBottom: 40 }}>
+                        <Text style={styles.loginLink}>
+                            Already have an account? <Text style={styles.loginLinkBold}>Sign in</Text>
+                        </Text>
                     </TouchableOpacity>
-                </View>
+                </Animated.View>
             </ScrollView>
         </KeyboardAvoidingView>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    scrollContent: {
-        padding: spacing.lg,
-        paddingTop: 60,
-    },
-    backButton: {
-        width: 44,
-        height: 44,
-        borderRadius: borderRadius.lg,
-        backgroundColor: colors.surface,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: spacing.xl,
-    },
-    title: {
-        fontSize: fontSize.hero,
-        fontWeight: fontWeight.bold,
-        color: colors.text,
-        marginBottom: spacing.sm,
-    },
-    subtitle: {
-        fontSize: fontSize.md,
-        color: colors.textSecondary,
-        marginBottom: spacing.xl,
-        lineHeight: 22,
-    },
-    errorBox: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.errorBg,
-        padding: spacing.md,
-        borderRadius: borderRadius.lg,
-        marginBottom: spacing.md,
-        gap: spacing.sm,
-        borderWidth: 1,
-        borderColor: colors.error + '40',
-    },
-    errorText: {
-        color: colors.error,
-        fontSize: fontSize.sm,
-        flex: 1,
-    },
-    label: {
-        fontSize: fontSize.sm,
-        fontWeight: fontWeight.medium,
-        color: colors.textSecondary,
-        marginBottom: spacing.sm,
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.surface,
-        borderRadius: borderRadius.lg,
-        borderWidth: 1,
-        borderColor: colors.border,
-        marginBottom: spacing.md,
-        height: 52,
-        paddingHorizontal: spacing.md,
-    },
-    input: {
-        flex: 1,
-        fontSize: fontSize.md,
-        color: colors.text,
-    },
-    eyeIcon: {
-        padding: 4,
-    },
-    connectButton: {
-        backgroundColor: colors.primary,
-        borderRadius: borderRadius.lg,
-        height: 52,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: spacing.lg,
-        marginTop: spacing.sm,
-    },
-    connectButtonText: {
-        color: colors.white,
-        fontSize: fontSize.md,
-        fontWeight: fontWeight.semibold,
-    },
-    divider: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: spacing.lg,
-    },
-    dividerLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: colors.border,
-    },
-    dividerText: {
-        marginHorizontal: spacing.md,
-        fontSize: fontSize.sm,
-        color: colors.textMuted,
-    },
-    socialButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.surface,
-        borderRadius: borderRadius.lg,
-        height: 52,
-        borderWidth: 1,
-        borderColor: colors.border,
-        marginBottom: spacing.lg,
-        gap: 10,
-    },
-    googleIcon: {
-        fontSize: 18,
-        fontWeight: fontWeight.bold,
-        color: '#EA4335',
-    },
-    socialButtonText: {
-        fontSize: fontSize.md,
-        color: colors.text,
-        fontWeight: fontWeight.medium,
-    },
-    loginRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginBottom: spacing.xl,
-    },
-    loginText: {
-        fontSize: fontSize.md,
-        color: colors.textSecondary,
-    },
-    loginLink: {
-        fontSize: fontSize.md,
-        color: colors.primary,
-        fontWeight: fontWeight.semibold,
-    },
-    // Success state
-    successContainer: {
-        flex: 1,
-        backgroundColor: colors.background,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: spacing.lg,
-    },
-    successIcon: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: colors.successBg,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: spacing.lg,
-        borderWidth: 1,
-        borderColor: colors.success + '30',
-    },
-    successTitle: {
-        fontSize: fontSize.xxxl,
-        fontWeight: fontWeight.bold,
-        color: colors.text,
-        marginBottom: spacing.sm,
-    },
-    successText: {
-        fontSize: fontSize.md,
-        color: colors.textSecondary,
-        textAlign: 'center',
-        marginBottom: spacing.xl,
-        lineHeight: 24,
-    },
+    root: { flex: 1, backgroundColor: BRAND },
+    top: { height: height * 0.22, backgroundColor: BRAND, overflow: 'hidden', justifyContent: 'center', alignItems: 'center' },
+    ring: { position: 'absolute', borderWidth: 1, borderColor: '#fff' },
+    backBtn: { position: 'absolute', top: 52, left: 20, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+    topContent: { alignItems: 'center', gap: 6 },
+    topTitle: { fontSize: 20, fontWeight: '800', color: '#fff' },
+    waveBox: { height: 40, overflow: 'hidden', backgroundColor: BRAND },
+    waveCurve: { height: 70, backgroundColor: '#fff', borderTopLeftRadius: 40, borderTopRightRadius: 40, marginTop: -30 },
+    bottom: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 28 },
+    heading: { fontSize: 28, fontWeight: '800', color: '#111827', marginTop: 4 },
+    headingUnderline: { width: 50, height: 3, backgroundColor: BRAND, borderRadius: 2, marginTop: 6, marginBottom: 20 },
+    label: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 8 },
+    roleRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
+    roleBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: BRAND, backgroundColor: '#EEF2FF' },
+    roleBtnActive: { backgroundColor: BRAND, borderColor: BRAND },
+    roleBtnText: { fontSize: 14, fontWeight: '700', color: BRAND },
+    errorBox: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FEF2F2', borderRadius: 10, padding: 12, marginBottom: 16 },
+    errorText: { flex: 1, fontSize: 13, color: '#EF4444' },
+    inputRow: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1.5, borderBottomColor: '#E5E7EB', paddingBottom: 10, marginBottom: 18, gap: 10 },
+    input: { flex: 1, fontSize: 15, color: '#111827', paddingVertical: 2 },
+    signupBtn: { backgroundColor: BRAND, height: 54, borderRadius: 27, alignItems: 'center', justifyContent: 'center', marginTop: 8, shadowColor: BRAND, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 12, elevation: 8 },
+    signupBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+    loginLink: { textAlign: 'center', fontSize: 14, color: '#6B7280' },
+    loginLinkBold: { color: BRAND, fontWeight: '700' },
 });
-
-export default SignupScreen;

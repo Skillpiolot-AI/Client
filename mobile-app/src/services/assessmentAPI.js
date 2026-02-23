@@ -2,7 +2,7 @@
 import api from './api';
 
 export const assessmentAPI = {
-    // Get available assessments
+    // Get available assessments list
     getAssessments: async () => {
         const response = await api.get('/assessments');
         return response.data;
@@ -14,27 +14,22 @@ export const assessmentAPI = {
         return response.data;
     },
 
-    // Start assessment
-    startAssessment: async (assessmentId) => {
-        const response = await api.post(`/assessments/${assessmentId}/start`);
+    // Submit RIASEC Holland assessment answers → POST /assessments
+    // answers: { R1: 3, R2: 5, I1: 4, ... }
+    submitRiasec: async (userId, answers) => {
+        const response = await api.post('/assessments', { userId, answers });
         return response.data;
     },
 
-    // Submit assessment answers
-    submitAssessment: async (assessmentId, answers) => {
-        const response = await api.post(`/assessments/${assessmentId}/submit`, { answers });
+    // Get authenticated user's RIASEC history with trends → GET /assessments/me/history
+    getMyHistory: async () => {
+        const response = await api.get('/assessments/me/history');
         return response.data;
     },
 
-    // Get assessment results
-    getAssessmentResults: async (assessmentId) => {
-        const response = await api.get(`/assessments/${assessmentId}/results`);
-        return response.data;
-    },
-
-    // Get user's assessment history
-    getAssessmentHistory: async () => {
-        const response = await api.get('/assessments/history');
+    // Legacy: get by userId string
+    getUserAssessments: async (userId) => {
+        const response = await api.get(`/assessments/user/${userId}`);
         return response.data;
     },
 };

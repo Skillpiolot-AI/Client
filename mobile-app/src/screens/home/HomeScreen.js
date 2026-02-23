@@ -1,358 +1,252 @@
-// HomeScreen.js — Centralized-theme refactor
+// HomeScreen.js — Full student-focused redesign
 import React, { useState, useCallback } from 'react';
 import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity,
-    RefreshControl, Dimensions,
+    RefreshControl, Dimensions, TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
-import { colors, spacing, fontSize, fontWeight, borderRadius, shadows } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
+const BRAND = '#5B5FEF';
+const ACCENT = '#F59E0B';
 
-const HomeScreen = ({ navigation }) => {
-    const { user, logout } = useAuth();
+export default function HomeScreen({ navigation }) {
+    const { user } = useAuth();
+    const { theme, isDark } = useTheme();
     const insets = useSafeAreaInsets();
     const [refreshing, setRefreshing] = useState(false);
+    const [search, setSearch] = useState('');
 
-    const onRefresh = useCallback(async () => {
+    const onRefresh = useCallback(() => {
         setRefreshing(true);
-        setTimeout(() => setRefreshing(false), 1000);
+        setTimeout(() => setRefreshing(false), 900);
     }, []);
 
-    const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
-    const isMentor = user?.role === 'mentor';
+    const name = user?.name?.split(' ')[0] || 'Student';
+    const isMentor = user?.role === 'Mentor';
 
-    const features = [
-        {
-            icon: 'school-outline',
-            title: 'AI Assessment',
-            description: 'Get personalized skill gap analysis',
-            screen: isMentor ? null : 'Assessment',
-            color: colors.primary,
-            bgColor: colors.primaryBg,
-        },
-        {
-            icon: 'people-outline',
-            title: 'Find Mentors',
-            description: 'Connect with industry experts',
-            screen: 'MentorList',
-            navigator: 'Mentorship',
-            color: colors.info,
-            bgColor: colors.infoBg,
-        },
-        {
-            icon: 'calendar-outline',
-            title: 'Sessions',
-            description: 'Manage your bookings',
-            screen: isMentor ? 'MentorDashboard' : 'MyBookings',
-            navigator: isMentor ? undefined : 'Mentorship',
-            color: colors.success,
-            bgColor: colors.successBg,
-        },
-        {
-            icon: 'notifications-outline',
-            title: 'Notifications',
-            description: 'Stay up to date',
-            screen: 'Notifications',
-            color: colors.warning,
-            bgColor: colors.warningBg,
-        },
+    const features = isMentor ? [
+        { icon: 'calendar', label: 'My Sessions', desc: 'View scheduled sessions', color: '#5B5FEF', bg: '#EEF2FF', nav: () => navigation.navigate('MentorSection') },
+        { icon: 'people', label: 'Find Students', desc: 'Browse applicants', color: '#10B981', bg: '#ECFDF5', nav: () => navigation.navigate('Mentorship') },
+        { icon: 'star', label: 'My Ratings', desc: 'See your reviews', color: '#F59E0B', bg: '#FFFBEB', nav: () => navigation.navigate('Profile') },
+        { icon: 'chatbubbles', label: 'Community', desc: 'Mentor network', color: '#EF4444', bg: '#FEF2F2', nav: () => { } },
+    ] : [
+        { icon: 'school', label: 'AI Assessment', desc: 'Personalized skill gaps', color: '#5B5FEF', bg: '#EEF2FF', nav: () => navigation.navigate('Career', { screen: 'Assessment' }) },
+        { icon: 'people', label: 'Find Mentors', desc: 'Browse top industry experts', color: '#10B981', bg: '#ECFDF5', nav: () => navigation.navigate('Mentorship') },
+        { icon: 'calendar', label: 'My Bookings', desc: 'Upcoming sessions', color: '#F59E0B', bg: '#FFFBEB', nav: () => navigation.navigate('Mentorship', { screen: 'MyBookings' }) },
+        { icon: 'compass', label: 'Career Path', desc: 'Explore your future', color: '#EF4444', bg: '#FEF2F2', nav: () => navigation.navigate('Career') },
     ];
 
-    const tips = [
-        { icon: '🎯', text: 'Complete your profile to attract better mentor matches' },
-        { icon: '📊', text: 'Regular assessments help track your skill growth over time' },
-        { icon: '🤝', text: 'First sessions are always free — book yours today!' },
-    ];
+    const stats = isMentor
+        ? [{ label: 'Sessions', val: '12', icon: 'calendar-outline', color: BRAND }, { label: 'Students', val: '48', icon: 'people-outline', color: '#10B981' }, { label: 'Rating', val: '4.8', icon: 'star-outline', color: ACCENT }]
+        : [{ label: 'Assessment', val: '2', icon: 'school-outline', color: BRAND }, { label: 'Sessions', val: '3', icon: 'calendar-outline', color: '#10B981' }, { label: 'Skills', val: '8', icon: 'flash-outline', color: ACCENT }];
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.root, { backgroundColor: theme.background, paddingTop: insets.top }]}>
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        tintColor={colors.primary}
-                        colors={[colors.primary]}
-                    />
-                }
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND} />}
             >
-                {/* ── Hero Header ── */}
-                <LinearGradient
-                    colors={[colors.primaryDark, colors.primary, colors.secondary]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={[styles.hero, { paddingTop: insets.top + spacing.lg }]}
-                >
-                    <View style={styles.heroTopRow}>
-                        <View>
-                            <Text style={styles.heroWelcome}>Welcome back,</Text>
-                            <Text style={styles.heroName}>{firstName} 👋</Text>
+                {/* ── Header ── */}
+                <View style={[styles.header, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+                    <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.menuBtn}>
+                        <Ionicons name="menu" size={24} color={theme.text} />
+                    </TouchableOpacity>
+                    <View style={styles.headerCenter}>
+                        <Ionicons name="rocket" size={18} color={BRAND} />
+                        <Text style={[styles.headerBrand, { color: theme.text }]}>SkillPilot</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={styles.notifBtn}>
+                        <Ionicons name="notifications-outline" size={22} color={theme.text} />
+                        <View style={styles.notifDot} />
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.content}>
+                    {/* ── Greeting ── */}
+                    <View style={[styles.greetCard, { backgroundColor: BRAND }]}>
+                        <View style={styles.greetCardBg}>
+                            {[100, 70, 45].map((r, i) => (
+                                <View key={i} style={[styles.greetRing, { width: r * 2, height: r * 2, borderRadius: r, opacity: 0.1 + i * 0.08, right: -r * 0.4, top: -r * 0.4 }]} />
+                            ))}
                         </View>
-                        <TouchableOpacity
-                            style={styles.avatarBtn}
-                            onPress={() => navigation.navigate('Profile')}
-                        >
-                            <View style={styles.avatarCircle}>
-                                <Text style={styles.avatarInitial}>
-                                    {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
-                                </Text>
-                            </View>
+                        <View style={styles.greetLeft}>
+                            <Text style={styles.greetHi}>Good morning 👋</Text>
+                            <Text style={styles.greetName}>{name}!</Text>
+                            <Text style={styles.greetSub}>
+                                {isMentor ? "Let's make a difference today" : "Let's grow your skills today"}
+                            </Text>
+                        </View>
+                        <TouchableOpacity style={styles.greetAvatar} onPress={() => navigation.navigate('Profile')}>
+                            <Text style={styles.greetAvatarText}>{name[0].toUpperCase()}</Text>
                         </TouchableOpacity>
                     </View>
 
-                    {isMentor && (
-                        <View style={styles.roleBadge}>
-                            <Ionicons name="ribbon-outline" size={14} color={colors.white} />
-                            <Text style={styles.roleBadgeText}>Mentor Account</Text>
-                        </View>
-                    )}
-
-                    <Text style={styles.heroTagline}>
-                        {isMentor
-                            ? 'Help others grow while building your impact'
-                            : 'Your AI-powered career growth starts here'}
-                    </Text>
-                </LinearGradient>
-
-                <View style={styles.body}>
-                    {/* ── Feature Cards ── */}
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>What would you like to do?</Text>
-                        <View style={styles.featuresGrid}>
-                            {features.map((f) => (
-                                <TouchableOpacity
-                                    key={f.title}
-                                    style={styles.featureCard}
-                                    onPress={() => f.screen && (f.navigator ? navigation.navigate(f.navigator, { screen: f.screen }) : navigation.navigate(f.screen))}
-                                    activeOpacity={0.8}
-                                    disabled={!f.screen}
-                                >
-                                    <View style={[styles.featureIconWrap, { backgroundColor: f.bgColor }]}>
-                                        <Ionicons name={f.icon} size={26} color={f.color} />
-                                    </View>
-                                    <Text style={styles.featureTitle}>{f.title}</Text>
-                                    <Text style={styles.featureDesc}>{f.description}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    </View>
-
-                    {/* ── Pro Tips ── */}
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Tips for You</Text>
-                        <View style={styles.tipsCard}>
-                            {tips.map((tip, index) => (
-                                <View key={index} style={[styles.tipRow, index < tips.length - 1 && styles.tipDivider]}>
-                                    <Text style={styles.tipIcon}>{tip.icon}</Text>
-                                    <Text style={styles.tipText}>{tip.text}</Text>
+                    {/* ── Quick Stats ── */}
+                    <View style={styles.statsRow}>
+                        {stats.map((s, i) => (
+                            <View key={i} style={[styles.statCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                                <View style={[styles.statIcon, { backgroundColor: s.color + '15' }]}>
+                                    <Ionicons name={s.icon} size={18} color={s.color} />
                                 </View>
-                            ))}
-                        </View>
+                                <Text style={[styles.statVal, { color: theme.text }]}>{s.val}</Text>
+                                <Text style={[styles.statLabel, { color: theme.textMuted }]}>{s.label}</Text>
+                            </View>
+                        ))}
                     </View>
 
-                    {/* ── Mentor CTA (Students only) ── */}
-                    {!isMentor && (
-                        <View style={styles.section}>
+                    {/* ── Search ── */}
+                    <View style={[styles.searchBox, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                        <Ionicons name="search-outline" size={18} color={theme.textMuted} />
+                        <TextInput
+                            style={[styles.searchInput, { color: theme.text }]}
+                            placeholder="Search mentors, skills, topics..."
+                            placeholderTextColor={theme.textMuted}
+                            value={search}
+                            onChangeText={setSearch}
+                        />
+                    </View>
+
+                    {/* ── Feature Grid ── */}
+                    <Text style={[styles.sectionTitle, { color: theme.text }]}>What would you like to do?</Text>
+                    <View style={styles.grid}>
+                        {features.map((f, i) => (
                             <TouchableOpacity
-                                style={styles.ctaCard}
-                                onPress={() => navigation.navigate('Mentorship', { screen: 'MentorList' })}
+                                key={i}
+                                style={[styles.featureCard, { backgroundColor: isDark ? theme.card : f.bg, borderColor: isDark ? theme.cardBorder : 'transparent' }]}
+                                onPress={f.nav}
                                 activeOpacity={0.8}
                             >
-                                <LinearGradient
-                                    colors={[colors.primary, colors.primaryDark]}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 0 }}
-                                    style={styles.ctaGradient}
-                                >
-                                    <View style={styles.ctaContent}>
-                                        <Text style={styles.ctaTitle}>Book a Free Session</Text>
-                                        <Text style={styles.ctaSub}>Connect with top industry mentors</Text>
-                                    </View>
-                                    <Ionicons name="arrow-forward-circle" size={36} color={colors.white + 'CC'} />
-                                </LinearGradient>
+                                <View style={[styles.featureIconBox, { backgroundColor: isDark ? f.bg : f.color + '20' }]}>
+                                    <Ionicons name={f.icon} size={24} color={f.color} />
+                                </View>
+                                <Text style={[styles.featureLabel, { color: theme.text }]}>{f.label}</Text>
+                                <Text style={[styles.featureDesc, { color: theme.textMuted }]}>{f.desc}</Text>
                             </TouchableOpacity>
-                        </View>
+                        ))}
+                    </View>
+
+                    {/* ── CTA banner ── */}
+                    {!isMentor && (
+                        <TouchableOpacity
+                            style={styles.ctaBanner}
+                            onPress={() => navigation.navigate('Mentorship')}
+                            activeOpacity={0.88}
+                        >
+                            <View style={styles.ctaDecor}>
+                                {[80, 55, 30].map((r, i) => (
+                                    <View key={i} style={[styles.greetRing, { width: r * 2, height: r * 2, borderRadius: r, opacity: 0.12 + i * 0.08, right: -r * 0.3, top: -r * 0.2 }]} />
+                                ))}
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.ctaTitle}>Book a Free Mentor Session</Text>
+                                <Text style={styles.ctaSub}>Connect with top industry professionals</Text>
+                            </View>
+                            <View style={styles.ctaArrow}>
+                                <Ionicons name="arrow-forward" size={18} color="#fff" />
+                            </View>
+                        </TouchableOpacity>
                     )}
 
-                    <View style={{ height: 100 }} />
+                    {/* ── Tips ── */}
+                    <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                        {isMentor ? 'Mentor Tips' : 'Growth Tips'}
+                    </Text>
+                    <View style={[styles.tipsCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                        {(isMentor ? [
+                            { icon: '⭐', text: 'Track your feedback regularly to improve session quality' },
+                            { icon: '📅', text: 'Keep your availability calendar up to date' },
+                            { icon: '💬', text: 'Follow up with mentees after each session' },
+                        ] : [
+                            { icon: '🎯', text: 'Complete your profile to attract better mentor matches' },
+                            { icon: '📊', text: 'Regular assessments help track your skill growth' },
+                            { icon: '🤝', text: 'First sessions are always free — book yours today!' },
+                        ]).map((tip, i, arr) => (
+                            <View key={i} style={[styles.tipRow, i < arr.length - 1 && { borderBottomWidth: 1, borderBottomColor: theme.borderLight }]}>
+                                <Text style={styles.tipIcon}>{tip.icon}</Text>
+                                <Text style={[styles.tipText, { color: theme.textSecondary }]}>{tip.text}</Text>
+                            </View>
+                        ))}
+                    </View>
                 </View>
+
+                <View style={{ height: 40 }} />
             </ScrollView>
         </View>
     );
-};
+}
 
-const cardWidth = (width - spacing.md * 2 - spacing.sm) / 2;
+const cardW = (width - 16 * 2 - 12) / 2;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    hero: {
-        paddingHorizontal: spacing.md,
-        paddingBottom: spacing.xxl,
-        gap: spacing.sm,
-    },
-    heroTopRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-    },
-    heroWelcome: {
-        fontSize: fontSize.md,
-        color: colors.white + 'BB',
-        fontWeight: fontWeight.medium,
-    },
-    heroName: {
-        fontSize: fontSize.xxxl,
-        fontWeight: fontWeight.extrabold,
-        color: colors.white,
-    },
-    avatarBtn: {
-        marginTop: 4,
-    },
-    avatarCircle: {
-        width: 46,
-        height: 46,
-        borderRadius: 23,
-        backgroundColor: colors.white + '30',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 2,
-        borderColor: colors.white + '60',
-    },
-    avatarInitial: {
-        fontSize: fontSize.xl,
-        fontWeight: fontWeight.bold,
-        color: colors.white,
-    },
-    roleBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.xs,
-        alignSelf: 'flex-start',
-        backgroundColor: colors.white + '20',
-        paddingHorizontal: spacing.sm + 2,
-        paddingVertical: 4,
-        borderRadius: borderRadius.full,
-        marginTop: spacing.xs,
-    },
-    roleBadgeText: {
-        fontSize: fontSize.xs,
-        color: colors.white,
-        fontWeight: fontWeight.semibold,
-    },
-    heroTagline: {
-        fontSize: fontSize.md,
-        color: colors.white + 'DD',
-        lineHeight: 22,
-        marginTop: spacing.xs,
-    },
-    body: {
-        padding: spacing.md,
-        marginTop: -(spacing.xl),
-    },
-    section: {
-        marginBottom: spacing.lg,
-    },
-    sectionTitle: {
-        fontSize: fontSize.lg,
-        fontWeight: fontWeight.bold,
-        color: colors.text,
-        marginBottom: spacing.md,
-    },
-    // ── Feature Cards ─────────────────────────────────────
-    featuresGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: spacing.sm,
-    },
-    featureCard: {
-        width: cardWidth,
-        backgroundColor: colors.card,
-        borderRadius: borderRadius.xl,
-        padding: spacing.md,
-        borderWidth: 1,
-        borderColor: colors.cardBorder,
-        ...shadows.sm,
-        gap: spacing.xs,
-    },
-    featureIconWrap: {
-        width: 52,
-        height: 52,
-        borderRadius: borderRadius.lg,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: spacing.xs,
-    },
-    featureTitle: {
-        fontSize: fontSize.md,
-        fontWeight: fontWeight.bold,
-        color: colors.text,
-    },
-    featureDesc: {
-        fontSize: fontSize.sm,
-        color: colors.textSecondary,
-        lineHeight: 18,
-    },
-    // ── Tips Card ─────────────────────────────────────────
-    tipsCard: {
-        backgroundColor: colors.card,
-        borderRadius: borderRadius.xl,
-        borderWidth: 1,
-        borderColor: colors.cardBorder,
-        overflow: 'hidden',
-        ...shadows.sm,
-    },
-    tipRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        gap: spacing.md,
-        padding: spacing.md,
-    },
-    tipDivider: {
+    root: { flex: 1 },
+    header: {
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+        paddingHorizontal: 16, paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: colors.borderLight,
     },
-    tipIcon: {
-        fontSize: 20,
-    },
-    tipText: {
-        flex: 1,
-        fontSize: fontSize.sm,
-        color: colors.textSecondary,
-        lineHeight: 20,
-    },
-    // ── CTA Card ──────────────────────────────────────────
-    ctaCard: {
-        borderRadius: borderRadius.xl,
+    menuBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+    headerCenter: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    headerBrand: { fontSize: 17, fontWeight: '800', letterSpacing: -0.3 },
+    notifBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+    notifDot: { position: 'absolute', top: 8, right: 8, width: 8, height: 8, borderRadius: 4, backgroundColor: '#EF4444' },
+    content: { padding: 16, gap: 20 },
+    greetCard: {
+        borderRadius: 20, padding: 20,
+        flexDirection: 'row', alignItems: 'center',
         overflow: 'hidden',
-        ...shadows.primary,
     },
-    ctaGradient: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: spacing.lg,
+    greetCardBg: { ...StyleSheet.absoluteFillObject, overflow: 'hidden' },
+    greetRing: { position: 'absolute', borderWidth: 1.5, borderColor: '#fff' },
+    greetLeft: { flex: 1, gap: 3 },
+    greetHi: { fontSize: 13, color: 'rgba(255,255,255,0.75)', fontWeight: '500' },
+    greetName: { fontSize: 24, fontWeight: '800', color: '#fff' },
+    greetSub: { fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
+    greetAvatar: {
+        width: 48, height: 48, borderRadius: 24,
+        backgroundColor: 'rgba(255,255,255,0.25)',
+        alignItems: 'center', justifyContent: 'center',
+        borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)',
     },
-    ctaContent: {
-        flex: 1,
+    greetAvatarText: { fontSize: 20, fontWeight: '700', color: '#fff' },
+    statsRow: { flexDirection: 'row', gap: 10 },
+    statCard: {
+        flex: 1, borderRadius: 14, padding: 14,
+        alignItems: 'center', gap: 4,
+        borderWidth: 1,
     },
-    ctaTitle: {
-        fontSize: fontSize.xl,
-        fontWeight: fontWeight.extrabold,
-        color: colors.white,
+    statIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+    statVal: { fontSize: 20, fontWeight: '800' },
+    statLabel: { fontSize: 11, fontWeight: '500', textAlign: 'center' },
+    searchBox: {
+        flexDirection: 'row', alignItems: 'center', gap: 10,
+        borderRadius: 14, paddingHorizontal: 14, height: 48,
+        borderWidth: 1,
     },
-    ctaSub: {
-        fontSize: fontSize.sm,
-        color: colors.white + 'CC',
-        marginTop: 4,
+    searchInput: { flex: 1, fontSize: 14 },
+    sectionTitle: { fontSize: 17, fontWeight: '700' },
+    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+    featureCard: {
+        width: cardW, borderRadius: 18, padding: 16, gap: 8,
+        borderWidth: 1,
     },
+    featureIconBox: { width: 46, height: 46, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+    featureLabel: { fontSize: 14, fontWeight: '700' },
+    featureDesc: { fontSize: 12, lineHeight: 17 },
+    ctaBanner: {
+        flexDirection: 'row', alignItems: 'center', gap: 14,
+        backgroundColor: '#5B5FEF', borderRadius: 18, padding: 18,
+        overflow: 'hidden',
+    },
+    ctaDecor: { ...StyleSheet.absoluteFillObject, overflow: 'hidden' },
+    ctaTitle: { fontSize: 15, fontWeight: '800', color: '#fff' },
+    ctaSub: { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 3 },
+    ctaArrow: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center' },
+    tipsCard: { borderRadius: 16, borderWidth: 1, overflow: 'hidden' },
+    tipRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, padding: 14 },
+    tipIcon: { fontSize: 18, marginTop: 1 },
+    tipText: { flex: 1, fontSize: 13, lineHeight: 19 },
 });
-
-export default HomeScreen;

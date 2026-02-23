@@ -1,174 +1,143 @@
+// ResetPasswordScreen.js — Wave redesign matching Login/Signup style
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import {
+    View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView,
+    Platform, TextInput, ActivityIndicator, Dimensions, StatusBar,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import authAPI from '../../services/authAPI';
-import { ScreenWrapper } from '../../components/layout';
-import { Button, Input } from '../../components/ui';
-import { colors, fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
 
-const ResetPasswordScreen = ({ navigation, route }) => {
+const { height } = Dimensions.get('window');
+const BRAND = '#5B5FEF';
+
+export default function ResetPasswordScreen({ navigation, route }) {
     const { resetToken, email, fromProfile = false } = route.params || {};
+    const { theme } = useTheme();
     const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const [confirm, setConfirm] = useState('');
+    const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
 
     const handleReset = async () => {
-        if (!password || !confirmPassword) {
-            Alert.alert('Error', 'Please fill in all fields');
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            Alert.alert('Error', 'Passwords do not match');
-            return;
-        }
-
-        if (password.length < 6) {
-            Alert.alert('Error', 'Password must be at least 6 characters long');
-            return;
-        }
-
-        setLoading(true);
+        if (!password || !confirm) { setError('Please fill in both fields'); return; }
+        if (password !== confirm) { setError('Passwords do not match'); return; }
+        if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
+        setLoading(true); setError('');
         try {
-            const response = await authAPI.resetPassword(resetToken, password, confirmPassword);
+            const response = await authAPI.resetPassword(resetToken, password, confirm);
             if (response.success) {
-                Alert.alert('Success', 'Your password has been reset successfully!', [
-                    {
-                        text: 'OK',
-                        onPress: () => {
-                            if (fromProfile) {
-                                navigation.navigate('ProfileMain');
-                            } else {
-                                navigation.navigate('Login');
-                            }
-                        }
-                    }
-                ]);
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: fromProfile ? 'ProfileMain' : 'Login' }],
+                });
             } else {
-                Alert.alert('Error', response.message || 'Failed to reset password');
+                setError(response.message || 'Failed to reset password');
             }
         } catch (err) {
-            Alert.alert('Error', err.response?.data?.message || 'Failed to reset password. Token might be expired.');
-        } finally {
-            setLoading(false);
-        }
+            setError(err.response?.data?.message || 'Token expired. Please request a new code.');
+        } finally { setLoading(false); }
     };
 
     return (
-        <ScreenWrapper scrollable={false} style={{ backgroundColor: colors.background }}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.container}
-            >
-                {/* Back Button */}
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                >
-                    <View style={styles.backCircle}>
-                        <Ionicons name="arrow-back" size={24} color={colors.primary} />
-                    </View>
+        <KeyboardAvoidingView
+            style={[styles.root, { backgroundColor: BRAND }]}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <StatusBar barStyle="light-content" backgroundColor={BRAND} />
+            <View style={styles.top}>
+                {[160, 120, 80].map((r, i) => (
+                    <View key={i} style={[styles.ring, { width: r * 2, height: r * 2, borderRadius: r, opacity: 0.07 + i * 0.04 }]} />
+                ))}
+                <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+                    <Ionicons name="arrow-back" size={22} color="#fff" />
                 </TouchableOpacity>
-
-                {/* Header */}
-                <View style={styles.header}>
-                    <Text style={styles.title}>
-                        {fromProfile ? 'Update Password' : 'Reset Password'}
-                    </Text>
-                    <Text style={styles.subtitle}>
-                        Last step! Create a new strong password for your account linked to {email}.
-                    </Text>
+                <View style={styles.topContent}>
+                    <View style={styles.iconCircle}>
+                        <Ionicons name="lock-open-outline" size={30} color="#fff" />
+                    </View>
+                    <Text style={styles.topTitle}>New Password</Text>
                 </View>
+            </View>
+            <View style={styles.waveBox}><View style={styles.waveCurve} /></View>
 
-                {/* Form */}
-                <View style={styles.form}>
-                    <Input
-                        label="New Password"
-                        placeholder="••••••••"
+            <View style={[styles.bottom, { backgroundColor: theme.background }]}>
+                <Text style={[styles.heading, { color: theme.text }]}>
+                    {fromProfile ? 'Update Password' : 'Reset Password'}
+                </Text>
+                <View style={styles.headingUnderline} />
+                <Text style={[styles.sub, { color: theme.textMuted }]}>
+                    Last step! Create a strong new password for your account.
+                </Text>
+
+                {error ? (
+                    <View style={styles.errorBox}>
+                        <Ionicons name="alert-circle-outline" size={15} color="#EF4444" />
+                        <Text style={styles.errorText}>{error}</Text>
+                    </View>
+                ) : null}
+
+                <Text style={[styles.label, { color: theme.textSecondary }]}>New Password</Text>
+                <View style={[styles.inputRow, { borderBottomColor: theme.border }]}>
+                    <Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" />
+                    <TextInput
+                        style={[styles.input, { color: theme.text }]}
+                        placeholder="min. 6 characters"
+                        placeholderTextColor="#9CA3AF"
+                        secureTextEntry={!showPass}
                         value={password}
                         onChangeText={setPassword}
-                        secureTextEntry={!showPassword}
-                        focusedColor={colors.primary}
-                        icon={
-                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                                <Ionicons
-                                    name={showPassword ? "eye-off-outline" : "eye-outline"}
-                                    size={20}
-                                    color={colors.textSecondary}
-                                />
-                            </TouchableOpacity>
-                        }
                     />
+                    <TouchableOpacity onPress={() => setShowPass(!showPass)}>
+                        <Ionicons name={showPass ? 'eye-off-outline' : 'eye-outline'} size={18} color="#9CA3AF" />
+                    </TouchableOpacity>
+                </View>
 
-                    <Input
-                        label="Confirm New Password"
-                        placeholder="••••••••"
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                        secureTextEntry={!showPassword}
-                        focusedColor={colors.primary}
-                        icon={
-                            <Ionicons
-                                name="lock-closed-outline"
-                                size={20}
-                                color={colors.textSecondary}
-                            />
-                        }
-                    />
-
-                    <Button
-                        title="RESET PASSWORD"
-                        onPress={handleReset}
-                        loading={loading}
-                        color={colors.primary}
-                        style={styles.resetButton}
+                <Text style={[styles.label, { color: theme.textSecondary }]}>Confirm Password</Text>
+                <View style={[styles.inputRow, { borderBottomColor: theme.border }]}>
+                    <Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" />
+                    <TextInput
+                        style={[styles.input, { color: theme.text }]}
+                        placeholder="repeat password"
+                        placeholderTextColor="#9CA3AF"
+                        secureTextEntry
+                        value={confirm}
+                        onChangeText={setConfirm}
                     />
                 </View>
-            </KeyboardAvoidingView>
-        </ScreenWrapper>
+
+                <TouchableOpacity
+                    style={[styles.resetBtn, loading && { opacity: 0.7 }]}
+                    onPress={handleReset}
+                    disabled={loading}
+                >
+                    {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.resetBtnText}>Set New Password</Text>}
+                </TouchableOpacity>
+            </View>
+        </KeyboardAvoidingView>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingHorizontal: 24,
-    },
-    backButton: {
-        marginTop: Platform.OS === 'ios' ? 20 : 40,
-        marginBottom: 20,
-    },
-    backCircle: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: colors.surface,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    header: {
-        marginBottom: 32,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: colors.text,
-        marginBottom: 12,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: colors.textSecondary,
-        lineHeight: 24,
-    },
-    form: {
-        flex: 1,
-    },
-    resetButton: {
-        marginTop: 24,
-        height: 56,
-        borderRadius: 30,
-    },
+    root: { flex: 1 },
+    top: { height: height * 0.28, overflow: 'hidden', justifyContent: 'center', alignItems: 'center' },
+    ring: { position: 'absolute', borderWidth: 1, borderColor: '#fff' },
+    backBtn: { position: 'absolute', top: 52, left: 20, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+    topContent: { alignItems: 'center', gap: 8 },
+    iconCircle: { width: 68, height: 68, borderRadius: 34, backgroundColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center' },
+    topTitle: { fontSize: 20, fontWeight: '800', color: '#fff' },
+    waveBox: { height: 40, overflow: 'hidden', backgroundColor: BRAND },
+    waveCurve: { height: 70, backgroundColor: '#fff', borderTopLeftRadius: 40, borderTopRightRadius: 40, marginTop: -30 },
+    bottom: { flex: 1, paddingHorizontal: 28 },
+    heading: { fontSize: 26, fontWeight: '800', marginTop: 8 },
+    headingUnderline: { width: 50, height: 3, backgroundColor: BRAND, borderRadius: 2, marginTop: 6, marginBottom: 8 },
+    sub: { fontSize: 14, lineHeight: 22, marginBottom: 24 },
+    errorBox: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FEF2F2', borderRadius: 10, padding: 12, marginBottom: 16 },
+    errorText: { flex: 1, fontSize: 13, color: '#EF4444' },
+    label: { fontSize: 14, fontWeight: '600', marginBottom: 8 },
+    inputRow: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1.5, paddingBottom: 10, marginBottom: 20, gap: 10 },
+    input: { flex: 1, fontSize: 15, paddingVertical: 2 },
+    resetBtn: { backgroundColor: BRAND, height: 54, borderRadius: 27, alignItems: 'center', justifyContent: 'center', marginTop: 8, shadowColor: BRAND, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 12, elevation: 8 },
+    resetBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });
-
-export default ResetPasswordScreen;

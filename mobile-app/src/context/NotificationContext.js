@@ -84,8 +84,8 @@ export const NotificationProvider = ({ children }) => {
 
         return () => {
             clearInterval(pollRef.current);
-            if (listenerRef.current) {
-                Notifications.removeNotificationSubscription(listenerRef.current);
+            if (listenerRef.current?.remove) {
+                listenerRef.current.remove();
             }
         };
     }, [isAuthenticated, fetchNotifications]);

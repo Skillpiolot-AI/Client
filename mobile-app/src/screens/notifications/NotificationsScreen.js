@@ -1,18 +1,19 @@
-// NotificationsScreen.js — Phase 3: Real API data via NotificationContext + type filters + deep-link
-import React, { useState, useCallback } from 'react';
+// NotificationsScreen.js — Premium redesign with date sections, theme-aware, live server data
+import React, { useState, useCallback, useMemo } from 'react';
 import {
     View, Text, StyleSheet, FlatList, TouchableOpacity,
-    RefreshControl, Animated,
+    RefreshControl, SectionList,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNotifications, NOTIF_META } from '../../context/NotificationContext';
+import { useTheme } from '../../context/ThemeContext';
 import { Loading } from '../../components/ui';
-import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
 
-// ── Filter tabs ───────────────────────────────────────────────────────────────
+const BRAND = '#5B5FEF';
 const FILTERS = ['All', 'Unread', 'Booking', 'Assessment', 'Mentor', 'System'];
 
+// ── Time helpers ──────────────────────────────────────────────────────────────
 const timeAgo = (iso) => {
     const diff = Date.now() - new Date(iso).getTime();
     const mins = Math.floor(diff / 60_000);
@@ -23,46 +24,96 @@ const timeAgo = (iso) => {
     return `${Math.floor(hrs / 24)}d ago`;
 };
 
+const getDayLabel = (iso) => {
+    const d = new Date(iso);
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfYesterday = new Date(startOfToday.getTime() - 86_400_000);
+
+    if (d >= startOfToday) return 'Today';
+    if (d >= startOfYesterday) return 'Yesterday';
+    return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+};
+
+// ── Group notifications by day ────────────────────────────────────────────────
+const groupByDay = (items) => {
+    const map = {};
+    items.forEach((n) => {
+        const label = getDayLabel(n.createdAt || n.sentAt || Date.now());
+        if (!map[label]) map[label] = [];
+        map[label].push(n);
+    });
+    return Object.entries(map).map(([title, data]) => ({ title, data }));
+};
+
 // ── Notification Card ─────────────────────────────────────────────────────────
-const NotifCard = ({ item, onPress }) => {
-    const meta = NOTIF_META[item.type] || NOTIF_META.default;
+const NotifCard = ({ item, onPress, theme }) => {
+    const meta = NOTIF_META[item.type] || NOTIF_META.default || { icon: 'notifications-outline', color: BRAND };
+    const isUnread = !item.isRead && !item.read;
+
     return (
         <TouchableOpacity
-            style={[styles.card, !item.isRead && !item.read && styles.cardUnread]}
+            style={[
+                styles.card,
+                { backgroundColor: theme.card, borderColor: theme.cardBorder },
+                isUnread && { backgroundColor: BRAND + '0E', borderColor: BRAND + '40' },
+            ]}
             onPress={() => onPress(item)}
             activeOpacity={0.78}
         >
-            {(!item.isRead && !item.read) && <View style={styles.unreadDot} />}
+            {/* Left: icon */}
             <View style={[styles.iconWrap, { backgroundColor: meta.color + '18' }]}>
                 <Ionicons name={meta.icon} size={22} color={meta.color} />
             </View>
+
+            {/* Body */}
             <View style={styles.cardBody}>
                 <View style={styles.cardTop}>
-                    <Text style={[styles.cardTitle, !item.isRead && !item.read && styles.cardTitleUnread]} numberOfLines={1}>
+                    <Text
+                        style={[
+                            styles.cardTitle,
+                            { color: theme.text },
+                            isUnread && { fontWeight: '700' },
+                        ]}
+                        numberOfLines={1}
+                    >
                         {item.subject || item.title}
                     </Text>
-                    <Text style={styles.cardTime}>{timeAgo(item.createdAt)}</Text>
+                    {isUnread && <View style={[styles.dot, { backgroundColor: meta.color }]} />}
                 </View>
-                <Text style={styles.cardMsg} numberOfLines={2}>{item.description || item.message}</Text>
+                <Text style={[styles.cardMsg, { color: theme.textSecondary }]} numberOfLines={2}>
+                    {item.description || item.message}
+                </Text>
+                <View style={styles.cardFooter}>
+                    <View style={[styles.typePill, { backgroundColor: meta.color + '15' }]}>
+                        <Text style={[styles.typePillText, { color: meta.color }]}>
+                            {item.type?.charAt(0).toUpperCase() + item.type?.slice(1) || 'System'}
+                        </Text>
+                    </View>
+                    <Text style={[styles.cardTime, { color: theme.textMuted }]}>
+                        {timeAgo(item.createdAt || item.sentAt)}
+                    </Text>
+                </View>
             </View>
         </TouchableOpacity>
     );
 };
 
 // ── Main Screen ───────────────────────────────────────────────────────────────
-const NotificationsScreen = ({ navigation }) => {
+export default function NotificationsScreen({ navigation }) {
     const { notifications, unreadCount, loading, markRead, markAllRead, refresh } = useNotifications();
+    const { theme } = useTheme();
+    const insets = useSafeAreaInsets();
     const [activeFilter, setActiveFilter] = useState('All');
     const [refreshing, setRefreshing] = useState(false);
 
-    // ── Deep-link routing by type ─────────────────────────────────────────────
     const handlePress = useCallback(async (item) => {
         if (!item.isRead && !item.read) await markRead(item._id);
         switch (item.type) {
             case 'booking': navigation.navigate('Mentorship', { screen: 'MyBookings' }); break;
             case 'assessment': navigation.navigate('Career', { screen: 'Assessment' }); break;
             case 'mentor': navigation.navigate('Mentorship', { screen: 'MentorList' }); break;
-            default: break; // stay on screen for system/reminder
+            default: break;
         }
     }, [markRead, navigation]);
 
@@ -72,84 +123,91 @@ const NotificationsScreen = ({ navigation }) => {
         setRefreshing(false);
     }, [refresh]);
 
-    // ── Filter logic ──────────────────────────────────────────────────────────
-    const filtered = notifications.filter((n) => {
-        if (activeFilter === 'All') return true;
-        if (activeFilter === 'Unread') return (!n.isRead && !n.read);
-        return n.type === activeFilter.toLowerCase();
-    });
+    const filtered = useMemo(() => {
+        return notifications.filter((n) => {
+            if (activeFilter === 'All') return true;
+            if (activeFilter === 'Unread') return !n.isRead && !n.read;
+            return n.type === activeFilter.toLowerCase();
+        });
+    }, [notifications, activeFilter]);
 
-    // ── Empty state ────────────────────────────────────────────────────────────
-    const renderEmpty = () => (
-        <View style={styles.emptyWrap}>
-            <Ionicons name="notifications-off-outline" size={56} color={colors.textMuted} />
-            <Text style={styles.emptyTitle}>No notifications</Text>
-            <Text style={styles.emptySub}>
-                {activeFilter === 'All'
-                    ? "You're all caught up!"
-                    : `No ${activeFilter.toLowerCase()} notifications yet.`}
-            </Text>
-        </View>
-    );
+    const sections = useMemo(() => groupByDay(filtered), [filtered]);
+
+    const filterCount = (f) => {
+        if (f === 'All') return notifications.length;
+        if (f === 'Unread') return unreadCount;
+        return notifications.filter((n) => n.type === f.toLowerCase()).length;
+    };
 
     if (loading) return <Loading fullScreen text="Loading notifications…" />;
 
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={[styles.root, { backgroundColor: theme.background, paddingTop: insets.top }]}>
             {/* ── Header ── */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={22} color={colors.text} />
+            <View style={[styles.header, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+                <TouchableOpacity
+                    onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.openDrawer?.()}
+                    style={styles.backBtn}
+                >
+                    <Ionicons name="arrow-back" size={22} color={theme.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Notifications</Text>
+                <View style={styles.headerTitleRow}>
+                    <Text style={[styles.headerTitle, { color: theme.text }]}>Notifications</Text>
+                    {unreadCount > 0 && (
+                        <View style={styles.headerBadge}>
+                            <Text style={styles.headerBadgeText}>{unreadCount}</Text>
+                        </View>
+                    )}
+                </View>
                 {unreadCount > 0 && (
-                    <TouchableOpacity onPress={markAllRead} style={styles.markAllBtn}>
-                        <Text style={styles.markAllText}>Mark all read</Text>
+                    <TouchableOpacity onPress={markAllRead} style={styles.markAllBtn} activeOpacity={0.7}>
+                        <Ionicons name="checkmark-done-outline" size={20} color={BRAND} />
                     </TouchableOpacity>
                 )}
             </View>
 
-            {/* Unread summary chip */}
+            {/* ── Unread banner ── */}
             {unreadCount > 0 && (
-                <View style={styles.summaryRow}>
-                    <View style={styles.summaryChip}>
-                        <View style={styles.liveDot} />
-                        <Text style={styles.summaryText}>
-                            {unreadCount} unread notification{unreadCount > 1 ? 's' : ''}
-                        </Text>
-                    </View>
+                <View style={[styles.unreadBanner, { backgroundColor: BRAND + '12' }]}>
+                    <View style={styles.liveDot} />
+                    <Text style={styles.unreadBannerText}>
+                        You have <Text style={{ fontWeight: '700' }}>{unreadCount}</Text> unread{' '}
+                        notification{unreadCount > 1 ? 's' : ''}
+                    </Text>
+                    <TouchableOpacity onPress={markAllRead} activeOpacity={0.7}>
+                        <Text style={styles.markAllInline}>Mark all read</Text>
+                    </TouchableOpacity>
                 </View>
             )}
 
-            {/* ── Filter tabs ── */}
-            <View>
+            {/* ── Filter chips ── */}
+            <View style={{ flexGrow: 0, flexShrink: 0 }}>
                 <FlatList
                     data={FILTERS}
                     horizontal
+                    style={{ flexGrow: 0 }}
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(f) => f}
                     contentContainerStyle={styles.filterList}
                     renderItem={({ item: f }) => {
                         const isActive = f === activeFilter;
-                        const count = f === 'Unread'
-                            ? unreadCount
-                            : f === 'All'
-                                ? notifications.length
-                                : notifications.filter((n) => n.type === f.toLowerCase()).length;
+                        const count = filterCount(f);
                         return (
                             <TouchableOpacity
-                                style={[styles.filterTab, isActive && styles.filterTabActive]}
+                                style={[
+                                    styles.chip,
+                                    { backgroundColor: theme.surfaceAlt, borderColor: theme.border },
+                                    isActive && { backgroundColor: BRAND, borderColor: BRAND },
+                                ]}
                                 onPress={() => setActiveFilter(f)}
                                 activeOpacity={0.75}
                             >
-                                <Text style={[styles.filterLabel, isActive && styles.filterLabelActive]}>
+                                <Text style={[styles.chipLabel, { color: theme.textSecondary }, isActive && { color: '#fff' }]}>
                                     {f}
                                 </Text>
                                 {count > 0 && (
-                                    <View style={[styles.filterBadge, isActive && styles.filterBadgeActive]}>
-                                        <Text style={[styles.filterBadgeText, isActive && styles.filterBadgeTextActive]}>
-                                            {count}
-                                        </Text>
+                                    <View style={[styles.chipBadge, isActive ? { backgroundColor: 'rgba(255,255,255,0.25)' } : { backgroundColor: BRAND + '20' }]}>
+                                        <Text style={[styles.chipBadgeText, { color: isActive ? '#fff' : BRAND }]}>{count}</Text>
                                     </View>
                                 )}
                             </TouchableOpacity>
@@ -158,233 +216,111 @@ const NotificationsScreen = ({ navigation }) => {
                 />
             </View>
 
-            {/* ── Notification list ── */}
-            <FlatList
-                data={filtered}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => <NotifCard item={item} onPress={handlePress} />}
-                contentContainerStyle={[styles.list, !filtered.length && styles.listEmpty]}
-                ListEmptyComponent={renderEmpty}
-                showsVerticalScrollIndicator={false}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        tintColor={colors.primary}
-                        colors={[colors.primary]}
-                    />
-                }
-            />
-        </SafeAreaView>
+            {/* ── Notification list with sections ── */}
+            {filtered.length === 0 ? (
+                <View style={styles.emptyWrap}>
+                    <View style={[styles.emptyIconBox, { backgroundColor: theme.surfaceAlt }]}>
+                        <Ionicons name="notifications-off-outline" size={40} color={theme.textMuted} />
+                    </View>
+                    <Text style={[styles.emptyTitle, { color: theme.text }]}>No notifications</Text>
+                    <Text style={[styles.emptySub, { color: theme.textMuted }]}>
+                        {activeFilter === 'All'
+                            ? "You're all caught up! 🎉"
+                            : `No ${activeFilter.toLowerCase()} notifications yet.`}
+                    </Text>
+                </View>
+            ) : (
+                <SectionList
+                    sections={sections}
+                    keyExtractor={(item) => item._id}
+                    stickySectionHeadersEnabled={false}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 24 }]}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND} colors={[BRAND]} />
+                    }
+                    renderSectionHeader={({ section }) => (
+                        <View style={styles.sectionHeaderRow}>
+                            <Text style={[styles.sectionHeaderText, { color: theme.textMuted }]}>{section.title}</Text>
+                            <View style={[styles.sectionLine, { backgroundColor: theme.border }]} />
+                        </View>
+                    )}
+                    renderItem={({ item }) => (
+                        <NotifCard item={item} onPress={handlePress} theme={theme} />
+                    )}
+                />
+            )}
+        </View>
     );
-};
+}
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
+    root: { flex: 1 },
     // Header
     header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm + 2,
-        backgroundColor: colors.white,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border,
+        flexDirection: 'row', alignItems: 'center',
+        paddingHorizontal: 16, paddingVertical: 12,
+        borderBottomWidth: 1, gap: 8,
     },
-    backBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: borderRadius.lg,
-        backgroundColor: colors.surface,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: spacing.sm,
+    backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+    headerTitleRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
+    headerTitle: { fontSize: 18, fontWeight: '700' },
+    headerBadge: {
+        backgroundColor: BRAND, borderRadius: 30,
+        minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center',
+        paddingHorizontal: 6,
     },
-    headerTitle: {
-        flex: 1,
-        fontSize: fontSize.xl,
-        fontWeight: fontWeight.bold,
-        color: colors.text,
-    },
-    markAllBtn: {
-        paddingHorizontal: spacing.sm,
-        paddingVertical: spacing.xs,
-    },
-    markAllText: {
-        fontSize: fontSize.sm,
-        color: colors.primary,
-        fontWeight: fontWeight.semibold,
-    },
-    // Summary chip
-    summaryRow: {
-        paddingHorizontal: spacing.md,
-        paddingTop: spacing.sm,
-    },
-    summaryChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignSelf: 'flex-start',
-        backgroundColor: colors.primaryBg,
-        borderRadius: borderRadius.full,
-        paddingHorizontal: spacing.sm + 2,
-        paddingVertical: 5,
-        gap: spacing.xs,
+    headerBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
+    markAllBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+    // Unread banner
+    unreadBanner: {
+        flexDirection: 'row', alignItems: 'center', gap: 8,
+        paddingHorizontal: 16, paddingVertical: 10,
     },
     liveDot: {
-        width: 7,
-        height: 7,
-        borderRadius: 4,
-        backgroundColor: colors.primary,
+        width: 8, height: 8, borderRadius: 4, backgroundColor: BRAND,
     },
-    summaryText: {
-        fontSize: fontSize.xs,
-        fontWeight: fontWeight.semibold,
-        color: colors.primary,
+    unreadBannerText: { flex: 1, fontSize: 13, color: BRAND },
+    markAllInline: { fontSize: 13, color: BRAND, fontWeight: '700' },
+    // Filter chips
+    filterList: { paddingHorizontal: 16, paddingVertical: 6, gap: 8 },
+    chip: {
+        flexDirection: 'row', alignItems: 'center', gap: 6,
+        paddingHorizontal: 12, paddingVertical: 5,
+        borderRadius: 30, borderWidth: 1,
     },
-    // Filter tabs
-    filterList: {
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
-        gap: spacing.sm,
-    },
-    filterTab: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.xs + 2,
-        borderRadius: borderRadius.full,
-        backgroundColor: colors.surface,
-        borderWidth: 1,
-        borderColor: colors.border,
-        gap: spacing.xs,
-    },
-    filterTabActive: {
-        backgroundColor: colors.primary,
-        borderColor: colors.primary,
-    },
-    filterLabel: {
-        fontSize: fontSize.sm,
-        fontWeight: fontWeight.medium,
-        color: colors.textSecondary,
-    },
-    filterLabelActive: {
-        color: colors.white,
-        fontWeight: fontWeight.semibold,
-    },
-    filterBadge: {
-        backgroundColor: colors.border,
-        borderRadius: borderRadius.full,
-        paddingHorizontal: 6,
-        paddingVertical: 1,
-        minWidth: 20,
-        alignItems: 'center',
-    },
-    filterBadgeActive: {
-        backgroundColor: colors.white + '35',
-    },
-    filterBadgeText: {
-        fontSize: 10,
-        fontWeight: fontWeight.bold,
-        color: colors.textSecondary,
-    },
-    filterBadgeTextActive: {
-        color: colors.white,
-    },
+    chipLabel: { fontSize: 13, fontWeight: '600' },
+    chipBadge: { minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 5, alignItems: 'center', justifyContent: 'center' },
+    chipBadgeText: { fontSize: 10, fontWeight: '800' },
+    // Section headers
+    sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8, marginTop: 4 },
+    sectionHeaderText: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, flexShrink: 0 },
+    sectionLine: { flex: 1, height: 1 },
     // List
-    list: {
-        paddingHorizontal: spacing.md,
-        paddingTop: spacing.sm,
-        paddingBottom: spacing.xl,
-    },
-    listEmpty: {
-        flex: 1,
-    },
-    // Notification card
+    list: { paddingHorizontal: 16, paddingTop: 4 },
+    // Card
     card: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        backgroundColor: colors.card,
-        borderRadius: borderRadius.xl,
-        padding: spacing.md,
-        marginBottom: spacing.sm,
+        flexDirection: 'row', alignItems: 'flex-start', gap: 12,
+        borderRadius: 16, padding: 14, marginBottom: 8,
         borderWidth: 1,
-        borderColor: colors.cardBorder,
-        gap: spacing.sm,
-        position: 'relative',
-        ...shadows.xs,
-    },
-    cardUnread: {
-        backgroundColor: colors.primaryBg,
-        borderColor: colors.primaryBorder,
-    },
-    unreadDot: {
-        position: 'absolute',
-        top: spacing.md,
-        right: spacing.md,
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: colors.primary,
     },
     iconWrap: {
-        width: 46,
-        height: 46,
-        borderRadius: borderRadius.lg,
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
+        width: 46, height: 46, borderRadius: 14,
+        alignItems: 'center', justifyContent: 'center', flexShrink: 0,
     },
-    cardBody: {
-        flex: 1,
-        gap: 3,
-    },
-    cardTop: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        gap: spacing.xs,
-    },
-    cardTitle: {
-        flex: 1,
-        fontSize: fontSize.md,
-        fontWeight: fontWeight.medium,
-        color: colors.text,
-    },
-    cardTitleUnread: {
-        fontWeight: fontWeight.bold,
-    },
-    cardTime: {
-        fontSize: fontSize.xs,
-        color: colors.textMuted,
-        flexShrink: 0,
-    },
-    cardMsg: {
-        fontSize: fontSize.sm,
-        color: colors.textSecondary,
-        lineHeight: 20,
-    },
+    cardBody: { flex: 1, gap: 4 },
+    cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+    cardTitle: { flex: 1, fontSize: 14, fontWeight: '500' },
+    dot: { width: 8, height: 8, borderRadius: 4, flexShrink: 0 },
+    cardMsg: { fontSize: 13, lineHeight: 18 },
+    cardFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
+    typePill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 30 },
+    typePillText: { fontSize: 11, fontWeight: '700' },
+    cardTime: { fontSize: 11 },
     // Empty
-    emptyWrap: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: spacing.sm,
-        paddingTop: 80,
-    },
-    emptyTitle: {
-        fontSize: fontSize.xl,
-        fontWeight: fontWeight.bold,
-        color: colors.text,
-    },
-    emptySub: {
-        fontSize: fontSize.md,
-        color: colors.textSecondary,
-        textAlign: 'center',
-    },
+    emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80, gap: 12, paddingHorizontal: 40 },
+    emptyIconBox: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
+    emptyTitle: { fontSize: 20, fontWeight: '700' },
+    emptySub: { fontSize: 14, textAlign: 'center', lineHeight: 22 },
 });
-
-export default NotificationsScreen;

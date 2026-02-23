@@ -1,59 +1,49 @@
-// screens/admin/MentorApplicationsScreen.js — Phase 5
+// MentorApplicationsScreen.js — Theme-aware via useTheme()
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, StyleSheet, FlatList, TouchableOpacity,
     RefreshControl, ActivityIndicator, Alert, TextInput, Modal,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { mentorshipAPI } from '../../services/mentorshipAPI';
-import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
 
+const BRAND = '#5B5FEF';
 const FILTERS = ['Pending', 'Approved', 'Rejected'];
-const STATUS_COLORS = {
-    pending: { color: colors.warning, bg: colors.warningBg || '#FFFBEB', label: 'Pending' },
-    approved: { color: colors.success, bg: colors.successBg || '#ECFDF5', label: 'Approved' },
-    rejected: { color: colors.error, bg: colors.errorBg || '#FEF2F2', label: 'Rejected' },
+const STATUS = {
+    pending: { color: '#F59E0B', bg: '#FFFBEB', label: 'Pending' },
+    approved: { color: '#10B981', bg: '#ECFDF5', label: 'Approved' },
+    rejected: { color: '#EF4444', bg: '#FEF2F2', label: 'Rejected' },
 };
 
-const StatusBadge = ({ status }) => {
-    const meta = STATUS_COLORS[status] || STATUS_COLORS.pending;
-    return (
-        <View style={[styles.badge, { backgroundColor: meta.bg }]}>
-            <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
-        </View>
-    );
-};
-
-const MentorApplicationsScreen = ({ navigation }) => {
+export default function MentorApplicationsScreen({ navigation }) {
+    const { theme } = useTheme();
+    const insets = useSafeAreaInsets();
     const [applications, setApplications] = useState([]);
     const [activeFilter, setActiveFilter] = useState('Pending');
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const [rejectModal, setRejectModal] = useState(null); // { id }
+    const [rejectModal, setRejectModal] = useState(null);
     const [reason, setReason] = useState('');
 
     const load = useCallback(async () => {
         try {
             const res = await mentorshipAPI.getMentorApplications?.();
-            const list = res?.applications || res?.data || res || [];
-            setApplications(list);
-        } catch {
-            setApplications([]);
-        } finally { setLoading(false); }
+            setApplications(res?.applications || res?.data || res || []);
+        } catch { setApplications([]); }
+        finally { setLoading(false); }
     }, []);
 
     useEffect(() => { load(); }, [load]);
     const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false); };
 
-    const filtered = applications.filter((a) =>
-        (a.status || 'pending').toLowerCase() === activeFilter.toLowerCase()
-    );
+    const filtered = applications.filter(a => (a.status || 'pending').toLowerCase() === activeFilter.toLowerCase());
 
     const handleApprove = async (id) => {
         try {
             await mentorshipAPI.updateApplicationStatus?.(id, 'approved');
-            setApplications((prev) => prev.map((a) => a._id === id ? { ...a, status: 'approved' } : a));
+            setApplications(prev => prev.map(a => a._id === id ? { ...a, status: 'approved' } : a));
         } catch { Alert.alert('Error', 'Could not approve application.'); }
     };
 
@@ -61,166 +51,161 @@ const MentorApplicationsScreen = ({ navigation }) => {
         if (!rejectModal) return;
         try {
             await mentorshipAPI.updateApplicationStatus?.(rejectModal.id, 'rejected', reason);
-            setApplications((prev) => prev.map((a) => a._id === rejectModal.id ? { ...a, status: 'rejected' } : a));
+            setApplications(prev => prev.map(a => a._id === rejectModal.id ? { ...a, status: 'rejected' } : a));
         } catch { Alert.alert('Error', 'Could not reject application.'); }
-        setRejectModal(null);
-        setReason('');
+        setRejectModal(null); setReason('');
     };
 
-    const renderItem = ({ item }) => (
-        <View style={styles.card}>
-            <View style={styles.cardHeader}>
-                <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>{(item.name || '?')[0].toUpperCase()}</Text>
+    const renderItem = ({ item }) => {
+        const meta = STATUS[item.status || 'pending'] || STATUS.pending;
+        return (
+            <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                <View style={styles.cardHeader}>
+                    <View style={[styles.avatar, { backgroundColor: BRAND + '18' }]}>
+                        <Text style={[styles.avatarText, { color: BRAND }]}>{(item.name || '?')[0].toUpperCase()}</Text>
+                    </View>
+                    <View style={styles.cardInfo}>
+                        <Text style={[styles.cardName, { color: theme.text }]}>{item.name || 'Applicant'}</Text>
+                        <Text style={[styles.cardRole, { color: theme.textSecondary }]} numberOfLines={1}>{item.jobTitle || item.tagline || ''}</Text>
+                        <Text style={[styles.cardDate, { color: theme.textMuted }]}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+                    </View>
+                    <View style={[styles.badge, { backgroundColor: meta.bg }]}>
+                        <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
+                    </View>
                 </View>
-                <View style={styles.cardInfo}>
-                    <Text style={styles.cardName}>{item.name || 'Applicant'}</Text>
-                    <Text style={styles.cardRole} numberOfLines={1}>{item.jobTitle || item.tagline || ''}</Text>
-                    <Text style={styles.cardDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-                </View>
-                <StatusBadge status={item.status || 'pending'} />
+                {item.bio ? <Text style={[styles.cardBio, { color: theme.textSecondary }]} numberOfLines={2}>{item.bio}</Text> : null}
+                {item.expertise?.length > 0 && (
+                    <View style={styles.chipRow}>
+                        {item.expertise.slice(0, 3).map((e, i) => (
+                            <View key={i} style={[styles.chip, { backgroundColor: theme.surfaceAlt }]}>
+                                <Text style={[styles.chipText, { color: theme.textSecondary }]}>{e}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+                {(item.status || 'pending') === 'pending' && (
+                    <View style={styles.actionRow}>
+                        <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#10B981' }]} onPress={() => handleApprove(item._id)}>
+                            <Ionicons name="checkmark" size={15} color="#fff" />
+                            <Text style={styles.greenBtnText}>Approve</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FEF2F2', borderWidth: 1, borderColor: '#EF4444' }]} onPress={() => setRejectModal({ id: item._id })}>
+                            <Ionicons name="close" size={15} color="#EF4444" />
+                            <Text style={[styles.redBtnText]}>Reject</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
-            {item.bio ? <Text style={styles.cardBio} numberOfLines={2}>{item.bio}</Text> : null}
-            {item.expertise?.length > 0 && (
-                <View style={styles.chipRow}>
-                    {item.expertise.slice(0, 3).map((e, i) => (
-                        <View key={i} style={styles.chip}><Text style={styles.chipText}>{e}</Text></View>
-                    ))}
-                </View>
-            )}
-            {(item.status || 'pending') === 'pending' && (
-                <View style={styles.actionRow}>
-                    <TouchableOpacity
-                        style={[styles.actionBtn, styles.approveBtn]}
-                        onPress={() => handleApprove(item._id)}
-                    >
-                        <Ionicons name="checkmark" size={16} color={colors.white} />
-                        <Text style={styles.approveBtnText}>Approve</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.actionBtn, styles.rejectBtn]}
-                        onPress={() => setRejectModal({ id: item._id })}
-                    >
-                        <Ionicons name="close" size={16} color={colors.error} />
-                        <Text style={styles.rejectBtnText}>Reject</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        </View>
-    );
+        );
+    };
 
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={22} color={colors.text} />
+        <View style={[styles.root, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+            <View style={[styles.header, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { backgroundColor: theme.surfaceAlt }]}>
+                    <Ionicons name="arrow-back" size={20} color={theme.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Mentor Applications</Text>
+                <Text style={[styles.headerTitle, { color: theme.text }]}>Mentor Applications</Text>
             </View>
 
-            {/* Filter tabs */}
-            <View style={styles.filterRow}>
-                {FILTERS.map((f) => {
-                    const count = applications.filter((a) => (a.status || 'pending').toLowerCase() === f.toLowerCase()).length;
+            <View style={[styles.filterRow, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+                {FILTERS.map(f => {
+                    const count = applications.filter(a => (a.status || 'pending').toLowerCase() === f.toLowerCase()).length;
+                    const isActive = activeFilter === f;
                     return (
                         <TouchableOpacity
                             key={f}
-                            style={[styles.filterTab, activeFilter === f && styles.filterTabActive]}
+                            style={[styles.filterTab, { backgroundColor: isActive ? BRAND : theme.surfaceAlt }]}
                             onPress={() => setActiveFilter(f)}
                         >
-                            <Text style={[styles.filterLabel, activeFilter === f && styles.filterLabelActive]}>
-                                {f} {count > 0 ? `(${count})` : ''}
+                            <Text style={[styles.filterLabel, { color: isActive ? '#fff' : theme.textSecondary }]}>
+                                {f}{count > 0 ? ` (${count})` : ''}
                             </Text>
                         </TouchableOpacity>
                     );
                 })}
             </View>
 
-            {loading ? <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.xl }} /> : (
+            {loading ? <ActivityIndicator color={BRAND} style={{ marginTop: 32 }} /> : (
                 <FlatList
                     data={filtered}
-                    keyExtractor={(i) => i._id}
+                    keyExtractor={i => i._id}
                     renderItem={renderItem}
                     contentContainerStyle={styles.list}
                     showsVerticalScrollIndicator={false}
-                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} colors={[colors.primary]} />}
-                    ListEmptyComponent={<View style={styles.emptyWrap}><Ionicons name="document-text-outline" size={48} color={colors.textMuted} /><Text style={styles.emptyText}>No {activeFilter.toLowerCase()} applications</Text></View>}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND} colors={[BRAND]} />}
+                    ListEmptyComponent={
+                        <View style={styles.emptyWrap}>
+                            <Ionicons name="document-text-outline" size={48} color={theme.textMuted} />
+                            <Text style={[styles.emptyText, { color: theme.textMuted }]}>No {activeFilter.toLowerCase()} applications</Text>
+                        </View>
+                    }
                 />
             )}
 
-            {/* Reject reason modal */}
             <Modal visible={!!rejectModal} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
-                    <View style={styles.modal}>
-                        <Text style={styles.modalTitle}>Reject Application</Text>
-                        <Text style={styles.modalSub}>Provide a reason (optional)</Text>
+                    <View style={[styles.modal, { backgroundColor: theme.card }]}>
+                        <Text style={[styles.modalTitle, { color: theme.text }]}>Reject Application</Text>
+                        <Text style={[styles.modalSub, { color: theme.textMuted }]}>Provide a reason (optional)</Text>
                         <TextInput
-                            style={styles.reasonInput}
-                            placeholder="Reason for rejection…"
-                            placeholderTextColor={colors.textMuted}
+                            style={[styles.reasonInput, { borderColor: theme.border, color: theme.text, backgroundColor: theme.surfaceAlt }]}
+                            placeholder="Reason…"
+                            placeholderTextColor={theme.textMuted}
                             value={reason}
                             onChangeText={setReason}
                             multiline
                         />
                         <View style={styles.modalBtns}>
-                            <TouchableOpacity style={styles.cancelBtn} onPress={() => { setRejectModal(null); setReason(''); }}>
-                                <Text style={styles.cancelBtnText}>Cancel</Text>
+                            <TouchableOpacity style={[styles.footerBtn, { backgroundColor: theme.surfaceAlt }]} onPress={() => { setRejectModal(null); setReason(''); }}>
+                                <Text style={[styles.footerBtnText, { color: theme.textSecondary }]}>Cancel</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.confirmRejectBtn} onPress={handleReject}>
-                                <Text style={styles.confirmRejectText}>Reject</Text>
+                            <TouchableOpacity style={[styles.footerBtn, { backgroundColor: '#EF4444' }]} onPress={handleReject}>
+                                <Text style={[styles.footerBtnText, { color: '#fff' }]}>Reject</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                 </View>
             </Modal>
-        </SafeAreaView>
+        </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.sm + 2, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.border },
-    backBtn: { width: 40, height: 40, borderRadius: borderRadius.lg, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', marginRight: spacing.sm },
-    headerTitle: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text },
-    filterRow: { flexDirection: 'row', padding: spacing.md, gap: spacing.sm },
-    filterTab: { flex: 1, paddingVertical: spacing.sm, borderRadius: borderRadius.lg, backgroundColor: colors.surface, alignItems: 'center', borderWidth: 1, borderColor: colors.border },
-    filterTabActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-    filterLabel: { fontSize: fontSize.sm, fontWeight: fontWeight.semibold, color: colors.textSecondary },
-    filterLabelActive: { color: colors.white },
-    list: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
-    card: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.sm, borderWidth: 1, borderColor: colors.cardBorder, gap: spacing.sm, ...shadows.xs },
-    cardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
-    avatar: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.primaryBg, alignItems: 'center', justifyContent: 'center' },
-    avatarText: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.primary },
+    root: { flex: 1 },
+    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, gap: 12 },
+    backBtn: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { fontSize: 18, fontWeight: '700' },
+    filterRow: { flexDirection: 'row', padding: 12, gap: 8, borderBottomWidth: 1 },
+    filterTab: { flex: 1, paddingVertical: 8, borderRadius: 12, alignItems: 'center' },
+    filterLabel: { fontSize: 13, fontWeight: '600' },
+    list: { padding: 16, gap: 10, paddingBottom: 24 },
+    card: { borderRadius: 16, padding: 14, borderWidth: 1, gap: 10 },
+    cardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+    avatar: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+    avatarText: { fontSize: 20, fontWeight: '800' },
     cardInfo: { flex: 1 },
-    cardName: { fontSize: fontSize.md, fontWeight: fontWeight.bold, color: colors.text },
-    cardRole: { fontSize: fontSize.sm, color: colors.textSecondary },
-    cardDate: { fontSize: fontSize.xs, color: colors.textMuted, marginTop: 2 },
-    badge: { borderRadius: borderRadius.full, paddingHorizontal: spacing.sm + 2, paddingVertical: 3 },
-    badgeText: { fontSize: fontSize.xs, fontWeight: fontWeight.bold },
-    cardBio: { fontSize: fontSize.sm, color: colors.textSecondary, lineHeight: 20 },
+    cardName: { fontSize: 15, fontWeight: '700' },
+    cardRole: { fontSize: 13 },
+    cardDate: { fontSize: 12, marginTop: 2 },
+    badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
+    badgeText: { fontSize: 11, fontWeight: '700' },
+    cardBio: { fontSize: 13, lineHeight: 20 },
     chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-    chip: { backgroundColor: colors.surfaceAlt, borderRadius: borderRadius.full, paddingHorizontal: spacing.sm, paddingVertical: 3 },
-    chipText: { fontSize: fontSize.xs, color: colors.textSecondary, fontWeight: fontWeight.medium },
-    actionRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs },
-    actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, paddingVertical: spacing.sm, borderRadius: borderRadius.lg },
-    approveBtn: { backgroundColor: colors.success },
-    approveBtnText: { color: colors.white, fontWeight: fontWeight.bold, fontSize: fontSize.sm },
-    rejectBtn: { backgroundColor: colors.errorBg || '#FEF2F2', borderWidth: 1, borderColor: colors.error },
-    rejectBtnText: { color: colors.error, fontWeight: fontWeight.bold, fontSize: fontSize.sm },
-    emptyWrap: { alignItems: 'center', paddingTop: 60, gap: spacing.sm },
-    emptyText: { fontSize: fontSize.md, color: colors.textMuted },
-    // Modal
+    chip: { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+    chipText: { fontSize: 11, fontWeight: '600' },
+    actionRow: { flexDirection: 'row', gap: 10 },
+    actionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, borderRadius: 12 },
+    greenBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+    redBtnText: { color: '#EF4444', fontWeight: '700', fontSize: 13 },
+    emptyWrap: { alignItems: 'center', paddingTop: 60, gap: 10 },
+    emptyText: { fontSize: 15 },
     modalOverlay: { flex: 1, backgroundColor: '#00000066', justifyContent: 'center', alignItems: 'center' },
-    modal: { width: '88%', backgroundColor: colors.white, borderRadius: borderRadius.xxl, padding: spacing.lg, gap: spacing.md },
-    modalTitle: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text },
-    modalSub: { fontSize: fontSize.sm, color: colors.textSecondary },
-    reasonInput: { borderWidth: 1, borderColor: colors.border, borderRadius: borderRadius.lg, padding: spacing.md, fontSize: fontSize.md, color: colors.text, minHeight: 80, textAlignVertical: 'top' },
-    modalBtns: { flexDirection: 'row', gap: spacing.sm },
-    cancelBtn: { flex: 1, paddingVertical: spacing.sm + 2, borderRadius: borderRadius.lg, backgroundColor: colors.surface, alignItems: 'center' },
-    cancelBtnText: { fontWeight: fontWeight.semibold, color: colors.textSecondary },
-    confirmRejectBtn: { flex: 1, paddingVertical: spacing.sm + 2, borderRadius: borderRadius.lg, backgroundColor: colors.error, alignItems: 'center' },
-    confirmRejectText: { fontWeight: fontWeight.bold, color: colors.white },
+    modal: { width: '88%', borderRadius: 20, padding: 20, gap: 14 },
+    modalTitle: { fontSize: 18, fontWeight: '700' },
+    modalSub: { fontSize: 13 },
+    reasonInput: { borderWidth: 1, borderRadius: 12, padding: 12, fontSize: 14, minHeight: 80, textAlignVertical: 'top' },
+    modalBtns: { flexDirection: 'row', gap: 10 },
+    footerBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
+    footerBtnText: { fontWeight: '700', fontSize: 14 },
 });
-
-export default MentorApplicationsScreen;

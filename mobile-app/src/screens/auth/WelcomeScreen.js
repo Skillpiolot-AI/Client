@@ -1,192 +1,184 @@
-// Welcome Screen — Dark Theme
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, StatusBar } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors, fontSize, fontWeight, spacing, borderRadius } from '../../theme';
+// WelcomeScreen.js — Branded wave onboarding screen
+import React, { useEffect, useRef } from 'react';
+import {
+    View, Text, StyleSheet, Animated, Dimensions,
+    TouchableOpacity, StatusBar,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const BRAND = '#5B5FEF';
+const BRAND_DARK = '#3D40C4';
 
-const WelcomeScreen = ({ navigation }) => {
+export default function WelcomeScreen({ navigation }) {
+    const fadeIn = useRef(new Animated.Value(0)).current;
+    const slideUp = useRef(new Animated.Value(40)).current;
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(fadeIn, { toValue: 1, duration: 700, delay: 200, useNativeDriver: true }),
+            Animated.timing(slideUp, { toValue: 0, duration: 600, delay: 300, useNativeDriver: true }),
+        ]).start();
+    }, []);
+
     return (
         <View style={styles.container}>
-            <StatusBar barStyle="light-content" />
+            <StatusBar barStyle="light-content" backgroundColor={BRAND} />
 
-            {/* Dark Indigo Hero Section */}
-            <LinearGradient
-                colors={['#4F46E5', '#3730A3']}
-                style={styles.heroSection}
-            >
-                {/* Decorative Stars */}
-                <Text style={styles.star}>✦</Text>
-                <Text style={[styles.star, styles.star2]}>✦</Text>
-                <Text style={[styles.star, styles.star3]}>+</Text>
-                <Text style={[styles.star, styles.star4]}>+</Text>
-
-                {/* Cloud / blob decorations */}
-                <View style={styles.cloudContainer}>
-                    <View style={styles.cloud} />
-                    <View style={[styles.cloud, styles.cloud2]} />
+            {/* Top — Branded wave section */}
+            <View style={styles.top}>
+                {/* Decorative circles for topographic effect */}
+                {[180, 140, 100, 60].map((r, i) => (
+                    <View key={i} style={[styles.ring, {
+                        width: r * 2, height: r * 2, borderRadius: r,
+                        opacity: 0.08 + i * 0.04,
+                        top: height * 0.18 - r,
+                        left: width * 0.5 - r,
+                    }]} />
+                ))}
+                <View style={styles.logoSection}>
+                    <View style={styles.logoCircle}>
+                        <Ionicons name="rocket" size={36} color="#fff" />
+                    </View>
+                    <Text style={styles.brandName}>SkillPilot</Text>
                 </View>
-
-                {/* Hero Image */}
-                <Image
-                    source={require('../../../assets/images/hero.png')}
-                    style={styles.heroImage}
-                    resizeMode="contain"
-                />
-
-                {/* App Name */}
-                <Text style={styles.appName}>SkillPilot</Text>
-            </LinearGradient>
-
-            {/* Dark Content Section */}
-            <View style={styles.contentSection}>
-                <Text style={styles.title}>{'Unlock Your Career\nPotential'}</Text>
-                <Text style={styles.subtitle}>
-                    Get personalized mentorship, career guidance, and skill assessments to achieve your dreams.
-                </Text>
-
-                <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.loginButtonText}>Log in</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate('Signup')}>
-                    <Text style={styles.signupButtonText}>Create Account</Text>
-                </TouchableOpacity>
             </View>
 
-            {/* Bottom Indicator */}
-            <View style={styles.bottomIndicator} />
+            {/* Wave divider */}
+            <View style={styles.waveBox}>
+                <View style={styles.waveCurve} />
+            </View>
+
+            {/* Bottom — Content section */}
+            <Animated.View style={[styles.bottom, {
+                opacity: fadeIn,
+                transform: [{ translateY: slideUp }],
+            }]}>
+                <Text style={styles.welcomeText}>Welcome</Text>
+                <Text style={styles.subtitle}>
+                    The AI-powered platform connecting{'\n'}students with industry mentors.
+                </Text>
+
+                {/* Feature highlights */}
+                {[
+                    { icon: 'school-outline', text: 'AI-powered skill assessment' },
+                    { icon: 'people-outline', text: 'Expert industry mentors' },
+                    { icon: 'calendar-outline', text: 'Free first session' },
+                ].map((f, i) => (
+                    <View key={i} style={styles.featureRow}>
+                        <View style={styles.featureIcon}>
+                            <Ionicons name={f.icon} size={16} color={BRAND} />
+                        </View>
+                        <Text style={styles.featureText}>{f.text}</Text>
+                    </View>
+                ))}
+
+                {/* CTA */}
+                <TouchableOpacity
+                    style={styles.continueRow}
+                    onPress={() => navigation.navigate('Login')}
+                    activeOpacity={0.85}
+                >
+                    <Text style={styles.continueText}>Continue</Text>
+                    <View style={styles.continueBall}>
+                        <Ionicons name="arrow-forward" size={20} color="#fff" />
+                    </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Signup')}
+                    style={{ marginTop: 16 }}
+                >
+                    <Text style={styles.signupLink}>
+                        New here?{' '}
+                        <Text style={styles.signupLinkBold}>Create Account</Text>
+                    </Text>
+                </TouchableOpacity>
+            </Animated.View>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    heroSection: {
-        flex: 0.55,
-        borderBottomLeftRadius: 40,
-        borderBottomRightRadius: 40,
-        alignItems: 'center',
+    container: { flex: 1, backgroundColor: BRAND },
+    top: {
+        height: height * 0.42,
+        backgroundColor: BRAND,
         justifyContent: 'center',
-        position: 'relative',
+        alignItems: 'center',
         overflow: 'hidden',
     },
-    star: {
+    ring: {
         position: 'absolute',
-        color: 'rgba(255,255,255,0.55)',
-        fontSize: 16,
-        top: 80,
-        left: 30,
+        borderWidth: 1,
+        borderColor: '#fff',
     },
-    star2: {
-        top: 120,
-        left: width - 60,
-        fontSize: 12,
+    logoSection: { alignItems: 'center', gap: 10 },
+    logoCircle: {
+        width: 76, height: 76, borderRadius: 38,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        alignItems: 'center', justifyContent: 'center',
+        borderWidth: 2, borderColor: 'rgba(255,255,255,0.4)',
     },
-    star3: {
-        top: 60,
-        left: width / 2 + 40,
-        fontSize: 20,
+    brandName: { fontSize: 28, fontWeight: '800', color: '#fff', letterSpacing: -0.5 },
+    waveBox: { height: 50, overflow: 'hidden', backgroundColor: BRAND },
+    waveCurve: {
+        height: 80,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 50,
+        borderTopRightRadius: 50,
+        marginTop: -30,
     },
-    star4: {
-        top: 200,
-        left: 50,
-        fontSize: 14,
+    bottom: {
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingHorizontal: 32,
+        paddingTop: 8,
+        paddingBottom: 40,
     },
-    cloudContainer: {
-        position: 'absolute',
-        top: 100,
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    cloud: {
-        width: 80,
-        height: 40,
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        borderRadius: 20,
-    },
-    cloud2: {
-        width: 100,
-        height: 50,
-        marginTop: 20,
-    },
-    heroImage: {
-        width: width * 0.6,
-        height: width * 0.6,
-        marginTop: 40,
-    },
-    appName: {
-        fontSize: fontSize.xxxl,
-        fontWeight: fontWeight.bold,
-        color: colors.white,
-        marginTop: spacing.md,
-        letterSpacing: 1,
-    },
-    contentSection: {
-        flex: 0.45,
-        paddingHorizontal: spacing.xl,
-        paddingTop: spacing.xl,
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: fontSize.xxxl,
-        fontWeight: fontWeight.bold,
-        color: colors.text,
-        textAlign: 'center',
-        lineHeight: 36,
-        marginBottom: spacing.md,
+    welcomeText: {
+        fontSize: 36,
+        fontWeight: '800',
+        color: '#111827',
+        letterSpacing: -1,
     },
     subtitle: {
-        fontSize: fontSize.md,
-        color: colors.textSecondary,
-        textAlign: 'center',
+        fontSize: 15,
+        color: '#6B7280',
         lineHeight: 22,
-        marginBottom: spacing.xl,
+        marginTop: 8,
+        marginBottom: 24,
     },
-    loginButton: {
-        width: '100%',
-        backgroundColor: colors.primary,
-        borderRadius: borderRadius.xl,
-        height: 56,
+    featureRow: {
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: spacing.md,
+        gap: 10,
+        marginBottom: 12,
     },
-    loginButtonText: {
-        color: colors.white,
-        fontSize: fontSize.lg,
-        fontWeight: fontWeight.semibold,
+    featureIcon: {
+        width: 30, height: 30, borderRadius: 8,
+        backgroundColor: '#EEF2FF',
+        alignItems: 'center', justifyContent: 'center',
     },
-    signupButton: {
-        width: '100%',
-        backgroundColor: colors.surface,
-        borderRadius: borderRadius.xl,
-        height: 56,
+    featureText: { fontSize: 14, color: '#374151', fontWeight: '500' },
+    continueRow: {
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: colors.border,
+        justifyContent: 'flex-end',
+        marginTop: 30,
+        gap: 14,
     },
-    signupButtonText: {
-        color: colors.text,
-        fontSize: fontSize.lg,
-        fontWeight: fontWeight.semibold,
+    continueText: { fontSize: 17, fontWeight: '700', color: '#111827' },
+    continueBall: {
+        width: 52, height: 52, borderRadius: 26,
+        backgroundColor: BRAND,
+        alignItems: 'center', justifyContent: 'center',
+        shadowColor: BRAND,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
+        elevation: 8,
     },
-    bottomIndicator: {
-        position: 'absolute',
-        bottom: 20,
-        left: '50%',
-        marginLeft: -40,
-        width: 80,
-        height: 5,
-        backgroundColor: colors.surfaceAlt,
-        borderRadius: 3,
-    },
+    signupLink: { textAlign: 'center', fontSize: 14, color: '#6B7280' },
+    signupLinkBold: { color: BRAND, fontWeight: '700' },
 });
-
-export default WelcomeScreen;

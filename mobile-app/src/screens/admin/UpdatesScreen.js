@@ -1,31 +1,33 @@
-// screens/admin/UpdatesScreen.js — Phase 5
+// UpdatesScreen.js — Theme-aware via useTheme()
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, StyleSheet, FlatList, TouchableOpacity,
     RefreshControl, ActivityIndicator, Alert, TextInput, Modal,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { adminAPI } from '../../services/adminAPI';
-import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+
+const BRAND = '#5B5FEF';
 
 const timeAgo = (iso) => {
     if (!iso) return '';
-    const diff = Date.now() - new Date(iso).getTime();
-    const days = Math.floor(diff / 86_400_000);
+    const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
     if (days === 0) return 'Today';
     if (days === 1) return 'Yesterday';
     return `${days} days ago`;
 };
 
-const UpdatesScreen = ({ navigation }) => {
+export default function UpdatesScreen({ navigation }) {
+    const { theme } = useTheme();
+    const insets = useSafeAreaInsets();
     const [updates, setUpdates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [title, setTitle] = useState('');
-    const [body, setBody] = useState('');
+    const [titleVal, setTitleVal] = useState('');
+    const [bodyVal, setBodyVal] = useState('');
     const [creating, setCreating] = useState(false);
 
     const load = useCallback(async () => {
@@ -40,14 +42,13 @@ const UpdatesScreen = ({ navigation }) => {
     const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false); };
 
     const handleCreate = async () => {
-        if (!title.trim()) { Alert.alert('Error', 'Title is required.'); return; }
+        if (!titleVal.trim()) { Alert.alert('Error', 'Title is required.'); return; }
         setCreating(true);
         try {
-            const res = await adminAPI.createUpdate({ title: title.trim(), body: body.trim() });
-            const newUpdate = res?.update || res?.data || { _id: Date.now().toString(), title: title.trim(), body: body.trim(), createdAt: new Date().toISOString() };
-            setUpdates((prev) => [newUpdate, ...prev]);
-            setModalVisible(false);
-            setTitle(''); setBody('');
+            const res = await adminAPI.createUpdate({ title: titleVal.trim(), body: bodyVal.trim() });
+            const newItem = res?.update || res?.data || { _id: Date.now().toString(), title: titleVal.trim(), body: bodyVal.trim(), createdAt: new Date().toISOString() };
+            setUpdates(prev => [newItem, ...prev]);
+            setModalVisible(false); setTitleVal(''); setBodyVal('');
         } catch { Alert.alert('Error', 'Could not create update.'); }
         finally { setCreating(false); }
     };
@@ -56,10 +57,8 @@ const UpdatesScreen = ({ navigation }) => {
         Alert.alert('Delete Update', `Remove "${updateTitle}"?`, [
             {
                 text: 'Delete', style: 'destructive', onPress: async () => {
-                    try {
-                        await adminAPI.deleteUpdate(id);
-                        setUpdates((prev) => prev.filter((u) => u._id !== id));
-                    } catch { Alert.alert('Error', 'Could not delete update.'); }
+                    try { await adminAPI.deleteUpdate(id); setUpdates(prev => prev.filter(u => u._id !== id)); }
+                    catch { Alert.alert('Error', 'Could not delete update.'); }
                 }
             },
             { text: 'Cancel', style: 'cancel' },
@@ -67,48 +66,48 @@ const UpdatesScreen = ({ navigation }) => {
     };
 
     const renderItem = ({ item }) => (
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
             <View style={styles.cardHeader}>
-                <View style={styles.cardIconWrap}>
-                    <Ionicons name="megaphone-outline" size={20} color={colors.primary} />
+                <View style={[styles.cardIconWrap, { backgroundColor: BRAND + '18' }]}>
+                    <Ionicons name="megaphone-outline" size={20} color={BRAND} />
                 </View>
                 <View style={styles.cardMeta}>
-                    <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
-                    <Text style={styles.cardDate}>{timeAgo(item.createdAt)}</Text>
+                    <Text style={[styles.cardTitle, { color: theme.text }]} numberOfLines={1}>{item.title}</Text>
+                    <Text style={[styles.cardDate, { color: theme.textMuted }]}>{timeAgo(item.createdAt)}</Text>
                 </View>
                 <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item._id, item.title)}>
-                    <Ionicons name="trash-outline" size={18} color={colors.error} />
+                    <Ionicons name="trash-outline" size={17} color="#EF4444" />
                 </TouchableOpacity>
             </View>
-            {item.body ? <Text style={styles.cardBody} numberOfLines={3}>{item.body}</Text> : null}
+            {item.body ? <Text style={[styles.cardBody, { color: theme.textSecondary }]} numberOfLines={3}>{item.body}</Text> : null}
         </View>
     );
 
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={22} color={colors.text} />
+        <View style={[styles.root, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+            <View style={[styles.header, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { backgroundColor: theme.surfaceAlt }]}>
+                    <Ionicons name="arrow-back" size={20} color={theme.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>App Updates</Text>
-                <View style={styles.countChip}>
-                    <Text style={styles.countChipText}>{updates.length}</Text>
+                <Text style={[styles.headerTitle, { color: theme.text }]}>App Updates</Text>
+                <View style={[styles.countChip, { backgroundColor: BRAND + '18' }]}>
+                    <Text style={[styles.countChipText, { color: BRAND }]}>{updates.length}</Text>
                 </View>
             </View>
 
-            {loading ? <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.xl }} /> : (
+            {loading ? <ActivityIndicator color={BRAND} style={{ marginTop: 32 }} /> : (
                 <FlatList
                     data={updates}
-                    keyExtractor={(u) => u._id}
+                    keyExtractor={u => u._id}
                     renderItem={renderItem}
                     contentContainerStyle={styles.list}
                     showsVerticalScrollIndicator={false}
-                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} colors={[colors.primary]} />}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND} colors={[BRAND]} />}
                     ListEmptyComponent={
                         <View style={styles.emptyWrap}>
-                            <Ionicons name="megaphone-outline" size={48} color={colors.textMuted} />
-                            <Text style={styles.emptyText}>No updates yet</Text>
-                            <Text style={styles.emptySub}>Tap + to create your first announcement</Text>
+                            <Ionicons name="megaphone-outline" size={48} color={theme.textMuted} />
+                            <Text style={[styles.emptyTitle, { color: theme.text }]}>No updates yet</Text>
+                            <Text style={[styles.emptySub, { color: theme.textMuted }]}>Tap + to create your first announcement</Text>
                         </View>
                     }
                 />
@@ -116,78 +115,73 @@ const UpdatesScreen = ({ navigation }) => {
 
             {/* FAB */}
             <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)} activeOpacity={0.85}>
-                <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.fabGradient}>
-                    <Ionicons name="add" size={26} color={colors.white} />
-                </LinearGradient>
+                <View style={styles.fabInner}>
+                    <Ionicons name="add" size={26} color="#fff" />
+                </View>
             </TouchableOpacity>
 
             {/* Create modal */}
             <Modal visible={modalVisible} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
-                    <View style={styles.modal}>
+                    <View style={[styles.modal, { backgroundColor: theme.card }]}>
                         <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>New Update</Text>
-                            <TouchableOpacity onPress={() => { setModalVisible(false); setTitle(''); setBody(''); }}>
-                                <Ionicons name="close" size={22} color={colors.text} />
+                            <Text style={[styles.modalTitle, { color: theme.text }]}>New Update</Text>
+                            <TouchableOpacity onPress={() => { setModalVisible(false); setTitleVal(''); setBodyVal(''); }}>
+                                <Ionicons name="close" size={22} color={theme.text} />
                             </TouchableOpacity>
                         </View>
                         <TextInput
-                            style={styles.inputField}
+                            style={[styles.inputField, { borderColor: theme.border, color: theme.text, backgroundColor: theme.surfaceAlt }]}
                             placeholder="Title *"
-                            placeholderTextColor={colors.textMuted}
-                            value={title}
-                            onChangeText={setTitle}
+                            placeholderTextColor={theme.textMuted}
+                            value={titleVal}
+                            onChangeText={setTitleVal}
                         />
                         <TextInput
-                            style={[styles.inputField, styles.inputMulti]}
+                            style={[styles.inputField, styles.inputMulti, { borderColor: theme.border, color: theme.text, backgroundColor: theme.surfaceAlt }]}
                             placeholder="Message (optional)"
-                            placeholderTextColor={colors.textMuted}
-                            value={body}
-                            onChangeText={setBody}
+                            placeholderTextColor={theme.textMuted}
+                            value={bodyVal}
+                            onChangeText={setBodyVal}
                             multiline
                         />
-                        <TouchableOpacity style={styles.createBtn} onPress={handleCreate} disabled={creating}>
-                            {creating
-                                ? <ActivityIndicator color={colors.white} />
-                                : <Text style={styles.createBtnText}>Publish Update</Text>
-                            }
+                        <TouchableOpacity style={[styles.createBtn, creating && { opacity: 0.7 }]} onPress={handleCreate} disabled={creating}>
+                            {creating ? <ActivityIndicator color="#fff" /> : <Text style={styles.createBtnText}>Publish Update</Text>}
                         </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
-        </SafeAreaView>
+        </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.sm + 2, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.border },
-    backBtn: { width: 40, height: 40, borderRadius: borderRadius.lg, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', marginRight: spacing.sm },
-    headerTitle: { flex: 1, fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text },
-    countChip: { backgroundColor: colors.primaryBg, borderRadius: borderRadius.full, paddingHorizontal: spacing.sm, paddingVertical: 3 },
-    countChipText: { fontSize: fontSize.sm, fontWeight: fontWeight.bold, color: colors.primary },
-    list: { paddingHorizontal: spacing.md, paddingTop: spacing.sm, paddingBottom: 100 },
-    card: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.sm, borderWidth: 1, borderColor: colors.cardBorder, gap: spacing.sm, ...shadows.xs },
-    cardHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-    cardIconWrap: { width: 40, height: 40, borderRadius: borderRadius.lg, backgroundColor: colors.primaryBg, alignItems: 'center', justifyContent: 'center' },
+    root: { flex: 1 },
+    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, gap: 12 },
+    backBtn: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { flex: 1, fontSize: 18, fontWeight: '700' },
+    countChip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
+    countChipText: { fontSize: 13, fontWeight: '700' },
+    list: { padding: 16, gap: 10, paddingBottom: 100 },
+    card: { borderRadius: 16, padding: 14, borderWidth: 1, gap: 10 },
+    cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    cardIconWrap: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
     cardMeta: { flex: 1 },
-    cardTitle: { fontSize: fontSize.md, fontWeight: fontWeight.bold, color: colors.text },
-    cardDate: { fontSize: fontSize.xs, color: colors.textMuted, marginTop: 2 },
-    cardBody: { fontSize: fontSize.sm, color: colors.textSecondary, lineHeight: 20 },
-    deleteBtn: { width: 36, height: 36, borderRadius: borderRadius.lg, backgroundColor: colors.errorBg || '#FEF2F2', alignItems: 'center', justifyContent: 'center' },
-    emptyWrap: { alignItems: 'center', paddingTop: 80, gap: spacing.sm },
-    emptyText: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text },
-    emptySub: { fontSize: fontSize.md, color: colors.textSecondary },
-    fab: { position: 'absolute', bottom: spacing.xl, right: spacing.lg, borderRadius: 30, ...shadows.lg },
-    fabGradient: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center' },
+    cardTitle: { fontSize: 15, fontWeight: '700' },
+    cardDate: { fontSize: 12, marginTop: 2 },
+    cardBody: { fontSize: 13, lineHeight: 20 },
+    deleteBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#FEF2F2', alignItems: 'center', justifyContent: 'center' },
+    emptyWrap: { alignItems: 'center', paddingTop: 80, gap: 8 },
+    emptyTitle: { fontSize: 18, fontWeight: '700' },
+    emptySub: { fontSize: 14 },
+    fab: { position: 'absolute', bottom: 28, right: 20 },
+    fabInner: { width: 60, height: 60, borderRadius: 30, backgroundColor: BRAND, alignItems: 'center', justifyContent: 'center', shadowColor: BRAND, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 10, elevation: 8 },
     modalOverlay: { flex: 1, backgroundColor: '#00000066', justifyContent: 'flex-end' },
-    modal: { backgroundColor: colors.white, borderTopLeftRadius: borderRadius.xxl, borderTopRightRadius: borderRadius.xxl, padding: spacing.lg, gap: spacing.md },
+    modal: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, gap: 14 },
     modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    modalTitle: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text },
-    inputField: { borderWidth: 1, borderColor: colors.border, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md, paddingVertical: spacing.sm + 2, fontSize: fontSize.md, color: colors.text },
+    modalTitle: { fontSize: 18, fontWeight: '700' },
+    inputField: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15 },
     inputMulti: { minHeight: 100, textAlignVertical: 'top' },
-    createBtn: { backgroundColor: colors.primary, borderRadius: borderRadius.xl, height: 52, alignItems: 'center', justifyContent: 'center' },
-    createBtnText: { color: colors.white, fontSize: fontSize.lg, fontWeight: fontWeight.bold },
+    createBtn: { backgroundColor: BRAND, borderRadius: 26, height: 52, alignItems: 'center', justifyContent: 'center' },
+    createBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });
-
-export default UpdatesScreen;

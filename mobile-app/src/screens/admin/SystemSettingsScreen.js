@@ -1,44 +1,19 @@
-// screens/admin/SystemSettingsScreen.js — Phase 5
+// SystemSettingsScreen.js — Theme-aware via useTheme()
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, StyleSheet, ScrollView, Switch,
     TextInput, TouchableOpacity, Alert, ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { adminAPI } from '../../services/adminAPI';
-import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
 
-const SettingRow = ({ label, sub, value, onToggle }) => (
-    <View style={styles.settingRow}>
-        <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>{label}</Text>
-            {sub ? <Text style={styles.settingSub}>{sub}</Text> : null}
-        </View>
-        <Switch
-            value={value}
-            onValueChange={onToggle}
-            thumbColor={value ? colors.white : colors.surfaceAlt}
-            trackColor={{ false: colors.border, true: colors.primary }}
-        />
-    </View>
-);
+const BRAND = '#5B5FEF';
 
-const InputRow = ({ label, sub, value, onChange, keyboardType }) => (
-    <View style={styles.inputRow}>
-        <Text style={styles.settingLabel}>{label}</Text>
-        {sub ? <Text style={styles.settingSub}>{sub}</Text> : null}
-        <TextInput
-            style={styles.input}
-            value={String(value ?? '')}
-            onChangeText={onChange}
-            keyboardType={keyboardType || 'default'}
-            placeholderTextColor={colors.textMuted}
-        />
-    </View>
-);
-
-const SystemSettingsScreen = ({ navigation }) => {
+export default function SystemSettingsScreen({ navigation }) {
+    const { theme } = useTheme();
+    const insets = useSafeAreaInsets();
     const [settings, setSettings] = useState({
         freeSessions: false,
         maxSessionsPerWeek: 3,
@@ -52,7 +27,7 @@ const SystemSettingsScreen = ({ navigation }) => {
         try {
             const res = await adminAPI.getSystemSettings();
             const s = res?.settings || res?.data || res || {};
-            setSettings((prev) => ({ ...prev, ...s }));
+            setSettings(prev => ({ ...prev, ...s }));
         } finally { setLoading(false); }
     }, []);
 
@@ -63,103 +38,90 @@ const SystemSettingsScreen = ({ navigation }) => {
         try {
             await adminAPI.updateSystemSettings(settings);
             Alert.alert('Saved', 'Settings updated successfully.');
-        } catch {
-            Alert.alert('Error', 'Could not save settings. Please try again.');
-        } finally { setSaving(false); }
+        } catch { Alert.alert('Error', 'Could not save settings.'); }
+        finally { setSaving(false); }
     };
 
-    if (loading) return (
-        <SafeAreaView style={styles.container} edges={['top']}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={22} color={colors.text} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>System Settings</Text>
+    const SettingRow = ({ label, sub, value, onToggle }) => (
+        <View style={styles.settingRow}>
+            <View style={{ flex: 1 }}>
+                <Text style={[styles.settingLabel, { color: theme.text }]}>{label}</Text>
+                {sub ? <Text style={[styles.settingSub, { color: theme.textMuted }]}>{sub}</Text> : null}
             </View>
-            <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.xl }} />
-        </SafeAreaView>
+            <Switch value={value} onValueChange={onToggle} thumbColor="#fff" trackColor={{ false: theme.border, true: BRAND }} />
+        </View>
+    );
+
+    const InputRow = ({ label, sub, value, onChange, keyboardType }) => (
+        <View style={{ paddingHorizontal: 16, paddingVertical: 14, gap: 6 }}>
+            <Text style={[styles.settingLabel, { color: theme.text }]}>{label}</Text>
+            {sub ? <Text style={[styles.settingSub, { color: theme.textMuted }]}>{sub}</Text> : null}
+            <TextInput
+                style={[styles.input, { borderColor: theme.border, color: theme.text, backgroundColor: theme.surfaceAlt }]}
+                value={String(value ?? '')}
+                onChangeText={onChange}
+                keyboardType={keyboardType || 'default'}
+                placeholderTextColor={theme.textMuted}
+            />
+        </View>
+    );
+
+    if (loading) return (
+        <View style={[styles.root, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+            <View style={[styles.header, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { backgroundColor: theme.surfaceAlt }]}>
+                    <Ionicons name="arrow-back" size={20} color={theme.text} />
+                </TouchableOpacity>
+                <Text style={[styles.headerTitle, { color: theme.text }]}>System Settings</Text>
+            </View>
+            <ActivityIndicator color={BRAND} style={{ marginTop: 32 }} />
+        </View>
     );
 
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={22} color={colors.text} />
+        <View style={[styles.root, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+            <View style={[styles.header, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { backgroundColor: theme.surfaceAlt }]}>
+                    <Ionicons name="arrow-back" size={20} color={theme.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>System Settings</Text>
+                <Text style={[styles.headerTitle, { color: theme.text }]}>System Settings</Text>
             </View>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body}>
-                {/* Toggles */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Feature Flags</Text>
-                    <View style={styles.settingCard}>
-                        <SettingRow
-                            label="Free Sessions"
-                            sub="Allow first session with any mentor for free"
-                            value={settings.freeSessions}
-                            onToggle={(v) => setSettings((p) => ({ ...p, freeSessions: v }))}
-                        />
-                        <View style={styles.divider} />
-                        <SettingRow
-                            label="Maintenance Mode"
-                            sub="Restrict access to all authenticated users"
-                            value={settings.maintenanceMode}
-                            onToggle={(v) => setSettings((p) => ({ ...p, maintenanceMode: v }))}
-                        />
-                    </View>
+                <Text style={[styles.sectionTitle, { color: theme.textMuted }]}>FEATURE FLAGS</Text>
+                <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                    <SettingRow label="Free Sessions" sub="Allow first session with any mentor for free" value={settings.freeSessions} onToggle={v => setSettings(p => ({ ...p, freeSessions: v }))} />
+                    <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                    <SettingRow label="Maintenance Mode" sub="Restrict access to authenticated users only" value={settings.maintenanceMode} onToggle={v => setSettings(p => ({ ...p, maintenanceMode: v }))} />
                 </View>
 
-                {/* Inputs */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Session Limits</Text>
-                    <View style={styles.settingCard}>
-                        <InputRow
-                            label="Max Sessions Per Week"
-                            sub="Maximum bookings a mentee can make per week"
-                            value={settings.maxSessionsPerWeek}
-                            onChange={(v) => setSettings((p) => ({ ...p, maxSessionsPerWeek: parseInt(v) || 0 }))}
-                            keyboardType="number-pad"
-                        />
-                        <View style={styles.divider} />
-                        <InputRow
-                            label="Default Session Duration"
-                            sub="Duration in minutes (e.g. 30, 45, 60)"
-                            value={settings.defaultSessionDuration}
-                            onChange={(v) => setSettings((p) => ({ ...p, defaultSessionDuration: parseInt(v) || 0 }))}
-                            keyboardType="number-pad"
-                        />
-                    </View>
+                <Text style={[styles.sectionTitle, { color: theme.textMuted }]}>SESSION LIMITS</Text>
+                <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                    <InputRow label="Max Sessions Per Week" sub="Maximum bookings a mentee can make per week" value={settings.maxSessionsPerWeek} onChange={v => setSettings(p => ({ ...p, maxSessionsPerWeek: parseInt(v) || 0 }))} keyboardType="number-pad" />
+                    <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                    <InputRow label="Default Session Duration" sub="Duration in minutes (e.g. 30, 45, 60)" value={settings.defaultSessionDuration} onChange={v => setSettings(p => ({ ...p, defaultSessionDuration: parseInt(v) || 0 }))} keyboardType="number-pad" />
                 </View>
 
-                <TouchableOpacity style={styles.saveBtn} onPress={save} disabled={saving}>
-                    {saving
-                        ? <ActivityIndicator color={colors.white} />
-                        : <Text style={styles.saveBtnText}>Save Changes</Text>
-                    }
+                <TouchableOpacity style={[styles.saveBtn, saving && { opacity: 0.7 }]} onPress={save} disabled={saving}>
+                    {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Save Changes</Text>}
                 </TouchableOpacity>
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.sm + 2, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.border },
-    backBtn: { width: 40, height: 40, borderRadius: borderRadius.lg, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', marginRight: spacing.sm },
-    headerTitle: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text },
-    body: { padding: spacing.md, gap: spacing.lg, paddingBottom: spacing.xxxl || 60 },
-    section: { gap: spacing.sm },
-    sectionTitle: { fontSize: fontSize.md, fontWeight: fontWeight.bold, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.8 },
-    settingCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, borderWidth: 1, borderColor: colors.cardBorder, overflow: 'hidden', ...shadows.xs },
-    settingRow: { flexDirection: 'row', alignItems: 'center', padding: spacing.md, gap: spacing.md },
-    settingInfo: { flex: 1 },
-    settingLabel: { fontSize: fontSize.md, fontWeight: fontWeight.semibold, color: colors.text },
-    settingSub: { fontSize: fontSize.sm, color: colors.textSecondary, marginTop: 2 },
-    divider: { height: 1, backgroundColor: colors.border, marginHorizontal: spacing.md },
-    inputRow: { padding: spacing.md, gap: spacing.xs },
-    input: { borderWidth: 1, borderColor: colors.border, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, fontSize: fontSize.md, color: colors.text, marginTop: spacing.xs },
-    saveBtn: { backgroundColor: colors.primary, borderRadius: borderRadius.xl, height: 52, alignItems: 'center', justifyContent: 'center' },
-    saveBtnText: { color: colors.white, fontSize: fontSize.lg, fontWeight: fontWeight.bold },
+    root: { flex: 1 },
+    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, gap: 12 },
+    backBtn: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { fontSize: 18, fontWeight: '700' },
+    body: { padding: 20, gap: 14, paddingBottom: 40 },
+    sectionTitle: { fontSize: 11, fontWeight: '700', letterSpacing: 0.8 },
+    card: { borderRadius: 18, borderWidth: 1, overflow: 'hidden' },
+    settingRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 },
+    settingLabel: { fontSize: 15, fontWeight: '600' },
+    settingSub: { fontSize: 12, marginTop: 2 },
+    divider: { height: 1, marginHorizontal: 16 },
+    input: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, marginTop: 4 },
+    saveBtn: { backgroundColor: BRAND, borderRadius: 26, height: 52, alignItems: 'center', justifyContent: 'center', marginTop: 10, shadowColor: BRAND, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 6 },
+    saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });
-
-export default SystemSettingsScreen;

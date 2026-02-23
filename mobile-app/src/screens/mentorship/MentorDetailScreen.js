@@ -1,386 +1,343 @@
-// MentorDetailScreen.js — Centralized-theme refactor
-import React from 'react';
+// MentorDetailScreen.js — Premium redesign with useTheme()
+import React, { useState } from 'react';
 import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity,
-    Image, SafeAreaView, Share,
+    Image, Share, Dimensions, Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, fontSize, fontWeight, spacing, borderRadius, shadows } from '../../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/ThemeContext';
 
-const MentorDetailScreen = ({ route, navigation }) => {
+const BRAND = '#5B5FEF';
+
+const MentorAvatar = ({ mentor, size = 90 }) => {
+    const colorList = ['#5B5FEF', '#10B981', '#F59E0B', '#EF4444', '#EC4899', '#6366F1'];
+    const color = colorList[(mentor.displayName || mentor.name || '?').charCodeAt(0) % colorList.length];
+    const initial = (mentor.displayName || mentor.name || '?').charAt(0).toUpperCase();
+    if (mentor.profileImage || mentor.avatar) {
+        return <Image source={{ uri: mentor.profileImage || mentor.avatar }} style={{ width: size, height: size, borderRadius: size / 2, borderWidth: 3, borderColor: '#fff' }} />;
+    }
+    return (
+        <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#fff' }}>
+            <Text style={{ fontSize: size * 0.38, fontWeight: '800', color: '#fff' }}>{initial}</Text>
+        </View>
+    );
+};
+
+export default function MentorDetailScreen({ route, navigation }) {
     const { mentor } = route.params;
+    const { theme } = useTheme();
+    const insets = useSafeAreaInsets();
+    const [showAllBio, setShowAllBio] = useState(false);
+
+    const bio = mentor.bio || 'Experienced professional dedicated to helping mentees achieve their career goals.';
+    const socialLinks = mentor.socialLinks || {};
 
     const handleShare = async () => {
-        try {
-            await Share.share({
-                message: `Check out ${mentor.displayName || mentor.name} on SkillPilot! A ${mentor.tagline || mentor.jobTitle} with ${mentor.experience} years of experience.`,
-            });
-        } catch (error) {
-            console.log('Share error:', error);
-        }
+        await Share.share({ message: `Check out ${mentor.displayName || mentor.name} on SkillPilot!\n${mentor.tagline || ''}` });
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            {/* ── Header ── */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn} activeOpacity={0.75}>
-                    <Ionicons name="arrow-back" size={22} color={colors.text} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleShare} style={styles.iconBtn} activeOpacity={0.75}>
-                    <Ionicons name="share-social-outline" size={22} color={colors.text} />
-                </TouchableOpacity>
-            </View>
+        <View style={[styles.root, { backgroundColor: theme.background }]}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 110 }}>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                {/* ── Profile Card ── */}
-                <View style={styles.profileCard}>
-                    <View style={styles.avatarContainer}>
-                        {(mentor.profileImage || mentor.avatar) ? (
-                            <Image
-                                source={{ uri: mentor.profileImage || mentor.avatar }}
-                                style={styles.avatar}
-                            />
-                        ) : (
-                            <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                                <Text style={styles.avatarInitial}>
-                                    {(mentor.displayName || mentor.name || '?').charAt(0).toUpperCase()}
-                                </Text>
-                            </View>
-                        )}
-                        {mentor.badge === 'verified' && (
-                            <View style={styles.verifiedBadge}>
-                                <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-                            </View>
-                        )}
+                {/* Hero */}
+                <View style={styles.hero}>
+                    {[240, 180, 120].map((r, i) => (
+                        <View key={i} style={[styles.ring, { width: r * 2, height: r * 2, borderRadius: r, opacity: 0.05 + i * 0.03 }]} />
+                    ))}
+                    <View style={[styles.heroNav, { paddingTop: insets.top + 8 }]}>
+                        <TouchableOpacity style={styles.circleBtn} onPress={() => navigation.goBack()}>
+                            <Ionicons name="arrow-back" size={20} color="#fff" />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.circleBtn} onPress={handleShare}>
+                            <Ionicons name="share-social-outline" size={20} color="#fff" />
+                        </TouchableOpacity>
                     </View>
-
-                    <Text style={styles.name}>{mentor.displayName || mentor.name}</Text>
-                    <Text style={styles.tagline}>{mentor.tagline || mentor.jobTitle}</Text>
-
-                    <View style={styles.statsRow}>
-                        {[
-                            { value: mentor.averageRating?.toFixed(1) || '0.0', label: 'Rating', icon: 'star', iconColor: '#F59E0B' },
-                            { value: mentor.totalReviews || 0, label: 'Reviews' },
-                            { value: `${mentor.experience || 0}+`, label: 'Yrs Exp' },
-                        ].map((stat, i) => (
-                            <React.Fragment key={i}>
-                                {i > 0 && <View style={styles.statDivider} />}
-                                <View style={styles.statItem}>
-                                    <View style={styles.statValueRow}>
-                                        {stat.icon && (
-                                            <Ionicons name={stat.icon} size={13} color={stat.iconColor} />
-                                        )}
-                                        <Text style={styles.statValue}>{stat.value}</Text>
-                                    </View>
-                                    <Text style={styles.statLabel}>{stat.label}</Text>
+                    <View style={styles.heroProfile}>
+                        <View style={{ position: 'relative', marginBottom: 8 }}>
+                            <MentorAvatar mentor={mentor} size={90} />
+                            {mentor.isVerified && (
+                                <View style={{ position: 'absolute', bottom: 2, right: 2, backgroundColor: '#fff', borderRadius: 12, padding: 1 }}>
+                                    <Ionicons name="checkmark-circle" size={20} color={BRAND} />
                                 </View>
-                            </React.Fragment>
-                        ))}
+                            )}
+                        </View>
+                        <Text style={styles.heroName}>{mentor.displayName || mentor.name}</Text>
+                        <Text style={styles.heroSub}>{mentor.tagline || (mentor.targetingDomains || []).join(' · ')}</Text>
+                        {mentor.location?.city && (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                                <Ionicons name="location-outline" size={12} color="rgba(255,255,255,0.7)" />
+                                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{mentor.location.city}</Text>
+                            </View>
+                        )}
                     </View>
-                </View>
-
-                {/* ── About ── */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>About</Text>
-                    <Text style={styles.bio}>
-                        {mentor.bio || 'Highly experienced professional dedicated to helping mentees achieve their career goals and master new skills.'}
-                    </Text>
-                </View>
-
-                {/* ── Expertise ── */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Expertise</Text>
-                    <View style={styles.chipContainer}>
-                        {(mentor.expertise || mentor.targetingDomains || []).map((skill, i) => (
-                            <View key={i} style={styles.chip}>
-                                <Text style={styles.chipText}>{skill.trim()}</Text>
+                    <View style={styles.kpiRow}>
+                        {[
+                            { val: (mentor.averageRating || 0).toFixed(1), label: 'Rating', icon: 'star' },
+                            { val: mentor.totalReviews || 0, label: 'Reviews', icon: 'chatbubble-outline' },
+                            { val: mentor.totalMentees || 0, label: 'Mentees', icon: 'people-outline' },
+                            { val: mentor.totalPlacements || 0, label: 'Placed', icon: 'briefcase-outline' },
+                        ].map((k, i) => (
+                            <View key={i} style={[styles.kpiItem, i < 3 && styles.kpiBorder]}>
+                                <Ionicons name={k.icon} size={13} color="rgba(255,255,255,0.8)" />
+                                <Text style={styles.kpiVal}>{k.val}</Text>
+                                <Text style={styles.kpiLabel}>{k.label}</Text>
                             </View>
                         ))}
                     </View>
                 </View>
+                <View style={[styles.wave, { backgroundColor: BRAND }]}>
+                    <View style={[styles.waveCurve, { backgroundColor: theme.background }]} />
+                </View>
 
-                {/* ── Companies ── */}
-                {mentor.companiesWorked?.length > 0 && (
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Worked At</Text>
-                        <View style={styles.chipContainer}>
-                            {mentor.companiesWorked.map((company, i) => (
-                                <View key={i} style={[styles.chip, styles.companyChip]}>
-                                    <Ionicons name="business-outline" size={13} color={colors.textSecondary} />
-                                    <Text style={styles.chipText}>{company}</Text>
+                <View style={{ paddingHorizontal: 20, gap: 16 }}>
+                    {/* About */}
+                    <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                        <View style={styles.cardHead}>
+                            <View style={[styles.cardIcon, { backgroundColor: BRAND + '12' }]}><Ionicons name="person-outline" size={17} color={BRAND} /></View>
+                            <Text style={[styles.cardTitle, { color: theme.text }]}>About</Text>
+                        </View>
+                        <Text style={[styles.bioText, { color: theme.textSecondary }]} numberOfLines={showAllBio ? undefined : 4}>{bio}</Text>
+                        {bio.length > 200 && (
+                            <TouchableOpacity onPress={() => setShowAllBio(!showAllBio)}>
+                                <Text style={{ color: BRAND, fontWeight: '700', fontSize: 13, marginTop: 4 }}>{showAllBio ? 'Less' : 'Read more'}</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+
+                    {/* Quick details */}
+                    <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                        <View style={styles.cardHead}>
+                            <View style={[styles.cardIcon, { backgroundColor: BRAND + '12' }]}><Ionicons name="information-circle-outline" size={17} color={BRAND} /></View>
+                            <Text style={[styles.cardTitle, { color: theme.text }]}>Details</Text>
+                        </View>
+                        <View style={{ gap: 0 }}>
+                            {[
+                                mentor.sessionDuration && { icon: 'time-outline', label: 'Session Duration', value: `${mentor.sessionDuration} min` },
+                                mentor.sessionsPerWeek && { icon: 'calendar-outline', label: 'Sessions/Week', value: `${mentor.sessionsPerWeek}` },
+                                mentor.pricingType && { icon: 'cash-outline', label: 'Pricing', value: mentor.pricingType.charAt(0).toUpperCase() + mentor.pricingType.slice(1) },
+                                (mentor.languages || []).length > 0 && { icon: 'language-outline', label: 'Languages', value: mentor.languages.join(', ') },
+                                (mentor.preferredMenteeType || []).length > 0 && { icon: 'people-outline', label: 'Best For', value: mentor.preferredMenteeType.join(', ') },
+                            ].filter(Boolean).map((row, i) => (
+                                <View key={i} style={[styles.infoRow, i > 0 && { borderTopWidth: 1, borderTopColor: theme.border }]}>
+                                    <View style={[styles.infoIcon, { backgroundColor: BRAND + '10' }]}><Ionicons name={row.icon} size={16} color={BRAND} /></View>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ fontSize: 11, color: theme.textMuted, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 }}>{row.label}</Text>
+                                        <Text style={{ fontSize: 14, color: theme.text, fontWeight: '600', marginTop: 1 }}>{row.value}</Text>
+                                    </View>
                                 </View>
                             ))}
                         </View>
                     </View>
-                )}
 
-                {/* ── Pricing Card ── */}
-                <View style={[styles.section, styles.pricingCard]}>
-                    <View style={styles.pricingHeader}>
-                        <View>
-                            <Text style={styles.pricingTitle}>Mentorship Settings</Text>
-                            <Text style={styles.pricingSubtitle}>
-                                {mentor.isFree ? 'Promotional pricing active' : 'Standard session rates'}
-                            </Text>
+                    {/* Expertise */}
+                    {(mentor.expertise || []).length > 0 && (
+                        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                            <View style={styles.cardHead}>
+                                <View style={[styles.cardIcon, { backgroundColor: '#10B981' + '12' }]}><Ionicons name="code-slash-outline" size={17} color="#10B981" /></View>
+                                <Text style={[styles.cardTitle, { color: theme.text }]}>Expertise</Text>
+                            </View>
+                            <View style={styles.tagWrap}>
+                                {(mentor.expertise || []).map((s, i) => (
+                                    <View key={i} style={[styles.tag, { backgroundColor: '#10B981' + '12', borderColor: '#10B981' + '30' }]}>
+                                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#10B981' }}>{s}</Text>
+                                    </View>
+                                ))}
+                            </View>
                         </View>
-                        <View style={styles.priceBadge}>
-                            <Text style={styles.priceValue}>{mentor.isFree ? 'FREE' : 'Paid'}</Text>
-                        </View>
-                    </View>
+                    )}
 
-                    {[
-                        { icon: 'time-outline', text: `${mentor.sessionDuration || 60} Min Sessions` },
-                        { icon: 'videocam-outline', text: '1-on-1 Personalized Guidance' },
-                        { icon: 'chatbubbles-outline', text: 'Unlimited Support for Mentees' },
-                    ].map((row, i) => (
-                        <View key={i} style={styles.featureRow}>
-                            <Ionicons name={row.icon} size={19} color={colors.primary} />
-                            <Text style={styles.featureText}>{row.text}</Text>
+                    {/* Domains */}
+                    {(mentor.targetingDomains || []).length > 0 && (
+                        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                            <View style={styles.cardHead}>
+                                <View style={[styles.cardIcon, { backgroundColor: BRAND + '12' }]}><Ionicons name="layers-outline" size={17} color={BRAND} /></View>
+                                <Text style={[styles.cardTitle, { color: theme.text }]}>Target Domains</Text>
+                            </View>
+                            <View style={styles.tagWrap}>
+                                {(mentor.targetingDomains || []).map((d, i) => (
+                                    <View key={i} style={[styles.tag, { backgroundColor: BRAND + '10', borderColor: BRAND + '25' }]}>
+                                        <Text style={{ fontSize: 13, fontWeight: '600', color: BRAND }}>{d}</Text>
+                                    </View>
+                                ))}
+                            </View>
                         </View>
-                    ))}
+                    )}
+
+                    {/* Top companies */}
+                    {mentor.referralsInTopCompanies && (mentor.topCompanies || []).length > 0 && (
+                        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                            <View style={styles.cardHead}>
+                                <View style={[styles.cardIcon, { backgroundColor: '#F59E0B15' }]}><Ionicons name="business-outline" size={17} color="#F59E0B" /></View>
+                                <Text style={[styles.cardTitle, { color: theme.text }]}>Referrals At</Text>
+                            </View>
+                            <View style={styles.tagWrap}>
+                                {(mentor.topCompanies || []).map((c, i) => (
+                                    <View key={i} style={[styles.tag, { backgroundColor: '#F59E0B12', borderColor: '#F59E0B30', flexDirection: 'row', gap: 4 }]}>
+                                        <Ionicons name="business-outline" size={12} color="#D97706" />
+                                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#D97706' }}>{c}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                    )}
+
+                    {/* Trial session */}
+                    {mentor.trialSession?.available && (
+                        <View style={[styles.card, { backgroundColor: '#10B981' + '10', borderColor: '#10B981' + '30', flexDirection: 'row', alignItems: 'flex-start', gap: 12 }]}>
+                            <Ionicons name="gift-outline" size={24} color="#10B981" />
+                            <View style={{ flex: 1 }}>
+                                <Text style={{ fontSize: 15, fontWeight: '700', color: '#10B981' }}>Free Trial Session {mentor.trialSession.price > 0 ? `@ ₹${mentor.trialSession.price}` : ''}</Text>
+                                {mentor.trialSession.description ? <Text style={{ fontSize: 13, color: '#047857', marginTop: 4 }}>{mentor.trialSession.description}</Text> : null}
+                            </View>
+                        </View>
+                    )}
+
+                    {/* Pricing plans */}
+                    {(mentor.pricingPlans || []).length > 0 && (
+                        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                            <View style={styles.cardHead}>
+                                <View style={[styles.cardIcon, { backgroundColor: BRAND + '12' }]}><Ionicons name="pricetag-outline" size={17} color={BRAND} /></View>
+                                <Text style={[styles.cardTitle, { color: theme.text }]}>Pricing Plans</Text>
+                            </View>
+                            <View style={{ gap: 10 }}>
+                                {(mentor.pricingPlans || []).map((plan, i) => (
+                                    <View key={i} style={[styles.planBox, { backgroundColor: theme.surfaceAlt, borderColor: theme.border }]}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                                            <Text style={{ fontSize: 15, fontWeight: '700', color: theme.text }}>{plan.duration}</Text>
+                                            <View style={{ alignItems: 'flex-end' }}>
+                                                <Text style={{ fontSize: 18, fontWeight: '900', color: BRAND }}>₹{plan.price}</Text>
+                                                {plan.discountPercent > 0 && <Text style={{ fontSize: 11, color: '#10B981', fontWeight: '600' }}>{plan.discountPercent}% off</Text>}
+                                            </View>
+                                        </View>
+                                        {(plan.features || []).map((f, j) => (
+                                            <View key={j} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                                                <Ionicons name="checkmark-circle" size={14} color="#10B981" />
+                                                <Text style={{ fontSize: 13, color: theme.textSecondary }}>{f}</Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                    )}
+
+                    {/* Education */}
+                    {(mentor.education || []).length > 0 && (
+                        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                            <View style={styles.cardHead}>
+                                <View style={[styles.cardIcon, { backgroundColor: '#EC489912' }]}><Ionicons name="school-outline" size={17} color="#EC4899" /></View>
+                                <Text style={[styles.cardTitle, { color: theme.text }]}>Education</Text>
+                            </View>
+                            <View style={{ gap: 8 }}>
+                                {(mentor.education || []).map((edu, i) => (
+                                    <View key={i} style={{ flexDirection: 'row', gap: 10 }}>
+                                        <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: '#EC4899', marginTop: 5 }} />
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={{ fontSize: 14, fontWeight: '600', color: theme.text }}>{edu.degree} in {edu.field}</Text>
+                                            <Text style={{ fontSize: 13, color: theme.textMuted }}>{edu.institution}{edu.year ? ` · ${edu.year}` : ''}</Text>
+                                        </View>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                    )}
+
+                    {/* Social links */}
+                    {Object.values(socialLinks).some(Boolean) && (
+                        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                            <View style={styles.cardHead}>
+                                <View style={[styles.cardIcon, { backgroundColor: BRAND + '12' }]}><Ionicons name="link-outline" size={17} color={BRAND} /></View>
+                                <Text style={[styles.cardTitle, { color: theme.text }]}>Connect</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+                                {[
+                                    { key: 'linkedIn', icon: 'logo-linkedin', color: '#0A66C2' },
+                                    { key: 'github', icon: 'logo-github', color: '#24292E' },
+                                    { key: 'twitter', icon: 'logo-twitter', color: '#1DA1F2' },
+                                    { key: 'portfolio', icon: 'globe-outline', color: '#6366F1' },
+                                    { key: 'youtube', icon: 'logo-youtube', color: '#FF0000' },
+                                ].filter(s => socialLinks[s.key]).map(s => (
+                                    <TouchableOpacity key={s.key} style={[styles.socialBtn, { backgroundColor: s.color + '12', borderColor: s.color + '30' }]} onPress={() => Linking.openURL(socialLinks[s.key])}>
+                                        <Ionicons name={s.icon} size={20} color={s.color} />
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+                    )}
+
+                    {/* Reviews */}
+                    {(mentor.reviews || []).length > 0 && (
+                        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                            <View style={styles.cardHead}>
+                                <View style={[styles.cardIcon, { backgroundColor: '#F59E0B18' }]}><Ionicons name="star-outline" size={17} color="#F59E0B" /></View>
+                                <Text style={[styles.cardTitle, { color: theme.text }]}>Reviews</Text>
+                                <Text style={{ marginLeft: 'auto', fontSize: 13, color: theme.textMuted }}>{mentor.totalReviews || 0} total</Text>
+                            </View>
+                            <View style={{ gap: 10 }}>
+                                {(mentor.reviews || []).slice(0, 3).map((r, i) => (
+                                    <View key={i} style={[styles.reviewBox, { backgroundColor: theme.surfaceAlt, borderColor: theme.border }]}>
+                                        <View style={{ flexDirection: 'row', gap: 4, marginBottom: 6 }}>
+                                            {[1, 2, 3, 4, 5].map(s => <Ionicons key={s} name={s <= r.rating ? 'star' : 'star-outline'} size={12} color="#F59E0B" />)}
+                                        </View>
+                                        {r.comment ? <Text style={{ fontSize: 13, color: theme.textSecondary, lineHeight: 18 }}>{r.comment}</Text> : null}
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                    )}
                 </View>
-
-                <View style={{ height: 110 }} />
             </ScrollView>
 
-            {/* ── Footer CTA ── */}
-            <View style={styles.footer}>
-                <TouchableOpacity
-                    style={styles.bookBtn}
-                    onPress={() => navigation.navigate('BookSession', { mentor })}
-                    activeOpacity={0.85}
-                >
-                    <Text style={styles.bookBtnText}>Book a Free Session</Text>
-                    <Ionicons name="arrow-forward" size={20} color={colors.white} />
+            {/* Footer CTA */}
+            <View style={[styles.footer, { backgroundColor: theme.surface, borderTopColor: theme.border, paddingBottom: insets.bottom + 8 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                    <MentorAvatar mentor={mentor} size={38} />
+                    <View>
+                        <Text style={{ fontSize: 14, fontWeight: '700', color: theme.text }} numberOfLines={1}>{mentor.displayName || mentor.name}</Text>
+                        <Text style={{ fontSize: 12, color: theme.textMuted, marginTop: 1 }}>
+                            {mentor.trialSession?.available ? '🎁 Free trial available' : mentor.pricingType === 'free' ? '✅ Free' : '💼 Paid'}
+                        </Text>
+                    </View>
+                </View>
+                <TouchableOpacity style={styles.footerBtn} onPress={() => navigation.navigate('BookSession', { mentor })} activeOpacity={0.85}>
+                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '700' }}>Book Session</Text>
+                    <Ionicons name="arrow-forward" size={18} color="#fff" />
                 </TouchableOpacity>
             </View>
-        </SafeAreaView>
+        </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border,
-    },
-    iconBtn: {
-        width: 42,
-        height: 42,
-        borderRadius: borderRadius.lg,
-        backgroundColor: colors.surface,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: colors.border,
-    },
-    scrollContent: {
-        paddingHorizontal: spacing.md,
-        paddingTop: spacing.md,
-    },
-    // ── Profile Card ──────────────────────────────
-    profileCard: {
-        alignItems: 'center',
-        paddingVertical: spacing.xl,
-        backgroundColor: colors.surface,
-        borderRadius: borderRadius.xxl,
-        marginBottom: spacing.lg,
-        borderWidth: 1,
-        borderColor: colors.cardBorder,
-    },
-    avatarContainer: {
-        position: 'relative',
-        marginBottom: spacing.md,
-    },
-    avatar: {
-        width: 96,
-        height: 96,
-        borderRadius: 48,
-        borderWidth: 4,
-        borderColor: colors.white,
-        ...shadows.md,
-    },
-    avatarPlaceholder: {
-        backgroundColor: colors.primary,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    avatarInitial: {
-        fontSize: 38,
-        fontWeight: fontWeight.extrabold,
-        color: colors.white,
-    },
-    verifiedBadge: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        backgroundColor: colors.white,
-        borderRadius: 12,
-        padding: 2,
-        ...shadows.xs,
-    },
-    name: {
-        fontSize: fontSize.xl,
-        fontWeight: fontWeight.extrabold,
-        color: colors.text,
-    },
-    tagline: {
-        fontSize: fontSize.md,
-        color: colors.textSecondary,
-        marginTop: 4,
-        textAlign: 'center',
-        paddingHorizontal: spacing.xl,
-    },
-    statsRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: spacing.lg,
-        paddingHorizontal: spacing.xl,
-        width: '100%',
-        justifyContent: 'space-around',
-    },
-    statItem: {
-        alignItems: 'center',
-        gap: 3,
-    },
-    statValueRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 3,
-    },
-    statValue: {
-        fontSize: fontSize.lg,
-        fontWeight: fontWeight.extrabold,
-        color: colors.text,
-    },
-    statLabel: {
-        fontSize: fontSize.xs,
-        color: colors.textSecondary,
-    },
-    statDivider: {
-        width: 1,
-        height: 32,
-        backgroundColor: colors.border,
-    },
-    // ── Content Sections ──────────────────────────
-    section: {
-        marginBottom: spacing.lg,
-    },
-    sectionTitle: {
-        fontSize: fontSize.lg,
-        fontWeight: fontWeight.bold,
-        color: colors.text,
-        marginBottom: spacing.md,
-    },
-    bio: {
-        fontSize: fontSize.md,
-        color: colors.textSecondary,
-        lineHeight: 24,
-    },
-    chipContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: spacing.sm,
-    },
-    chip: {
-        backgroundColor: colors.surface,
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
-        borderRadius: borderRadius.full,
-        borderWidth: 1,
-        borderColor: colors.border,
-    },
-    companyChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.xs,
-    },
-    chipText: {
-        fontSize: fontSize.sm,
-        color: colors.text,
-        fontWeight: fontWeight.medium,
-    },
-    // ── Pricing Card ──────────────────────────────
-    pricingCard: {
-        backgroundColor: colors.primaryBg,
-        padding: spacing.lg,
-        borderRadius: borderRadius.xxl,
-        borderWidth: 1,
-        borderColor: colors.primaryBorder,
-    },
-    pricingHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: spacing.lg,
-    },
-    pricingTitle: {
-        fontSize: fontSize.md,
-        fontWeight: fontWeight.bold,
-        color: colors.primary,
-    },
-    pricingSubtitle: {
-        fontSize: fontSize.xs,
-        color: colors.textSecondary,
-        marginTop: 2,
-    },
-    priceBadge: {
-        backgroundColor: colors.primary,
-        paddingHorizontal: spacing.sm + 2,
-        paddingVertical: 5,
-        borderRadius: borderRadius.md,
-    },
-    priceValue: {
-        color: colors.white,
-        fontWeight: fontWeight.bold,
-        fontSize: fontSize.sm,
-    },
-    featureRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.md,
-        marginBottom: spacing.sm,
-    },
-    featureText: {
-        fontSize: fontSize.md,
-        color: colors.text,
-        fontWeight: fontWeight.medium,
-    },
-    // ── Footer ────────────────────────────────────
-    footer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        padding: spacing.md,
-        paddingBottom: spacing.xl + spacing.xs,
-        backgroundColor: colors.white,
-        borderTopWidth: 1,
-        borderTopColor: colors.border,
-    },
-    bookBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.primary,
-        height: 56,
-        borderRadius: borderRadius.xl,
-        gap: spacing.sm,
-        ...shadows.primary,
-    },
-    bookBtnText: {
-        color: colors.white,
-        fontSize: fontSize.lg,
-        fontWeight: fontWeight.bold,
-    },
+    root: { flex: 1 },
+    hero: { backgroundColor: BRAND, alignItems: 'center', overflow: 'hidden', gap: 4, minHeight: 280 },
+    ring: { position: 'absolute', borderWidth: 1, borderColor: '#fff' },
+    heroNav: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 8 },
+    circleBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+    heroProfile: { alignItems: 'center', paddingHorizontal: 20, gap: 4 },
+    heroName: { fontSize: 22, fontWeight: '900', color: '#fff', textAlign: 'center' },
+    heroSub: { fontSize: 13, color: 'rgba(255,255,255,0.85)', textAlign: 'center' },
+    kpiRow: { flexDirection: 'row', paddingHorizontal: 16, paddingBottom: 20, paddingTop: 14, width: '100%' },
+    kpiItem: { flex: 1, alignItems: 'center', gap: 2, paddingVertical: 6 },
+    kpiBorder: { borderRightWidth: 0.5, borderRightColor: 'rgba(255,255,255,0.2)' },
+    kpiVal: { fontSize: 16, fontWeight: '900', color: '#fff' },
+    kpiLabel: { fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: '600' },
+    wave: { height: 36, overflow: 'hidden' },
+    waveCurve: { height: 60, borderTopLeftRadius: 36, borderTopRightRadius: 36, marginTop: -24 },
+    card: { borderRadius: 20, padding: 16, borderWidth: 1, gap: 10 },
+    cardHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    cardIcon: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+    cardTitle: { fontSize: 16, fontWeight: '700' },
+    bioText: { fontSize: 14, lineHeight: 22 },
+    tagWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    tag: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1 },
+    infoRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+    infoIcon: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+    planBox: { borderRadius: 14, padding: 14, borderWidth: 1 },
+    socialBtn: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+    reviewBox: { borderRadius: 12, padding: 12, borderWidth: 1 },
+    footer: { position: 'absolute', bottom: 0, left: 0, right: 0, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, borderTopWidth: 1, gap: 12 },
+    footerBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: BRAND, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 24, shadowColor: BRAND, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
 });
-
-export default MentorDetailScreen;
