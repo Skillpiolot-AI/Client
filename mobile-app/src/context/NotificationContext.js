@@ -40,7 +40,7 @@ export const NotificationProvider = ({ children }) => {
     const pollRef = useRef(null);
     const listenerRef = useRef(null);
 
-    const unreadCount = notifications.filter((n) => !n.read).length;
+    const unreadCount = notifications.filter((n) => !n.isRead && !n.read).length;
 
     // ── Fetch notifications from API ─────────────────────────────────────────
     const fetchNotifications = useCallback(async (quiet = false) => {

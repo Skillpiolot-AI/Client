@@ -16,10 +16,10 @@ const FILTERS = ['All', 'Unread', 'Booking', 'Assessment', 'Mentor', 'System'];
 const timeAgo = (iso) => {
     const diff = Date.now() - new Date(iso).getTime();
     const mins = Math.floor(diff / 60_000);
-    if (mins < 1)  return 'Just now';
+    if (mins < 1) return 'Just now';
     if (mins < 60) return `${mins}m ago`;
     const hrs = Math.floor(mins / 60);
-    if (hrs < 24)  return `${hrs}h ago`;
+    if (hrs < 24) return `${hrs}h ago`;
     return `${Math.floor(hrs / 24)}d ago`;
 };
 
@@ -28,22 +28,22 @@ const NotifCard = ({ item, onPress }) => {
     const meta = NOTIF_META[item.type] || NOTIF_META.default;
     return (
         <TouchableOpacity
-            style={[styles.card, !item.read && styles.cardUnread]}
+            style={[styles.card, !item.isRead && !item.read && styles.cardUnread]}
             onPress={() => onPress(item)}
             activeOpacity={0.78}
         >
-            {!item.read && <View style={styles.unreadDot} />}
+            {(!item.isRead && !item.read) && <View style={styles.unreadDot} />}
             <View style={[styles.iconWrap, { backgroundColor: meta.color + '18' }]}>
                 <Ionicons name={meta.icon} size={22} color={meta.color} />
             </View>
             <View style={styles.cardBody}>
                 <View style={styles.cardTop}>
-                    <Text style={[styles.cardTitle, !item.read && styles.cardTitleUnread]} numberOfLines={1}>
-                        {item.title}
+                    <Text style={[styles.cardTitle, !item.isRead && !item.read && styles.cardTitleUnread]} numberOfLines={1}>
+                        {item.subject || item.title}
                     </Text>
                     <Text style={styles.cardTime}>{timeAgo(item.createdAt)}</Text>
                 </View>
-                <Text style={styles.cardMsg} numberOfLines={2}>{item.message}</Text>
+                <Text style={styles.cardMsg} numberOfLines={2}>{item.description || item.message}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -57,11 +57,11 @@ const NotificationsScreen = ({ navigation }) => {
 
     // ── Deep-link routing by type ─────────────────────────────────────────────
     const handlePress = useCallback(async (item) => {
-        if (!item.read) await markRead(item._id);
+        if (!item.isRead && !item.read) await markRead(item._id);
         switch (item.type) {
-            case 'booking':    navigation.navigate('Mentorship', { screen: 'MyBookings' }); break;
-            case 'assessment': navigation.navigate('Career',     { screen: 'Assessment' }); break;
-            case 'mentor':     navigation.navigate('Mentorship', { screen: 'MentorList' }); break;
+            case 'booking': navigation.navigate('Mentorship', { screen: 'MyBookings' }); break;
+            case 'assessment': navigation.navigate('Career', { screen: 'Assessment' }); break;
+            case 'mentor': navigation.navigate('Mentorship', { screen: 'MentorList' }); break;
             default: break; // stay on screen for system/reminder
         }
     }, [markRead, navigation]);
@@ -74,8 +74,8 @@ const NotificationsScreen = ({ navigation }) => {
 
     // ── Filter logic ──────────────────────────────────────────────────────────
     const filtered = notifications.filter((n) => {
-        if (activeFilter === 'All')    return true;
-        if (activeFilter === 'Unread') return !n.read;
+        if (activeFilter === 'All') return true;
+        if (activeFilter === 'Unread') return (!n.isRead && !n.read);
         return n.type === activeFilter.toLowerCase();
     });
 
@@ -134,8 +134,8 @@ const NotificationsScreen = ({ navigation }) => {
                         const count = f === 'Unread'
                             ? unreadCount
                             : f === 'All'
-                            ? notifications.length
-                            : notifications.filter((n) => n.type === f.toLowerCase()).length;
+                                ? notifications.length
+                                : notifications.filter((n) => n.type === f.toLowerCase()).length;
                         return (
                             <TouchableOpacity
                                 style={[styles.filterTab, isActive && styles.filterTabActive]}
