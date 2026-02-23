@@ -110,10 +110,10 @@ export default function RiasecAssessmentScreen({ navigation }) {
     const [submitting, setSubmitting] = useState(false);
     const slideAnim = useRef(new Animated.Value(0)).current;
 
-    const q = QUESTIONS[currentQ];
-    const trait = TRAITS[q.trait];
+    const q = QUESTIONS[currentQ] || QUESTIONS[0];
+    const trait = TRAITS[q?.trait] || Object.values(TRAITS)[0];
     const progress = (currentQ + 1) / QUESTIONS.length;
-    const answered = answers[q.id];
+    const answered = answers[q?.id];
 
     const animateTransition = (direction, cb) => {
         Animated.sequence([
@@ -124,6 +124,12 @@ export default function RiasecAssessmentScreen({ navigation }) {
 
     const handleAnswer = (val) => {
         setAnswers(prev => ({ ...prev, [q.id]: val }));
+        // Auto-advance to next question after a brief moment so user sees their selection
+        if (currentQ < QUESTIONS.length - 1) {
+            setTimeout(() => {
+                animateTransition(1, () => setCurrentQ(prev => prev + 1));
+            }, 350);
+        }
     };
 
     const goNext = () => {
