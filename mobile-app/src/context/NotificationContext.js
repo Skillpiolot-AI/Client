@@ -48,7 +48,7 @@ export const NotificationProvider = ({ children }) => {
         if (!quiet) setLoading(true);
         try {
             const data = await notificationsAPI.getNotifications();
-            const list = data?.notifications || data?.data || data || [];
+            const list = data?.announcements || data?.notifications || data?.data || data || [];
             setNotifications(Array.isArray(list) && list.length > 0 ? list : DEMO_NOTIFICATIONS);
         } catch {
             // Graceful fallback to demo data

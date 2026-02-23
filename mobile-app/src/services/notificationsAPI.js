@@ -4,7 +4,8 @@ import api from './api';
 export const notificationsAPI = {
     // GET /announcements — fetch all notifications for the logged-in user
     getNotifications: async (params = {}) => {
-        const response = await api.get('/announcements', { params });
+        const response = await api.get('/announcements/my', { params });
+        console.log('Fetched notifications from backend:', response.data);
         return response.data;
     },
 

@@ -1,6 +1,7 @@
 // services/notificationService.js - Push notification setup for mobile app
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import api from './api';
 
@@ -42,8 +43,9 @@ export const registerForPushNotifications = async () => {
 
     // Get Expo push token
     try {
+        const projectId = Constants.expoConfig?.extra?.eas?.projectId;
         const response = await Notifications.getExpoPushTokenAsync({
-            projectId: 'your-project-id', // Optional: from app.json
+            projectId,
         });
         token = response.data;
         console.log('Push token:', token);

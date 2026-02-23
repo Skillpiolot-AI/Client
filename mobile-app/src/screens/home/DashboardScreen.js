@@ -54,8 +54,8 @@ const DashboardScreen = ({ navigation }) => {
 
     const quickActions = [
         { icon: 'school-outline', label: 'Take Assessment', screen: 'Assessment', color: colors.primary },
-        { icon: 'people-outline', label: 'Find Mentors', screen: 'MentorList', color: colors.info },
-        { icon: 'calendar-outline', label: 'My Bookings', screen: 'MyBookings', color: colors.success },
+        { icon: 'people-outline', label: 'Find Mentors', screen: 'MentorList', navigator: 'Mentorship', color: colors.info },
+        { icon: 'calendar-outline', label: 'My Bookings', screen: 'MyBookings', navigator: 'Mentorship', color: colors.success },
         { icon: 'person-outline', label: 'My Profile', screen: 'Profile', color: colors.warning },
     ];
 
@@ -122,7 +122,7 @@ const DashboardScreen = ({ navigation }) => {
                                 <TouchableOpacity
                                     key={action.label}
                                     style={styles.quickAction}
-                                    onPress={() => navigation.navigate(action.screen)}
+                                    onPress={() => action.navigator ? navigation.navigate(action.navigator, { screen: action.screen }) : navigation.navigate(action.screen)}
                                     activeOpacity={0.75}
                                 >
                                     <View style={[styles.quickActionIcon, { backgroundColor: action.color + '18' }]}>
@@ -210,7 +210,7 @@ const DashboardScreen = ({ navigation }) => {
                         <Text style={styles.sectionTitle}>Get Expert Guidance</Text>
                         <TouchableOpacity
                             style={styles.mentorCTA}
-                            onPress={() => navigation.navigate('MentorList')}
+                            onPress={() => navigation.navigate('Mentorship', { screen: 'MentorList' })}
                             activeOpacity={0.8}
                         >
                             <LinearGradient

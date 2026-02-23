@@ -39,6 +39,7 @@ const HomeScreen = ({ navigation }) => {
             title: 'Find Mentors',
             description: 'Connect with industry experts',
             screen: 'MentorList',
+            navigator: 'Mentorship',
             color: colors.info,
             bgColor: colors.infoBg,
         },
@@ -47,6 +48,7 @@ const HomeScreen = ({ navigation }) => {
             title: 'Sessions',
             description: 'Manage your bookings',
             screen: isMentor ? 'MentorDashboard' : 'MyBookings',
+            navigator: isMentor ? undefined : 'Mentorship',
             color: colors.success,
             bgColor: colors.successBg,
         },
@@ -126,7 +128,7 @@ const HomeScreen = ({ navigation }) => {
                                 <TouchableOpacity
                                     key={f.title}
                                     style={styles.featureCard}
-                                    onPress={() => f.screen && navigation.navigate(f.screen)}
+                                    onPress={() => f.screen && (f.navigator ? navigation.navigate(f.navigator, { screen: f.screen }) : navigation.navigate(f.screen))}
                                     activeOpacity={0.8}
                                     disabled={!f.screen}
                                 >
@@ -158,7 +160,7 @@ const HomeScreen = ({ navigation }) => {
                         <View style={styles.section}>
                             <TouchableOpacity
                                 style={styles.ctaCard}
-                                onPress={() => navigation.navigate('MentorList')}
+                                onPress={() => navigation.navigate('Mentorship', { screen: 'MentorList' })}
                                 activeOpacity={0.8}
                             >
                                 <LinearGradient
