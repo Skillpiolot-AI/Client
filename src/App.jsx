@@ -1,6 +1,8 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './assesment/styles/global.css';
+import RoleGuard from './components/RoleGuard';
+
 
 // 🧭 Core Pages
 const Landingpage = lazy(() => import("./homepage/pages/LandingPage"));
@@ -9,6 +11,7 @@ const Recommendation = lazy(() => import('./Pages/Recommendation/Recommendation'
 const JobDetails = lazy(() => import('./Pages/Recommendation/RecommDetails'));
 const NotFound = lazy(() => import('./Pages/Error/NotFound'));
 const Dashboard = lazy(() => import('./Pages/DashBoard'));
+
 
 // 🔐 Auth Pages
 const LoginForm = lazy(() => import('./Pages/User/Login'));
@@ -41,6 +44,13 @@ const Profile = lazy(() => import('./Pages/Profile'));
 const MyBookings = lazy(() => import('./Pages/MentorShip/Bookings/MyBookings'));
 const MentorSessions = lazy(() => import('./Pages/MentorShip/Bookings/MentorSessions'));
 const RateSession = lazy(() => import('./Pages/MentorShip/RateSession'));
+const MentorSearchPage = lazy(() => import('./Pages/MentorShip/MentorSearchPage'));
+const PublicMentorProfile = lazy(() => import('./Pages/MentorShip/PublicMentorProfile'));
+const BecomeMentorFlow = lazy(() => import('./Pages/MentorShip/BecomeMentorFlow'));
+const MentorDashboardNew = lazy(() => import('./Pages/MentorShip/MentorDashboardNew'));
+const MenteeDMInbox = lazy(() => import('./Pages/MentorShip/MenteeDMInbox'));
+const AdminMentorApprovals = lazy(() => import('./Pages/Admin/MentorApprovals'));
+
 
 // 🏫 Admin & University Management
 const AdminDashboard = lazy(() => import('./Pages/Admin/DashBoard'));
@@ -172,6 +182,20 @@ function App() {
           <Route path="/complete-profile" element={<GoogleProfileCompletion />} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/rate-session/:bookingId" element={<RateSession />} />
+          {/* Mentor search & public profile (Topmate-style) */}
+          <Route path="/mentors" element={<MentorSearchPage />} />
+          <Route path="/mentor/:handle" element={<PublicMentorProfile />} />
+          <Route path="/become-a-mentor" element={<BecomeMentorFlow />} />
+          <Route path="/mentor-dashboard" element={
+            <RoleGuard roles={['Mentor', 'Admin']}>
+              <MentorDashboardNew />
+            </RoleGuard>
+          } />
+          <Route path="/admin/mentor-applications" element={
+            <RoleGuard roles={['Admin']}>
+              <AdminMentorApprovals />
+            </RoleGuard>
+          } />
 
 
           {/* 👤 User Protected Routes */}
@@ -180,6 +204,8 @@ function App() {
             <Route path="/application" element={<CreativeApplicationForm />} />
             <Route path="/tracker" element={<ApplicationTracker />} />
             <Route path="/my-applications" element={<UserAppointments />} />
+            {/* Mentee routes */}
+            <Route path="/my-dms" element={<MenteeDMInbox />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/change-password" element={<Changepassword />} />

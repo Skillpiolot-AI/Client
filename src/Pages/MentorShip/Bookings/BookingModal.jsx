@@ -15,8 +15,12 @@ const BookingModal = ({
     onClose,
     mentor,
     onConfirmBooking,
-    isBooking
+    isBooking,
+    bookingService = null,  // New prop for specific Topmate service
+    couponCode = null,      // New prop for applied coupon
+    couponResult = null     // New prop for applied coupon result
 }) => {
+
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
     const [remark, setRemark] = useState('');
@@ -97,11 +101,14 @@ const BookingModal = ({
 
         onConfirmBooking({
             mentorProfileId: mentor.mentorProfileId || mentor.id || mentor._id,
+            serviceId: bookingService ? bookingService._id : undefined,
+            couponCode: couponCode || undefined,
             scheduledAt: scheduledAt.toISOString(),
-            duration: mentor.sessionDuration || 60,
+            duration: bookingService ? (bookingService.duration || 60) : (mentor.sessionDuration || 60),
             remark: remark.trim(),
             topics: topics.split(',').map(t => t.trim()).filter(Boolean)
         });
+
     };
 
     const nextSevenDays = getNextSevenDays();
@@ -115,8 +122,9 @@ const BookingModal = ({
                 <div className="booking-modal-header">
                     <div className="booking-modal-title">
                         <Calendar size={24} />
-                        <h2>Book a Session</h2>
+                        <h2>{bookingService ? bookingService.title : 'Book a Session'}</h2>
                     </div>
+
                     <button className="close-btn" onClick={onClose}>
                         <X size={24} />
                     </button>
@@ -131,12 +139,25 @@ const BookingModal = ({
                     <div>
                         <h3>{mentor.displayName || mentor.name}</h3>
                         <p>{mentor.jobTitle || 'Mentor'}</p>
-                        {mentor.isFree ? (
+                        
+                        {/* Dynamic pricing logic */}
+                        {bookingService ? (
+                            couponResult?.valid ? (
+                                <span className="price-badge" style={{background:'#D1FAE5',color:'#059669',fontWeight:700}}>
+                                    ₹{couponResult.finalPrice} <span style={{textDecoration:'line-through',fontWeight:400,fontSize:'12px'}}>₹{bookingService.price}</span>
+                                </span>
+                            ) : bookingService.isFree ? (
+                                <span className="free-badge">🎁 FREE</span>
+                            ) : (
+                                <span className="price-badge">₹{bookingService.price}</span>
+                            )
+                        ) : mentor.isFree ? (
                             <span className="free-badge">🎁 FREE Session</span>
                         ) : (
                             <span className="price-badge">₹{mentor.trialSession?.price || 199}</span>
                         )}
                     </div>
+
                 </div>
 
                 {/* Date Selection */}

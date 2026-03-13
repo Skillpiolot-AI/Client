@@ -19,8 +19,10 @@ import {
 import { HomeScreen, DashboardScreen } from '../screens/home';
 import {
     MentorListScreen, BookSessionScreen, MyBookingsScreen,
-    MentorDashboardScreen, EditMentorProfileScreen, MentorDetailScreen
+    MentorDashboardScreen, EditMentorProfileScreen, MentorDetailScreen,
+    BecomeMentorScreen
 } from '../screens/mentorship';
+
 import { ProfileScreen, EditProfileScreen } from '../screens/profile';
 import { CareerQuizScreen, RecommendationsScreen } from '../screens/career';
 import { AssessmentScreen, AssessmentQuizScreen, RiasecAssessmentScreen, RiasecResultScreen } from '../screens/assessment';
@@ -80,7 +82,9 @@ const ProfileStack = () => (
         <Stack.Screen name="EditMentorProfile" component={EditMentorProfileScreen} />
         <Stack.Screen name="OtpVerification" component={OtpVerificationScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+        <Stack.Screen name="BecomeMentor" component={BecomeMentorScreen} />
     </Stack.Navigator>
+
 );
 
 const AdminStack = () => (

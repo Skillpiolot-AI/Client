@@ -67,9 +67,11 @@ export default function ProfileScreen({ navigation }) {
             items: [
                 { icon: 'person-outline', label: 'Edit Profile', sub: 'Personal info & skills', onPress: () => navigation.navigate('EditProfile'), color: BRAND },
                 ...(role === 'Mentor' ? [{ icon: 'briefcase-outline', label: 'Mentor Settings', sub: 'Availability, bio, expertise', onPress: () => navigation.navigate('EditMentorProfile'), color: AMBER }] : []),
+                ...(role === 'Student' ? [{ icon: 'medal-outline', label: 'Become a Mentor', sub: 'Share your knowledge and earn', onPress: () => navigation.navigate('BecomeMentor'), color: '#10B981' }] : []),
                 { icon: 'lock-closed-outline', label: 'Change Password', sub: 'Send OTP to email', onPress: handleChangePassword, color: '#6366F1' },
             ],
         },
+
         {
             title: 'Preferences',
             items: [

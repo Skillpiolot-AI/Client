@@ -23,6 +23,19 @@ const SORT_OPTIONS = [
     { value: 'recommended', label: 'Recommended', icon: 'sparkles-outline' },
     { value: 'rating', label: 'Highest Rated', icon: 'star-outline' },
     { value: 'experience', label: 'Most Experienced', icon: 'ribbon-outline' },
+    { value: 'price_asc', label: 'Lowest Price', icon: 'cash-outline' },
+];
+
+const SERVICE_TYPE_FILTERS = [
+    { value: '', label: 'All', icon: 'apps-outline' },
+    { value: 'one_on_one', label: '1:1 Session', icon: 'videocam-outline' },
+    { value: 'mock_interview', label: 'Mock Interview', icon: 'mic-outline' },
+    { value: 'resume_review', label: 'Resume Review', icon: 'document-text-outline' },
+    { value: 'priority_dm', label: 'Priority DM', icon: 'chatbubble-outline' },
+    { value: 'career_guidance', label: 'Career Guidance', icon: 'compass-outline' },
+    { value: 'course', label: 'Course', icon: 'book-outline' },
+    { value: 'workshop', label: 'Workshop', icon: 'people-outline' },
+    { value: 'referral', label: 'Referral', icon: 'git-network-outline' },
 ];
 
 // Avatar helper
@@ -59,9 +72,10 @@ export default function MentorListScreen({ navigation }) {
     const [showFilter, setShowFilter] = useState(false);
     const [selectedDomains, setSelectedDomains] = useState([]);
     const [selectedMenteeType, setSelectedMenteeType] = useState('');
+    const [selectedServiceType, setSelectedServiceType] = useState('');
     const [sortBy, setSortBy] = useState('recommended');
 
-    const activeFilterCount = selectedDomains.length + (selectedMenteeType ? 1 : 0);
+    const activeFilterCount = selectedDomains.length + (selectedMenteeType ? 1 : 0) + (selectedServiceType ? 1 : 0);
 
     const fetchMentors = useCallback(async () => {
         try {
@@ -106,17 +120,24 @@ export default function MentorListScreen({ navigation }) {
                 (m.preferredMenteeType || []).some(t => t.toLowerCase().includes(selectedMenteeType.toLowerCase()))
             );
         }
+        // service type filter
+        if (selectedServiceType) {
+            list = list.filter(m =>
+                (m.services || []).some(s => s.serviceType === selectedServiceType)
+            );
+        }
         // sort
         if (sortBy === 'rating') list.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
         else if (sortBy === 'experience') list.sort((a, b) => (b.experience || 0) - (a.experience || 0));
+        else if (sortBy === 'price_asc') list.sort((a, b) => (a.startingPrice || 9999) - (b.startingPrice || 9999));
         else list.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.averageRating || 0) - (a.averageRating || 0));
 
         setFiltered(list);
-    }, [mentors, searchQuery, selectedDomains, selectedMenteeType, sortBy, user]);
+    }, [mentors, searchQuery, selectedDomains, selectedMenteeType, selectedServiceType, sortBy, user]);
 
     const onRefresh = async () => { setRefreshing(true); await fetchMentors(); setRefreshing(false); };
     const toggleDomain = d => setSelectedDomains(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
-    const clearFilters = () => { setSelectedDomains([]); setSelectedMenteeType(''); setSortBy('recommended'); };
+    const clearFilters = () => { setSelectedDomains([]); setSelectedMenteeType(''); setSelectedServiceType(''); setSortBy('recommended'); };
 
     // ── Mentor Card ──────────────────────────────────────────────────────────
     const renderMentorCard = ({ item: m }) => (
@@ -190,7 +211,12 @@ export default function MentorListScreen({ navigation }) {
 
             <View style={[styles.cardFooter, { borderTopColor: theme.border }]}>
                 <View style={styles.pricingInfo}>
-                    {m.trialSession?.available ? (
+                    {m.startingPrice > 0 ? (
+                        <>
+                            <Text style={[styles.priceFrom, { color: theme.textMuted }]}>From </Text>
+                            <Text style={[styles.priceValue, { color: theme.text }]}>₹{m.startingPrice?.toLocaleString('en-IN')}</Text>
+                        </>
+                    ) : m.trialSession?.available ? (
                         <>
                             <Ionicons name="gift-outline" size={14} color="#10B981" />
                             <Text style={styles.freeText}>Free trial</Text>
@@ -354,7 +380,22 @@ export default function MentorListScreen({ navigation }) {
                 )}
             </View>
 
-            {/* ── Sort pills ── */}
+            {/* ── Service type chips ── */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 4 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
+                {SERVICE_TYPE_FILTERS.map(s => {
+                    const active = selectedServiceType === s.value;
+                    return (
+                        <TouchableOpacity
+                            key={s.value}
+                            style={[styles.sortPill, { borderColor: active ? BRAND : theme.border, backgroundColor: active ? BRAND : theme.card }]}
+                            onPress={() => setSelectedServiceType(s.value)}
+                        >
+                            <Ionicons name={s.icon} size={13} color={active ? '#fff' : theme.textMuted} />
+                            <Text style={[styles.sortPillText, { color: active ? '#fff' : theme.textSecondary }]}>{s.label}</Text>
+                        </TouchableOpacity>
+                    );
+                })}
+            </ScrollView>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.sortScroll} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
                 {SORT_OPTIONS.map(o => {
                     const active = sortBy === o.value;
@@ -447,6 +488,8 @@ const styles = StyleSheet.create({
     pricingInfo: { flexDirection: 'row', alignItems: 'center', gap: 5 },
     freeText: { fontSize: 13, fontWeight: '700', color: '#10B981' },
     paidText: { fontSize: 13, fontWeight: '600' },
+    priceFrom: { fontSize: 12 },
+    priceValue: { fontSize: 14, fontWeight: '800' },
     bookBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: BRAND, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 22, shadowColor: BRAND, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 },
     bookBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
     // Empty
