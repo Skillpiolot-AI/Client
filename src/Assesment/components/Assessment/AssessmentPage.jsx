@@ -4,13 +4,14 @@ import QuestionCard from './QuestionCard';
 import ProgressBar from './ProgressBar';
 import '../../styles/assessment.css';
 
+// Professional icons instead of emojis
 const DOMAIN_INFO = {
-  R: { name: 'Realistic', emoji: '🔧', color: '#475569' },
-  I: { name: 'Investigative', emoji: '🔬', color: '#0f766e' },
-  A: { name: 'Artistic', emoji: '🎨', color: '#be123c' },
-  S: { name: 'Social', emoji: '👥', color: '#047857' },
-  E: { name: 'Enterprising', emoji: '💼', color: '#c2410c' },
-  C: { name: 'Conventional', emoji: '📊', color: '#4338ca' }
+  R: { name: 'Realistic', color: '#166534' },
+  I: { name: 'Investigative', color: '#0f766e' },
+  A: { name: 'Artistic', color: '#9f1239' },
+  S: { name: 'Social', color: '#047857' },
+  E: { name: 'Enterprising', color: '#b45309' },
+  C: { name: 'Conventional', color: '#1e40af' }
 };
 
 const AssessmentPage = ({ onComplete }) => {
@@ -40,7 +41,7 @@ const AssessmentPage = ({ onComplete }) => {
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
     setAnimating(true);
-    
+
     setTimeout(async () => {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
@@ -55,8 +56,13 @@ const AssessmentPage = ({ onComplete }) => {
   const submitAssessment = async (finalAnswers) => {
     setSubmitting(true);
     try {
+      // Use authenticated user ID from token if available
+      const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId') || 'user-' + Date.now();
-      localStorage.setItem('userId', userId);
+
+      if (!token) {
+        localStorage.setItem('userId', userId);
+      }
 
       const response = await assessmentAPI.create({
         userId,
@@ -97,12 +103,12 @@ const AssessmentPage = ({ onComplete }) => {
   return (
     <div className="assessment-page">
       <div className="assessment-container">
-        <ProgressBar 
+        <ProgressBar
           current={currentQuestion + 1}
           total={questions.length}
           progress={progress}
         />
-        
+
         <QuestionCard
           question={question}
           domain={domain}

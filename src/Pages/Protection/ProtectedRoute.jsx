@@ -1,12 +1,14 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const { user } = useAuth();
+  const location = useLocation();
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    // Save the attempted URL and redirect to login with that info
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
   if (allowedRoles.includes(user.role)) {

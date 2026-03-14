@@ -1,15 +1,9 @@
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, Activity, ChevronDown, Menu, X } from "lucide-react"
+import { ChevronDown, Menu, X } from "lucide-react"
 import { useAuth } from "../../AuthContext"
 import { useNavigate } from "react-router-dom"
-
-// Server status hook (keep this if you have it elsewhere, or implement it)
-const useServerStatus = () => ({
-    isOnline: true,
-    isChecking: false,
-    checkServerStatus: () => console.log('Checking server'),
-});
+import config from "../../config"
 
 export default function Navbar() {
     const { user, logout, isAuthenticated } = useAuth()
@@ -18,8 +12,6 @@ export default function Navbar() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [activeTab, setActiveTab] = useState("Home")
     const dropdownRef = useRef(null)
-
-    const { isOnline, isChecking, checkServerStatus } = useServerStatus()
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -32,42 +24,27 @@ export default function Navbar() {
     }, [])
 
     const navItems = [
-        { name: "Home", path: "/", show: "desktop" },
-        { name: "Career", path: "/assesmentinfo", show: "both" },
-        { name: "Mentorship", path: "/mentorship", show: "both" },
-        { name: "Workshop", path: "/workshops", show: "both" },
-        { name: "Community", path: "/community", show: "mobile" },
-        { name: "PathWays", path: "/careerPaths", show: "mobile" },
+        { name: "Home", path: "/", show: "both" },
+        { name: "Pathfinder", path: "/Assesmentinfo", show: "both" },
+        { name: "Mentors", path: "/mentorship", show: "both" },
+        { name: "About Us", path: "/about", show: "both" },
     ]
 
     const dropdownItems = {
         User: [
-            { name: "Profile", path: "/profile" },
-            { name: "My Applications", path: "/my-applications" },
-            { name: "Resources", path: "/view-books" },
-            { name: "Workshops", path: "/workshops" },
+            { name: "👤 My Profile", path: "/profile" },
         ],
         Mentor: [
-            { name: "Profile", path: "/mentorDashboard" },
-            { name: "My Sessions", path: "/my-sessions" },
-            { name: "Resources", path: "/view-books" },
-            { name: "Mentor Training", path: "/learnlist" },
-            { name: "Dashboard", path: "/amdashboard" },
+            { name: "👤 My Profile", path: "/mentor-profile" },
         ],
         Admin: [
-            { name: "Main", path: "/dashboard" },
-            { name: "University", path: "/universityManagement" },
-            { name: "Dashboard", path: "/dashboardAdmin" },
-            { name: "Manage Users", path: "/manage-users" },
-            { name: "Updates", path: "/admin/updates" },
-            { name: "Reports", path: "/reports" },
-            { name: "Feedback", path: "/userFeedback" },
+            { name: "📊 Dashboard", path: "/dashboard" },
         ],
         UniTeach: [
-            { name: "Dashboard", path: "/teacher/dashboard" }
+            { name: "🏫 Teacher Portal", path: "/teacher/dashboard" },
         ],
         UniAdmin: [
-            { name: "Dashboard", path: "/uniAdminPortal" }
+            { name: "🏫 University Portal", path: "/uniAdminPortal" },
         ]
     }
 
@@ -95,7 +72,7 @@ export default function Navbar() {
                                 onClick={() => handleNavigation("/")}
                                 className="text-[#2F3037] text-xl font-semibold hover:opacity-80 transition-opacity"
                             >
-                                MentorHub
+                                SkillPilot
                             </button>
                         </div>
 
@@ -109,8 +86,8 @@ export default function Navbar() {
                                         setActiveTab(item.name)
                                     }}
                                     className={`text-sm font-medium transition-colors ${activeTab === item.name
-                                            ? "text-[#2F3037]"
-                                            : "text-[rgba(49,45,43,0.80)] hover:text-[#2F3037]"
+                                        ? "text-[#2F3037]"
+                                        : "text-[rgba(49,45,43,0.80)] hover:text-[#2F3037]"
                                         }`}
                                 >
                                     {item.name}
@@ -122,44 +99,6 @@ export default function Navbar() {
                         {/* Right Section */}
                         <div className="flex items-center space-x-3">
 
-                            {/* Server Status - Desktop Only */}
-                            <div className="hidden lg:flex">
-                                {isChecking ? (
-                                    <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-white shadow-sm text-[rgba(49,45,43,0.80)] text-xs font-medium">
-                                        <motion.div
-                                            className="w-1.5 h-1.5 bg-yellow-500 rounded-full"
-                                            animate={{ scale: [1, 1.2, 1] }}
-                                            transition={{ duration: 1, repeat: Infinity }}
-                                        />
-                                        <span>Checking</span>
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={checkServerStatus}
-                                        className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full shadow-sm text-xs font-medium transition-all ${isOnline
-                                                ? "bg-white text-green-700"
-                                                : "bg-white text-red-700"
-                                            }`}
-                                    >
-                                        <motion.div
-                                            className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-500" : "bg-red-500"}`}
-                                            animate={{ scale: [1, 1.2, 1] }}
-                                            transition={{ duration: 2, repeat: Infinity }}
-                                        />
-                                        <span>{isOnline ? "Online" : "Offline"}</span>
-                                        <Activity className="w-3 h-3 opacity-60" />
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Updates Button */}
-                            <button
-                                onClick={() => handleNavigation("/updates")}
-                                className="hidden lg:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-white shadow-sm text-[rgba(49,45,43,0.80)] text-xs font-medium hover:shadow-md transition-shadow"
-                            >
-                                <Sparkles className="w-3 h-3" />
-                                <span>Updates</span>
-                            </button>
 
                             {/* Auth Section */}
                             {isAuthenticated() && user ? (
@@ -264,6 +203,7 @@ export default function Navbar() {
                     )}
                 </AnimatePresence>
             </nav>
+
 
             {/* Spacer to prevent content from going under fixed navbar */}
             <div className="h-16"></div>

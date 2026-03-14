@@ -7,6 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+.env
+.env.*
+.env.development
+.env.production
 
 dist-ssr
 *.local
@@ -25,3 +29,7 @@ node_modules
 # Local Netlify folder
 .netlify
 .env
+
+# Google Service Account (contains secrets)
+mobile-app/google-service-account.json
+*.json.bak
