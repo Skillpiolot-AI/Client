@@ -28,7 +28,7 @@ export default function CustomSectionsTab() {
   const loadProfile = async () => {
     setLoading(true);
     try {
-      const r = await axios.get(`${API}/mentor/profile`, { headers: authHeader() });
+      const r = await axios.get(`${API}/mentors/my-profile`, { headers: authHeader() });
       const profile = r.data.profile || r.data;
       setSections((profile.customSections || []).sort((a, b) => a.sortOrder - b.sortOrder));
     } catch (e) {

@@ -471,8 +471,16 @@ export default function MentorDashboardNew() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('tab');
+    if (t && ['overview', 'services', 'inbox', 'coupons', 'schedule'].includes(t)) {
+      setTab(t);
+    }
+  }, []);
+
+  useEffect(() => {
     // Load profile
-    axios.get(`${API}/mentor/profile`, { headers: authHeader() })
+    axios.get(`${API}/mentors/my-profile`, { headers: authHeader() })
       .then(r => { setProfile(r.data.profile || r.data); })
       .catch(() => {})
       .finally(() => setLoading(false));

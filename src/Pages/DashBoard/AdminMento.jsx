@@ -21,10 +21,10 @@ const AMDashboard = () => {
     {
       title: "🚀 Core Management",
       routes: [
-        { path: '/mentorDashboard', name: 'Main Dashboard', icon: LayoutDashboard, description: 'View earnings, manage packages & services.' },
+        { path: '/mentorDashboard', name: 'Overview', icon: LayoutDashboard, description: 'View earning metrics & summary stats.' },
+        { path: '/mentorDashboard?tab=services', name: 'Manage Services', icon: Settings, description: 'Create, edit, or disable bookable services/packages.' },
         { path: '/mentor-dms', name: 'Student DMs', icon: MessageSquare, description: 'Reply to Student Priority DM requests async.' },
-        { path: '/mentor-sessions', name: 'Sessions Queue', icon: Calendar, description: 'Update scheduled sessions and active calendars.' },
-        { path: '/mentor-profile', name: 'Setup Profile', icon: UserPlus, description: 'Change bio links, schedules, and social handles.' }
+        { path: '/mentor-sessions', name: 'Sessions Queue', icon: Calendar, description: 'Update scheduled sessions and active calendars.' }
       ]
     },
     {
