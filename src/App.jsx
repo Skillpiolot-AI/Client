@@ -39,6 +39,7 @@ const ScheduleSession = lazy(() => import('./Pages/MentorShip/BookAppointment'))
 const MentorshipPage = lazy(() => import('./Pages/Mentor Home/HomePage'));
 const MentoHome = lazy(() => import('./Pages/MentoHome'));
 const CoachProfile = lazy(() => import('./Pages/DashBoard/MentorDashBoard'));
+const MentorDashboardModern = lazy(() => import('./Pages/DashBoard/MentorDashboard/MentorDashboard'));
 const AMDashboard = lazy(() => import('./Pages/DashBoard/AdminMento'));
 const Profile = lazy(() => import('./Pages/Profile'));
 const MyBookings = lazy(() => import('./Pages/MentorShip/Bookings/MyBookings'));
@@ -153,7 +154,7 @@ function App() {
           <Route path="/job-details/:jobTitle" element={<JobDetails />} />
           <Route path="/learn" element={<VideoForm />} />
           <Route path="/learnlist" element={<VideoList />} />
-          <Route path="/mentorship" element={<MentorList />} />. //NO WORK LEAVE THIS 
+          <Route path="/mentorship" element={<MentorList />} />. //NO WORK LEAVE THIS
           <Route path="/question" element={<CareerRecommendationForm />} />
           <Route path="/workshopAdd" element={<AddWorkshop />} />
           <Route path="/workshops" element={<AvailableWorkshops />} />
@@ -164,6 +165,7 @@ function App() {
           <Route path="/community" element={<ModernCommunityPage />} />
           <Route path="/roadmap" element={<FrontendRoadmap />} />
           <Route path="/mentorDashboard" element={<CoachProfile />} />
+          <Route path="/mentorDashboard/modern" element={<MentorDashboardModern />} />
           <Route path="/schedulementor" element={<ScheduleSession />} />
           <Route path="/mentor" element={<MentoHome />} />
           <Route path="/softwareengineer" element={<FrontendRoadmap />} />
@@ -185,7 +187,7 @@ function App() {
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/rate-session/:bookingId" element={<RateSession />} />
           {/* Mentor search & public profile (Topmate-style) */}
-          <Route path="/mentors" element={<MentorSearchPage />} />  //Mentor working this is priority 
+          <Route path="/mentors" element={<MentorSearchPage />} />  //Mentor working this is priority
           <Route path="/mentor/:handle" element={<PublicMentorProfile />} />
           <Route path="/become-a-mentor" element={<BecomeMentorFlow />} />
           <Route path="/mentor-dashboard" element={
