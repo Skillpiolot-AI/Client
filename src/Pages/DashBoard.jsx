@@ -62,7 +62,9 @@ const Dashboard = () => {
 
     mentorship: [
       { title: 'Mentorship Home', path: '/mentorHome', description: 'Mentorship program overview', badge: 'Public' },
-      { title: 'Find Mentors', path: '/mentorship', description: 'Browse and book available mentors', badge: 'Public' },
+      { title: 'Find Mentors', path: '/mentors', description: 'Browse and book available mentors', badge: 'Public' },
+      { title: 'My Priority DMs', path: '/my-dms', description: 'View and manage your Priority DMs with mentors', badge: 'User' },
+      { title: 'Student DMs', path: '/mentor-dms', description: 'Manage async Priority DMs with students', badge: 'Mentor' },
       { title: 'Mentor Dashboard', path: '/mentorDashboard', description: 'Mentor profile and settings', badge: 'Mentor' },
       { title: 'Become a Mentor', path: '/application', description: 'Apply to become a mentor', badge: 'User' },
       { title: 'Track Application', path: '/tracker', description: 'Track your mentor application status', badge: 'User' },

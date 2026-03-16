@@ -26,19 +26,22 @@ export default function Navbar() {
     const navItems = [
         { name: "Home", path: "/", show: "both" },
         { name: "Pathfinder", path: "/Assesmentinfo", show: "both" },
-        { name: "Mentors", path: "/mentorship", show: "both" },
+        { name: "Mentors", path: "/mentors", show: "both" },
         { name: "About Us", path: "/about", show: "both" },
     ]
 
     const dropdownItems = {
         User: [
             { name: "👤 My Profile", path: "/profile" },
+            { name: "💬 My DMs", path: "/my-dms" },
         ],
         Mentor: [
             { name: "👤 My Profile", path: "/mentor-profile" },
+            { name: "📥 Student DMs", path: "/mentor-dms" },
         ],
         Admin: [
             { name: "📊 Dashboard", path: "/dashboard" },
+            { name: "💬 My DMs", path: "/my-dms" },
         ],
         UniTeach: [
             { name: "🏫 Teacher Portal", path: "/teacher/dashboard" },

@@ -198,6 +198,12 @@ export default function PublicMentorProfile() {
                 {profile.expertise.map((t,i)=><span key={i} style={{ background:'rgba(255,255,255,0.2)', borderRadius:'20px', padding:'3px 10px', fontSize:'12px', fontWeight:600 }}>{t}</span>)}
               </div>
             )}
+            {profile.languages?.length>0 && (
+              <div style={{ display:'flex', gap:'6px', flexWrap:'wrap', marginTop:'8px' }}>
+                <span style={{ fontSize:'12px', opacity:0.7 }}>🗣️</span>
+                {profile.languages.map((lang,i)=><span key={i} style={{ background:'rgba(255,255,255,0.15)', borderRadius:'20px', padding:'3px 10px', fontSize:'11px', fontWeight:600 }}>{lang}</span>)}
+              </div>
+            )}
           </div>
           <div style={{ textAlign:'right', flexShrink:0 }}>
             <button onClick={()=>{navigator.clipboard.writeText(window.location.href);}} style={{ background:'rgba(255,255,255,0.2)', border:'1px solid rgba(255,255,255,0.3)', borderRadius:'10px', padding:'7px 14px', color:'#fff', cursor:'pointer', fontSize:'13px', fontWeight:600, display:'flex', alignItems:'center', gap:'5px' }}>
@@ -362,6 +368,7 @@ export default function PublicMentorProfile() {
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
         mentor={mentor}
+        mentorProfileId={profile._id}
         bookingService={bookingService}
         couponCode={couponResult?.valid ? couponCode : null}
         couponResult={couponResult}

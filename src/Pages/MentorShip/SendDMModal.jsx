@@ -43,7 +43,7 @@ export default function SendDMModal({ mentor, service, onClose }) {
 
     try {
       const payload = {
-        mentorId: mentor.userId,
+        mentorId: mentor._id || mentor.userId,
         serviceId: service._id,
         subject: subject.trim() || 'Priority DM',
         message: message.trim(),
@@ -52,15 +52,20 @@ export default function SendDMModal({ mentor, service, onClose }) {
 
       // Since we don't have a real payment gateway yet, we'll just create the thread
       // For a paid DM, in a real app this would create a checkout session
-      await axios.post(`${API}/dm/start`, payload, {
+      const response = await axios.post(`${API}/dm/start`, payload, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
       setSuccess(true);
+      const threadId = response.data.threadId;
       setTimeout(() => {
         onClose();
-        // optionally navigate to mentee's inbox if they have one, or just close
-      }, 3000);
+        if (threadId) {
+          navigate(`/dm/${threadId}`);
+        } else {
+          navigate('/my-dms');
+        }
+      }, 2000);
 
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to send message');

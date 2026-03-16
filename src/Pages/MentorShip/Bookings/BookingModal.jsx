@@ -14,11 +14,12 @@ const BookingModal = ({
     isOpen,
     onClose,
     mentor,
+    mentorProfileId: mentorProfileIdProp,
     onConfirmBooking,
     isBooking,
-    bookingService = null,  // New prop for specific Topmate service
-    couponCode = null,      // New prop for applied coupon
-    couponResult = null     // New prop for applied coupon result
+    bookingService = null,
+    couponCode = null,
+    couponResult = null
 }) => {
 
     const [selectedDate, setSelectedDate] = useState('');
@@ -46,9 +47,9 @@ const BookingModal = ({
         setDayMessage('');
 
         try {
-            const mentorProfileId = mentor.mentorProfileId || mentor.id || mentor._id;
+            const profileId = mentorProfileIdProp || mentor.mentorProfileId || mentor.id || mentor._id;
             const response = await axios.get(
-                `${config.API_BASE_URL}/bookings/available-slots/${mentorProfileId}?date=${date}`
+                `${config.API_BASE_URL}/bookings/available-slots/${profileId}?date=${date}`
             );
 
             const data = response.data;
@@ -73,17 +74,18 @@ const BookingModal = ({
 
     if (!isOpen || !mentor) return null;
 
-    // Generate next 7 days
+    // Generate next 7 days including today
     const getNextSevenDays = () => {
         const days = [];
         const today = new Date();
 
-        for (let i = 1; i <= 7; i++) {
+        for (let i = 0; i <= 7; i++) {
             const date = new Date(today);
             date.setDate(today.getDate() + i);
+            const isToday = i === 0;
             days.push({
                 value: date.toISOString().split('T')[0],
-                label: date.toLocaleDateString('en-IN', {
+                label: isToday ? 'Today' : date.toLocaleDateString('en-IN', {
                     weekday: 'short',
                     month: 'short',
                     day: 'numeric'
@@ -98,9 +100,10 @@ const BookingModal = ({
         if (!selectedDate || !selectedTime) return;
 
         const scheduledAt = new Date(`${selectedDate}T${selectedTime}:00`);
+        const profileId = mentorProfileIdProp || mentor.mentorProfileId || mentor.id || mentor._id;
 
         onConfirmBooking({
-            mentorProfileId: mentor.mentorProfileId || mentor.id || mentor._id,
+            mentorProfileId: profileId,
             serviceId: bookingService ? bookingService._id : undefined,
             couponCode: couponCode || undefined,
             scheduledAt: scheduledAt.toISOString(),
@@ -164,7 +167,7 @@ const BookingModal = ({
                 <div className="booking-section">
                     <label>
                         <Calendar size={16} />
-                        Select Date (Next 7 Days)
+                    Select Date (Next 8 Days)
                     </label>
                     <div className="date-grid">
                         {nextSevenDays.map(day => (

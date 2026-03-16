@@ -40,6 +40,9 @@ function ThreadView({ threadId, currentUserId, onClose, onThreadUpdate }) {
   const [thread, setThread] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reply, setReply] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [history, setHistory] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
   const [sending, setSending] = useState(false);
   const [closing, setClosing] = useState(false);
   const bottomRef = useRef(null);
@@ -49,8 +52,28 @@ function ThreadView({ threadId, currentUserId, onClose, onThreadUpdate }) {
     try {
       const r = await axios.get(`${API}/dm/${threadId}`, { headers: authHeader() });
       setThread(r.data.thread);
+      fetchHistory();
+      fetchSuggestions();
     } catch (e) { console.error(e); }
     setLoading(false);
+  };
+
+  const fetchHistory = async () => {
+    try {
+      const r = await axios.get(`${API}/dm/${threadId}/history`, { headers: authHeader() });
+      if (r.data.success && r.data.hasPreviousThread) {
+        setHistory(r.data.previousThread);
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  const fetchSuggestions = async () => {
+    try {
+      const r = await axios.get(`${API}/dm/suggestions?role=mentor`, { headers: authHeader() });
+      if (r.data.success) {
+        setSuggestions(r.data.suggestions || []);
+      }
+    } catch (e) { console.error(e); }
   };
 
   useEffect(() => { load(); }, [threadId]);
@@ -115,6 +138,40 @@ function ThreadView({ threadId, currentUserId, onClose, onThreadUpdate }) {
 
       {/* Messages */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '12px', background: '#F8FAFC' }}>
+        
+        {/* Previous History Toggle */}
+        {history && (
+          <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+            <button 
+              onClick={() => setShowHistory(!showHistory)}
+              style={{ background: '#EFF6FF', border: '1px solid #D6E4FF', padding: '4px 12px', borderRadius: '20px', fontSize: '11px', color: '#1E40AF', cursor: 'pointer', fontWeight: 600 }}
+            >
+              {showHistory ? 'Hide Previous History' : 'View 30-Day Previous History'}
+            </button>
+          </div>
+        )}
+
+        {/* Render History Messages */}
+        {showHistory && history && (
+          <div style={{ background: '#FAFBFF', padding: '12px', borderRadius: '12px', border: '1px dashed #E2E8F0', marginBottom: '10px' }}>
+            <p style={{ fontSize: '10px', color: '#94A3B8', textAlign: 'center', marginBottom: '8px', textTransform: 'uppercase' }}>📜 Archived History</p>
+            {history.messages?.map((m, i) => {
+              const isMyMsg = m.senderRole === 'mentor';
+              return (
+                <div key={`hist-${i}`} style={{ display: 'flex', flexDirection: isMyMsg ? 'row-reverse' : 'row', gap: '8px', alignItems: 'flex-end', marginBottom: '8px', opacity: 0.7 }}>
+                  {!isMyMsg && <Avatar user={thread.menteeId} size={24} />}
+                  <div style={{ maxWidth: '70%' }}>
+                    <div style={{ background: isMyMsg ? C.indigo : '#fff', color: isMyMsg ? '#fff' : '#1E293B', borderRadius: isMyMsg ? '16px 16px 4px 16px' : '16px 16px 16px 4px', padding: '8px 12px', fontSize: '13px', border: isMyMsg ? 'none' : `1px solid ${C.border}` }}>
+                      {m.content}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            <hr style={{ border: 'none', borderTop: '1px dashed #E2E8F0', margin: '12px 0' }} />
+          </div>
+        )}
+
         {thread.messages.map((m, i) => {
           const isMyMsg = m.senderRole === 'mentor';
           return (
@@ -137,18 +194,34 @@ function ThreadView({ threadId, currentUserId, onClose, onThreadUpdate }) {
 
       {/* Reply box */}
       {!isClosed ? (
-        <div style={{ padding: '12px 16px', background: '#fff', borderTop: `1px solid ${C.border}`, display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
-          <textarea
-            value={reply}
-            onChange={e => setReply(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder="Type your reply… (Enter to send, Shift+Enter for newline)"
-            rows={2}
-            style={{ flex: 1, border: `1.5px solid ${C.border}`, borderRadius: '12px', padding: '10px 14px', fontSize: '14px', outline: 'none', resize: 'none', fontFamily: 'inherit', lineHeight: 1.4 }}
-          />
-          <button onClick={send} disabled={sending || !reply.trim()} style={{ background: C.indigo, border: 'none', borderRadius: '12px', padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontWeight: 700, fontSize: '13px', opacity: reply.trim() ? 1 : 0.5 }}>
-            {sending ? <Loader2 size={14} style={{ animation: 'spin 0.6s linear infinite' }} /> : <Send size={14} />} Send
-          </button>
+        <div style={{ padding: '12px 16px', background: '#fff', borderTop: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* Suggestions roll */}
+          {suggestions.length > 0 && (
+            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '6px' }}>
+              {suggestions.map((sug, i) => (
+                <button
+                  key={i}
+                  onClick={() => setReply(sug)}
+                  style={{ background: '#EEF2FF', border: '1px solid #E0E7FF', padding: '5px 10px', borderRadius: '14px', fontSize: '11px', color: '#4F46E5', cursor: 'pointer', flexShrink: 0, fontWeight: 500 }}
+                >
+                  {sug}
+                </button>
+              ))}
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
+            <textarea
+              value={reply}
+              onChange={e => setReply(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
+              placeholder="Type your reply… (Enter to send, Shift+Enter for newline)"
+              rows={2}
+              style={{ flex: 1, border: `1.5px solid ${C.border}`, borderRadius: '12px', padding: '10px 14px', fontSize: '14px', outline: 'none', resize: 'none', fontFamily: 'inherit', lineHeight: 1.4 }}
+            />
+            <button onClick={send} disabled={sending || !reply.trim()} style={{ background: C.indigo, border: 'none', borderRadius: '12px', padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontWeight: 700, fontSize: '13px', opacity: reply.trim() ? 1 : 0.5 }}>
+              {sending ? <Loader2 size={14} style={{ animation: 'spin 0.6s linear infinite' }} /> : <Send size={14} />} Send
+            </button>
+          </div>
         </div>
       ) : (
         <div style={{ padding: '12px 20px', background: '#F1F5F9', borderTop: `1px solid ${C.border}`, textAlign: 'center', fontSize: '13px', color: C.slate }}>

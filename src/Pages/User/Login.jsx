@@ -425,6 +425,75 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </div>
+
+            {/* Quick Login Shortcuts */}
+            <div style={{ marginTop: '24px', borderTop: '1px solid #E2E8F0', paddingTop: '16px' }}>
+              <p style={{ fontSize: '12px', color: '#94A3B8', textAlign: 'center', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+                ⚡ Quick Login (Dev)
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {/* Admin */}
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#DC2626', marginBottom: '4px' }}>🛡️ Admin</p>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ username: 'admin@skillpilot.dev', password: 'Admin@Skill2024!' })}
+                    style={{ width: '100%', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#991B1B', cursor: 'pointer', textAlign: 'left', fontWeight: 500 }}
+                  >
+                    Super Admin — admin@skillpilot.dev
+                  </button>
+                </div>
+
+                {/* Mentors */}
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#7C3AED', marginBottom: '4px' }}>👨‍🏫 Mentors</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {[
+                      { name: 'Arjun Sharma', email: 'arjun.sharma@skillpilot.dev', tag: 'DSA, Java' },
+                      { name: 'Priya Nair', email: 'priya.nair@skillpilot.dev', tag: 'React, TS' },
+                      { name: 'Rahul Kapoor', email: 'rahul.kapoor@skillpilot.dev', tag: 'Full Mentor' },
+                      { name: 'Rohan Mehta', email: 'rohan.mehta@skillpilot.dev', tag: 'ML, Python' },
+                    ].map((m, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setForm({ username: m.email, password: m.email === 'rahul.kapoor@skillpilot.dev' ? 'FullMentor@2024!' : 'Mentor@1234' })}
+                        style={{ width: '100%', background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: '8px', padding: '7px 12px', fontSize: '12px', color: '#5B21B6', cursor: 'pointer', textAlign: 'left', fontWeight: 500, display: 'flex', justifyContent: 'space-between' }}
+                      >
+                        <span>{m.name}</span>
+                        <span style={{ opacity: 0.6, fontSize: '11px' }}>{m.tag}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Users */}
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#059669', marginBottom: '4px' }}>👤 Users</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {[
+                      { name: 'Ravi Gupta', email: 'ravi.gupta@user.dev', tag: 'JS, React' },
+                      { name: 'Pooja Verma', email: 'pooja.verma@user.dev', tag: 'Python' },
+                      { name: 'Akash Tiwari', email: 'akash.tiwari@user.dev', tag: 'Java' },
+                      { name: 'Neha Malhotra', email: 'neha.malhotra@user.dev', tag: 'C++, DSA' },
+                    ].map((u, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setForm({ username: u.email, password: 'User@1234' })}
+                        style={{ width: '100%', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: '8px', padding: '7px 12px', fontSize: '12px', color: '#065F46', cursor: 'pointer', textAlign: 'left', fontWeight: 500, display: 'flex', justifyContent: 'space-between' }}
+                      >
+                        <span>{u.name}</span>
+                        <span style={{ opacity: 0.6, fontSize: '11px' }}>{u.tag}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p style={{ fontSize: '10px', color: '#CBD5E1', textAlign: 'center', marginTop: '8px' }}>
+                Click to auto-fill, then hit "Log In"
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -28,6 +28,8 @@ const SORT_OPTIONS = [
   { value:'price_asc', label:'Lowest Price' },
 ];
 
+const LANGUAGES = ['English', 'Hindi', 'Telugu', 'Tamil', 'Kannada', 'Malayalam', 'Marathi', 'Bengali', 'Gujarati'];
+
 const MentorCard = ({ mentor, onClick }) => (
   <div
     onClick={onClick}
@@ -98,6 +100,7 @@ export default function MentorSearchPage() {
   const [serviceType, setServiceType] = useState(searchParams.get('serviceType') || '');
   const [minRating, setMinRating] = useState(searchParams.get('minRating') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
+  const [language, setLanguage] = useState(searchParams.get('language') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'featured');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -115,6 +118,7 @@ export default function MentorSearchPage() {
       if (serviceType) params.serviceType = serviceType;
       if (minRating) params.minRating = minRating;
       if (maxPrice) params.maxPrice = maxPrice;
+      if (language) params.language = language;
       const res = await axios.get(`${API_URL}/mentor/search`, { params });
       if (pg === 1) setMentors(res.data.mentors);
       else setMentors(prev => [...prev, ...res.data.mentors]);
@@ -123,7 +127,7 @@ export default function MentorSearchPage() {
       console.error('Failed to fetch mentors:', e);
     }
     setLoading(false);
-  }, [q, domain, serviceType, minRating, maxPrice, sort]);
+  }, [q, domain, serviceType, minRating, maxPrice, language, sort]);
 
   useEffect(() => {
     setPage(1);
@@ -135,12 +139,13 @@ export default function MentorSearchPage() {
     if (serviceType) p.serviceType = serviceType;
     if (minRating) p.minRating = minRating;
     if (maxPrice) p.maxPrice = maxPrice;
+    if (language) p.language = language;
     if (sort !== 'featured') p.sort = sort;
     setSearchParams(p);
-  }, [q, domain, serviceType, minRating, maxPrice, sort]);
+  }, [q, domain, serviceType, minRating, maxPrice, language, sort]);
 
-  const hasFilters = domain || serviceType || minRating || maxPrice;
-  const clearFilters = () => { setDomain(''); setServiceType(''); setMinRating(''); setMaxPrice(''); };
+  const hasFilters = domain || serviceType || minRating || maxPrice || language;
+  const clearFilters = () => { setDomain(''); setServiceType(''); setMinRating(''); setMaxPrice(''); setLanguage(''); };
 
   return (
     <div style={{ maxWidth:'1100px', margin:'0 auto', padding:'24px 16px', fontFamily:'Inter,sans-serif' }}>
@@ -214,6 +219,15 @@ export default function MentorSearchPage() {
             <label style={{ fontSize:'12px', fontWeight:600, color:'#64748B', display:'block', marginBottom:'6px' }}>Max Price</label>
             <input type="number" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)} placeholder="e.g. 5000" style={{ width:'100%', border:'1.5px solid #E2E8F0', borderRadius:'10px', padding:'8px 10px', fontSize:'13px', color:'#1E293B', outline:'none', boxSizing:'border-box' }}/>
           </div>
+
+          {/* Language */}
+          <div>
+            <label style={{ fontSize:'12px', fontWeight:600, color:'#64748B', display:'block', marginBottom:'6px' }}>Language</label>
+            <select value={language} onChange={e=>setLanguage(e.target.value)} style={{ width:'100%', border:'1.5px solid #E2E8F0', borderRadius:'10px', padding:'8px 10px', fontSize:'13px', color:'#1E293B', outline:'none' }}>
+              <option value="">All Languages</option>
+              {LANGUAGES.map(l=><option key={l} value={l}>{l}</option>)}
+            </select>
+          </div>
         </div>
       )}
 
@@ -224,6 +238,7 @@ export default function MentorSearchPage() {
           {serviceType && <span style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'4px 12px', fontSize:'12px', fontWeight:600, display:'flex', alignItems:'center', gap:'6px' }}>🎯 {SERVICE_TYPES.find(s=>s.value===serviceType)?.label} <button onClick={()=>setServiceType('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, color:'#4F46E5', lineHeight:1 }}>×</button></span>}
           {minRating && <span style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'4px 12px', fontSize:'12px', fontWeight:600, display:'flex', alignItems:'center', gap:'6px' }}>⭐ {minRating}+ stars <button onClick={()=>setMinRating('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, color:'#4F46E5', lineHeight:1 }}>×</button></span>}
           {maxPrice && <span style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'4px 12px', fontSize:'12px', fontWeight:600, display:'flex', alignItems:'center', gap:'6px' }}>💰 Under ₹{maxPrice} <button onClick={()=>setMaxPrice('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, color:'#4F46E5', lineHeight:1 }}>×</button></span>}
+          {language && <span style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'4px 12px', fontSize:'12px', fontWeight:600, display:'flex', alignItems:'center', gap:'6px' }}>🗣️ {language} <button onClick={()=>setLanguage('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, color:'#4F46E5', lineHeight:1 }}>×</button></span>}
         </div>
       )}
 

@@ -48,7 +48,9 @@ const MentorSearchPage = lazy(() => import('./Pages/MentorShip/MentorSearchPage'
 const PublicMentorProfile = lazy(() => import('./Pages/MentorShip/PublicMentorProfile'));
 const BecomeMentorFlow = lazy(() => import('./Pages/MentorShip/BecomeMentorFlow'));
 const MentorDashboardNew = lazy(() => import('./Pages/MentorShip/MentorDashboardNew'));
-const MenteeDMInbox = lazy(() => import('./Pages/MentorShip/MenteeDMInbox'));
+const MenteeDMInbox = lazy(() => import('./Pages/MentorShip/DM/MenteeDMInbox'));
+const MentorDMInbox = lazy(() => import('./Pages/MentorShip/DM/MentorDMInbox'));
+const ChatThread = lazy(() => import('./Pages/MentorShip/DM/ChatThread'));
 const AdminMentorApprovals = lazy(() => import('./Pages/Admin/MentorApprovals'));
 
 
@@ -151,7 +153,7 @@ function App() {
           <Route path="/job-details/:jobTitle" element={<JobDetails />} />
           <Route path="/learn" element={<VideoForm />} />
           <Route path="/learnlist" element={<VideoList />} />
-          <Route path="/mentorship" element={<MentorList />} />
+          <Route path="/mentorship" element={<MentorList />} />. //NO WORK LEAVE THIS 
           <Route path="/question" element={<CareerRecommendationForm />} />
           <Route path="/workshopAdd" element={<AddWorkshop />} />
           <Route path="/workshops" element={<AvailableWorkshops />} />
@@ -183,7 +185,7 @@ function App() {
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/rate-session/:bookingId" element={<RateSession />} />
           {/* Mentor search & public profile (Topmate-style) */}
-          <Route path="/mentors" element={<MentorSearchPage />} />
+          <Route path="/mentors" element={<MentorSearchPage />} />  //Mentor working this is priority 
           <Route path="/mentor/:handle" element={<PublicMentorProfile />} />
           <Route path="/become-a-mentor" element={<BecomeMentorFlow />} />
           <Route path="/mentor-dashboard" element={
@@ -207,6 +209,7 @@ function App() {
             {/* Mentee routes */}
             <Route path="/my-dms" element={<MenteeDMInbox />} />
             <Route path="/my-bookings" element={<MyBookings />} />
+            <Route path="/dm/:threadId" element={<ChatThread />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/change-password" element={<Changepassword />} />
           </Route>
@@ -215,6 +218,7 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['Mentor', 'Admin']} />}>
             <Route path="/my-sessions" element={<MentorAppointments />} />
             <Route path="/mentor-sessions" element={<MentorSessions />} />
+            <Route path="/mentor-dms" element={<MentorDMInbox />} />
             <Route path="/mentor-profile" element={<MentorProfilePage />} />
             <Route path="/interestForm" element={<InterestManagement />} />
             <Route path="/StrengthForm" element={<StrengthManagement />} />

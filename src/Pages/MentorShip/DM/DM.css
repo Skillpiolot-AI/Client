@@ -1,0 +1,147 @@
+/* DM.css - Priority DM Chat Styles */
+
+.dm-inbox-container {
+    padding: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+}
+
+.dm-inbox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.dm-inbox-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1E293B;
+    margin: 0;
+}
+
+.dm-inbox-header p {
+    color: #64748B;
+    margin: 4px 0 0 0;
+}
+
+.dm-tabs {
+    display: flex;
+    gap: 8px;
+    background: #F1F5F9;
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    width: fit-content;
+}
+
+.dm-tab {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: transparent;
+    color: #64748B;
+    transition: all 0.2s;
+}
+
+.dm-tab.active {
+    background: white;
+    color: #4F46E5;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.dm-thread-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dm-thread-card {
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dm-thread-card:hover {
+    border-color: #4F46E5;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.dm-participant {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.dm-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.dm-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1E293B;
+    margin: 0;
+}
+
+.dm-subject {
+    font-size: 14px;
+    color: #4F46E5;
+    font-weight: 500;
+    margin: 2px 0;
+}
+
+.dm-preview {
+    font-size: 13px;
+    color: #64748B;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px;
+}
+
+.dm-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.dm-time {
+    font-size: 12px;
+    color: #94A3B8;
+}
+
+.badge-unread {
+    background: #EF4444;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 20px;
+}
+
+/* Chat Thread View Styles */
+.chat-container {
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    background: #F8FAFC;
+    border-radius: 160px; /* Placeholder to match dashboard */
+}
+
+/* Add custom styles here as needed */
