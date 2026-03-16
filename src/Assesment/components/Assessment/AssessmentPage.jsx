@@ -14,7 +14,7 @@ const DOMAIN_INFO = {
   C: { name: 'Conventional', color: '#1e40af' }
 };
 
-const AssessmentPage = ({ onComplete }) => {
+const AssessmentPage = ({ onComplete, onViewHistory }) => {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -47,16 +47,26 @@ const AssessmentPage = ({ onComplete }) => {
         setCurrentQuestion(currentQuestion + 1);
         setAnimating(false);
       } else {
-        // Submit assessment
         await submitAssessment(newAnswers);
       }
     }, 300);
   };
 
+  // ── Auto-select all questions randomly (for testing) ─────────────────────
+  const handleAutoSelect = async () => {
+    if (questions.length === 0) return;
+    const randomAnswers = {};
+    questions.forEach(q => {
+      randomAnswers[q.id] = Math.floor(Math.random() * 5) + 1; // 1–5
+    });
+    setAnswers(randomAnswers);
+    setCurrentQuestion(questions.length - 1);
+    await submitAssessment(randomAnswers);
+  };
+
   const submitAssessment = async (finalAnswers) => {
     setSubmitting(true);
     try {
-      // Use authenticated user ID from token if available
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId') || 'user-' + Date.now();
 
@@ -108,6 +118,56 @@ const AssessmentPage = ({ onComplete }) => {
           total={questions.length}
           progress={progress}
         />
+
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <button
+            onClick={onViewHistory}
+            style={{
+              background: '#ffffff',
+              color: '#4f46e5',
+              border: '1px solid #e0e7ff',
+              borderRadius: '8px',
+              padding: '8px 20px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+              transition: 'all 0.2s',
+            }}
+            onMouseOver={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#c7d2fe'; }}
+            onMouseOut={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = '#e0e7ff'; }}
+          >
+            📋 View History
+          </button>
+          
+          <button
+            onClick={handleAutoSelect}
+            style={{
+              background: 'linear-gradient(135deg, #667eea, #764ba2)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '8px 20px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 2px 8px rgba(102,126,234,0.4)',
+              transition: 'opacity 0.2s',
+            }}
+            onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+            onMouseOut={e => e.currentTarget.style.opacity = '1'}
+            title="Randomly answers all questions instantly (testing only)"
+          >
+            🎲 Auto-Select All (Test)
+          </button>
+        </div>
 
         <QuestionCard
           question={question}

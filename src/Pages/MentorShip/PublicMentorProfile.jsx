@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import config from '../../config';
-import { useAuth } from '../../../AuthContext';
+import { useAuth } from '../../AuthContext';
 import SendDMModal from './SendDMModal';
 import BookingModal from './Bookings/BookingModal';
 

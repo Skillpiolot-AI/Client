@@ -1,11 +1,12 @@
 import React from 'react';
-import { Share2, Download, Home, CheckCircle } from 'lucide-react';
+import { Share2, Download, Home, CheckCircle, History } from 'lucide-react';
 import ChartsSection from './ChartsSection';
 import CareerRecommendations from './CareerRecommendations';
 import DomainInsights from './DomainInsights';
+import GeminiInsights from './GeminiInsights';
 import '../../styles/results.css';
 
-const ResultsPage = ({ assessmentData, onStartNew }) => {
+const ResultsPage = ({ assessmentData, onStartNew, onViewHistory }) => {
   // Extract data from the backend response
   const rawResults = assessmentData?.data?.results || assessmentData?.results || {};
 
@@ -98,7 +99,7 @@ const ResultsPage = ({ assessmentData, onStartNew }) => {
           {/* Holland Code Display */}
           <div className="holland-code-box">
             <span className="holland-label">Holland Code:</span>
-            <span className="holland-code">{results.hollandCode}</span>
+            <span className="results-holland-code">{results.hollandCode}</span>
             {improvement && improvement.hasImproved !== null && (
               <span className={`improvement-badge ${improvement.hasImproved ? 'positive' : 'negative'}`}>
                 {improvement.hasImproved ? '+' : ''}{improvement.percentageChange}% from last assessment
@@ -117,11 +118,18 @@ const ResultsPage = ({ assessmentData, onStartNew }) => {
             <Download size={16} />
             <span>Download PDF</span>
           </button>
+          <button onClick={onViewHistory} className="btn-secondary">
+            <History size={16} />
+            <span>View History</span>
+          </button>
           <button onClick={onStartNew} className="btn-primary">
             <Home size={16} />
             <span>Start New</span>
           </button>
         </div>
+
+        {/* Gemini AI Personality Analysis */}
+        <GeminiInsights results={results} />
 
         {/* Charts Section */}
         <ChartsSection results={results} />
@@ -195,14 +203,17 @@ const ResultsPage = ({ assessmentData, onStartNew }) => {
           color: #6b7280;
         }
 
-        .holland-code {
-          font-size: 22px;
-          font-weight: 700;
-          color: #166534;
-          background: #dcfce7;
-          padding: 6px 16px;
+        .results-holland-code {
+          font-size: 24px;
+          font-weight: 800;
+          color: #000000 !important;
+          background: #dcfce7 !important;
+          -webkit-text-fill-color: initial !important;
+          -webkit-background-clip: initial !important;
+          background-clip: initial !important;
+          padding: 8px 20px;
           border-radius: 8px;
-          letter-spacing: 3px;
+          letter-spacing: 4px;
         }
 
         .improvement-badge {

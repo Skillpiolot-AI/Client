@@ -119,7 +119,7 @@ const DomainInsights = ({ results }) => {
         })}
       </div>
 
-      <style jsx>{`
+      <style>{`
         .domain-insights {
           margin-bottom: 32px;
         }

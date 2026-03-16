@@ -148,7 +148,9 @@ function SignupPage() {
 
         toast.success('Welcome back! 🎉');
 
-        navigate('/dashboard');
+        // Restore context if they came from a protected flow
+        const from = navigate.state?.from || location?.state?.from || '/dashboard';
+        navigate(from);
       }
       // ❌ ERROR CASES
       else if (data.errorCode === 'EMAIL_NOT_VERIFIED') {
