@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Star, Filter, ChevronDown, X, MapPin, Users } from 'lucide-react';
 import axios from 'axios';
 import config from '../../config';
+import { useCurrency } from '../../CurrencyContext';
 
 const API_URL = config.API_BASE_URL;
 
@@ -30,7 +31,10 @@ const SORT_OPTIONS = [
 
 const LANGUAGES = ['English', 'Hindi', 'Telugu', 'Tamil', 'Kannada', 'Malayalam', 'Marathi', 'Bengali', 'Gujarati'];
 
-const MentorCard = ({ mentor, onClick }) => (
+const MentorCard = ({ mentor, onClick }) => {
+  const { convertPrice, currencySymbol } = useCurrency();
+  
+  return (
   <div
     onClick={onClick}
     style={{
@@ -82,14 +86,14 @@ const MentorCard = ({ mentor, onClick }) => (
       </div>
       <div style={{ textAlign:'right' }}>
         {mentor.startingPrice > 0 ? (
-          <span style={{ fontSize:'14px', fontWeight:700, color:'#1E293B' }}>From ₹{mentor.startingPrice?.toLocaleString('en-IN')}</span>
+          <span style={{ fontSize:'14px', fontWeight:700, color:'#1E293B' }}>From {currencySymbol}{convertPrice(mentor.startingPrice, mentor.preferredCurrency || 'INR')?.toLocaleString()}</span>
         ) : (
           <span style={{ fontSize:'13px', fontWeight:700, color:'#059669' }}>Free available</span>
         )}
       </div>
     </div>
   </div>
-);
+);};
 
 export default function MentorSearchPage() {
   const navigate = useNavigate();

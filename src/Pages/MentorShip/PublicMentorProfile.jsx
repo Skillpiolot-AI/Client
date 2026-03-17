@@ -7,6 +7,7 @@ import {
   Linkedin, Github, Twitter, Globe
 } from 'lucide-react';
 import axios from 'axios';
+import { useCurrency } from '../../CurrencyContext';
 import config from '../../config';
 import { useAuth } from '../../AuthContext';
 import SendDMModal from './SendDMModal';
@@ -36,9 +37,11 @@ const SERVICE_CONFIG = {
 
 const ASYNC_TYPES = ['priority_dm','resume_review','portfolio_review','ama','referral','course'];
 
-const ServiceCard = ({ service, onBook }) => {
+const ServiceCard = ({ service, onBook, preferredCurrency }) => {
   const cfg = SERVICE_CONFIG[service.serviceType] || SERVICE_CONFIG.custom;
   const [exp, setExp] = useState(false);
+  const { convertPrice, currencySymbol } = useCurrency();
+  
   return (
     <div style={{ border:'1px solid #E8ECF4', borderRadius:'16px', padding:'20px', background:'#fff', marginBottom:'12px' }}>
       <div style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
@@ -70,7 +73,7 @@ const ServiceCard = ({ service, onBook }) => {
         </div>
         <div style={{ textAlign:'right', flexShrink:0 }}>
           <div style={{ fontSize:'20px', fontWeight:800, color:'#1E293B' }}>
-            {service.isFree||service.price===0 ? <span style={{color:'#059669'}}>Free</span> : `₹${service.price?.toLocaleString('en-IN')}`}
+            {service.isFree||service.price===0 ? <span style={{color:'#059669'}}>Free</span> : `${currencySymbol}${convertPrice(service.price, preferredCurrency || 'INR')?.toLocaleString()}`}
           </div>
           {service.serviceType==='priority_dm' && <div style={{fontSize:'11px',color:'#94A3B8'}}>/month</div>}
           <button onClick={()=>onBook(service)} style={{ marginTop:'8px', background:service.isFree?'#059669':'#4F46E5', color:'#fff', border:'none', borderRadius:'10px', padding:'8px 16px', fontSize:'13px', fontWeight:600, cursor:'pointer' }}>
@@ -248,10 +251,10 @@ export default function PublicMentorProfile() {
         <div>
           {services.length===0 ? <p style={{textAlign:'center',color:'#94A3B8',padding:'40px'}}>No services listed yet.</p> : (
             <>
-              {grouped.live?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',marginBottom:'12px'}}>📅 Live Sessions</h2>{grouped.live.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService}/>)}</>}
-              {grouped.async?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',margin:'20px 0 12px'}}>💬 Async / On-Demand</h2>{grouped.async.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService}/>)}</>}
-              {grouped.group?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',margin:'20px 0 12px'}}>👥 Group Events</h2>{grouped.group.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService}/>)}</>}
-              {grouped.products?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',margin:'20px 0 12px'}}>🎓 Digital Products</h2>{grouped.products.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService}/>)}</>}
+              {grouped.live?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',marginBottom:'12px'}}>📅 Live Sessions</h2>{grouped.live.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService} preferredCurrency={data?.preferredCurrency}/>)}</>}
+              {grouped.async?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',margin:'20px 0 12px'}}>💬 Async / On-Demand</h2>{grouped.async.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService} preferredCurrency={data?.preferredCurrency}/>)}</>}
+              {grouped.group?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',margin:'20px 0 12px'}}>👥 Group Events</h2>{grouped.group.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService} preferredCurrency={data?.preferredCurrency}/>)}</>}
+              {grouped.products?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',margin:'20px 0 12px'}}>🎓 Digital Products</h2>{grouped.products.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService} preferredCurrency={data?.preferredCurrency}/>)}</>}
             </>
           )}
         </div>

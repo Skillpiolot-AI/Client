@@ -121,11 +121,31 @@ const Step5AvailabilityPricing = ({ formData, updateFormData, updateNestedFormDa
                     </div>
                 </div>
 
+                {/* Preferred Currency */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 uppercase tracking-wide mb-2">
+                        Preferred Currency
+                    </label>
+                    <p className="text-xs text-gray-500 mb-3">All your session prices will be listed and charged in this currency.</p>
+                    <select
+                        value={formData.preferredCurrency || 'INR'}
+                        onChange={(e) => updateFormData('preferredCurrency', e.target.value)}
+                        className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none font-medium text-gray-800"
+                    >
+                        <option value="INR">INR (₹)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="CAD">CAD (C$)</option>
+                        <option value="AUD">AUD (A$)</option>
+                    </select>
+                </div>
+
                 {/* Pricing Plans */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 uppercase tracking-wide mb-3">
                         <DollarSign className="inline w-4 h-4 mr-1" />
-                        Pricing Plans (in ₹)
+                        Pricing Plans (in {formData.preferredCurrency || 'INR'})
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
@@ -185,7 +205,7 @@ const Step5AvailabilityPricing = ({ formData, updateFormData, updateNestedFormDa
 
                     {formData.pricing?.trialAvailable && (
                         <div>
-                            <label className="block text-xs text-emerald-700 mb-1">Trial Session Price (₹)</label>
+                            <label className="block text-xs text-emerald-700 mb-1">Trial Session Price ({formData.preferredCurrency || 'INR'})</label>
                             <input
                                 type="number"
                                 value={formData.pricing?.trialPrice || ''}

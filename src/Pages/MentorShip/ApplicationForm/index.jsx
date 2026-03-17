@@ -67,6 +67,7 @@ const ApplicationForm = () => {
             trialAvailable: false,
             trialPrice: ''
         },
+        preferredCurrency: 'INR',
 
         // Step 6: Additional Info
         referralsInTopCompanies: false,
@@ -219,7 +220,8 @@ const ApplicationForm = () => {
                                     pricing: { monthlyPrice: '', threeMonthPrice: '', sixMonthPrice: '', trialAvailable: false, trialPrice: '' },
                                     referralsInTopCompanies: false, topCompanyReferrals: [], education: [], certifications: [],
                                     socialLinks: { linkedIn: '', github: '', twitter: '', portfolio: '' },
-                                    curriculum: { available: false, description: '' }
+                                    curriculum: { available: false, description: '' },
+                                    preferredCurrency: 'INR'
                                 });
                             }}
                             className="block w-full border-2 border-gray-200 hover:border-emerald-300 text-gray-700 font-medium py-3 px-6 rounded-full transition-colors"

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom"
+import { useCurrency } from "../../CurrencyContext"
 
 export default function FooterSection() {
+  const { selectedCurrency, setSelectedCurrency, rates } = useCurrency();
   const footerLinks = {
     "Career Growth": [
       { name: "Pathfinder", path: "/Assesmentinfo" },
@@ -109,7 +111,18 @@ export default function FooterSection() {
           <div className="text-[#605A57] text-xs font-medium">
             © 2025 SkillPilot Platform. Built for the future of talent.
           </div>
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
+            <select 
+              value={selectedCurrency} 
+              onChange={(e) => setSelectedCurrency(e.target.value)}
+              className="bg-transparent border border-[rgba(55,50,47,0.2)] rounded-lg px-3 py-1 text-xs font-semibold text-[#605A57] cursor-pointer hover:border-[rgba(55,50,47,0.4)] focus:outline-none bg-white transition-all duration-200"
+            >
+              {Object.keys(rates).length > 0 ? (
+                Object.keys(rates).map(c => <option key={c} value={c}>{c}</option>)
+              ) : (
+                ['INR', 'USD', 'EUR', 'GBP', 'CAD', 'AUD'].map(c => <option key={c} value={c}>{c}</option>)
+              )}
+            </select>
             <Link to="/privacy" className="text-[#605A57] text-xs font-medium hover:text-[#37322F] transition-colors">Privacy Policy</Link>
             <Link to="/terms" className="text-[#605A57] text-xs font-medium hover:text-[#37322F] transition-colors">Terms of Service</Link>
             <Link to="/docs" className="text-[#605A57] text-xs font-medium hover:text-[#37322F] transition-colors">Help Center</Link>

@@ -12,6 +12,8 @@ import { NextUIProvider } from '@nextui-org/react';
 import { ChakraProvider } from '@chakra-ui/react'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
+import { CurrencyProvider } from './CurrencyContext';
+
 const container = document.getElementById('root');
 const root = createRoot(container);
 
@@ -20,9 +22,11 @@ root.render(
     <GoogleOAuthProvider clientId="860946075972-h9p02v2019ad2n7rfco6dkil6resstqk.apps.googleusercontent.com">
       <ChakraProvider>
         <NextUIProvider>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
+          <CurrencyProvider>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </CurrencyProvider>
         </NextUIProvider>
       </ChakraProvider>
     </GoogleOAuthProvider>
