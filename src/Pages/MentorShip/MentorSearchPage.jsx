@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Star, Filter, ChevronDown, X, MapPin, Users } from 'lucide-react';
+import { Search, Star, Filter, X, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import config from '../../config';
 import { useCurrency } from '../../CurrencyContext';
+import './MentorSearchPage.css';
 
 const API_URL = config.API_BASE_URL;
 
@@ -33,67 +34,62 @@ const LANGUAGES = ['English', 'Hindi', 'Telugu', 'Tamil', 'Kannada', 'Malayalam'
 
 const MentorCard = ({ mentor, onClick }) => {
   const { convertPrice, currencySymbol } = useCurrency();
-  
+
+  const image = mentor.profileImage || mentor.userId?.imageUrl;
+  const title = mentor.displayName || 'Mentor';
+  const headline = mentor.bio || mentor.userId?.jobTitle || mentor.location?.city || 'Industry mentor';
+  const tags = mentor.expertise || mentor.skills || [];
+
   return (
-  <div
-    onClick={onClick}
-    style={{
-      background:'#fff', border:'1px solid #E8ECF4', borderRadius:'16px',
-      padding:'20px', cursor:'pointer', transition:'all 0.2s',
-    }}
-    onMouseEnter={e=>{ e.currentTarget.style.boxShadow='0 8px 24px rgba(79,70,229,0.12)'; e.currentTarget.style.transform='translateY(-3px)'; }}
-    onMouseLeave={e=>{ e.currentTarget.style.boxShadow='none'; e.currentTarget.style.transform='none'; }}
-  >
-    {/* Avatar + badge */}
-    <div style={{ display:'flex', gap:'14px', marginBottom:'14px' }}>
-      <div style={{ width:'60px', height:'60px', borderRadius:'50%', background:'linear-gradient(135deg,#4F46E5,#7C3AED)', flexShrink:0, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:'22px', fontWeight:800 }}>
-        {mentor.profileImage||mentor.userId?.imageUrl
-          ? <img src={mentor.profileImage||mentor.userId?.imageUrl} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}}/>
-          : mentor.displayName?.[0]?.toUpperCase()}
-      </div>
-      <div style={{ flex:1, minWidth:0 }}>
-        <h3 style={{ margin:'0 0 2px', fontSize:'15px', fontWeight:700, color:'#1E293B' }}>{mentor.displayName}</h3>
-        {mentor.handle && <div style={{ fontSize:'12px', color:'#94A3B8' }}>@{mentor.handle}</div>}
-        {mentor.userId?.jobTitle && <div style={{ fontSize:'12px', color:'#64748B', marginTop:'2px' }}>{mentor.userId.jobTitle}</div>}
-        {mentor.location?.city && <div style={{ fontSize:'12px', color:'#94A3B8', display:'flex', alignItems:'center', gap:'3px', marginTop:'2px' }}><MapPin size={10}/>{mentor.location.city}</div>}
-      </div>
-      {mentor.featured && <span style={{ fontSize:'10px', fontWeight:700, color:'#D97706', background:'#FEF3C7', borderRadius:'20px', padding:'2px 8px', height:'fit-content', whiteSpace:'nowrap' }}>⭐ Featured</span>}
+  <article className="mentor-card" onClick={onClick}>
+    <div className="mentor-card-image-wrap">
+      {image ? (
+        <img src={image} alt={title} />
+      ) : (
+        <div className="mentor-card-fallback">{title?.[0]?.toUpperCase() || 'M'}</div>
+      )}
     </div>
 
-    {/* Expertise tags */}
-    {mentor.expertise?.length > 0 && (
-      <div style={{ display:'flex', gap:'6px', flexWrap:'wrap', marginBottom:'12px' }}>
-        {mentor.expertise.slice(0,3).map((t,i) => (
-          <span key={i} style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'3px 10px', fontSize:'11px', fontWeight:600 }}>{t}</span>
-        ))}
-        {mentor.expertise.length > 3 && <span style={{ fontSize:'11px', color:'#94A3B8' }}>+{mentor.expertise.length-3}</span>}
-      </div>
-    )}
+    <div className="mentor-card-body">
+      <h3 className="mentor-card-title">{title}</h3>
+      <p className="mentor-card-headline">{headline}</p>
 
-    {/* Stats row */}
-    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', borderTop:'1px solid #F1F5F9', paddingTop:'12px' }}>
-      <div style={{ display:'flex', gap:'12px', fontSize:'12px', color:'#64748B' }}>
-        {mentor.averageRating > 0 && (
-          <span style={{ display:'flex', alignItems:'center', gap:'3px' }}>
-            <Star size={11} fill="#F59E0B" color="#F59E0B"/> {mentor.averageRating.toFixed(1)} ({mentor.totalReviews})
-          </span>
-        )}
-        {mentor.totalMentees > 0 && (
-          <span style={{ display:'flex', alignItems:'center', gap:'3px' }}>
-            <Users size={11}/> {mentor.totalMentees}
-          </span>
-        )}
-      </div>
-      <div style={{ textAlign:'right' }}>
-        {mentor.startingPrice > 0 ? (
-          <span style={{ fontSize:'14px', fontWeight:700, color:'#1E293B' }}>From {currencySymbol}{convertPrice(mentor.startingPrice, mentor.preferredCurrency || 'INR')?.toLocaleString()}</span>
-        ) : (
-          <span style={{ fontSize:'13px', fontWeight:700, color:'#059669' }}>Free available</span>
-        )}
+      {tags.length > 0 && (
+        <div className="mentor-tag-row">
+          {tags.slice(0, 3).map((tag, idx) => (
+            <span key={`${mentor._id || mentor.handle || idx}-${tag}-${idx}`} className="mentor-tag">{tag}</span>
+          ))}
+          {tags.length > 3 && <span className="mentor-tag">+{tags.length - 3}</span>}
+        </div>
+      )}
+
+      <div className="mentor-meta-row">
+        <div className="mentor-meta-left">
+          {mentor.averageRating > 0 && (
+            <span className="mentor-meta-item">
+              <Star size={12} fill="#f59e0b" color="#f59e0b" />
+              {mentor.averageRating.toFixed(1)} ({mentor.totalReviews || 0})
+            </span>
+          )}
+
+          {mentor.totalMentees > 0 && (
+            <span className="mentor-meta-item">
+              <Users size={12} />
+              {mentor.totalMentees}
+            </span>
+          )}
+        </div>
+
+        <div className="mentor-price">
+          {mentor.startingPrice > 0
+            ? `From ${currencySymbol}${convertPrice(mentor.startingPrice, mentor.preferredCurrency || 'INR')?.toLocaleString()}`
+            : 'Free available'}
+        </div>
       </div>
     </div>
-  </div>
-);};
+  </article>
+  );
+};
 
 export default function MentorSearchPage() {
   const navigate = useNavigate();
@@ -106,11 +102,12 @@ export default function MentorSearchPage() {
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [language, setLanguage] = useState(searchParams.get('language') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'featured');
+  const initialPage = Number(searchParams.get('page') || 1);
+  const [page, setPage] = useState(Number.isNaN(initialPage) || initialPage < 1 ? 1 : initialPage);
   const [showFilters, setShowFilters] = useState(false);
 
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
 
   const fetchMentors = useCallback(async (pg = 1) => {
@@ -124,8 +121,7 @@ export default function MentorSearchPage() {
       if (maxPrice) params.maxPrice = maxPrice;
       if (language) params.language = language;
       const res = await axios.get(`${API_URL}/mentor/search`, { params });
-      if (pg === 1) setMentors(res.data.mentors);
-      else setMentors(prev => [...prev, ...res.data.mentors]);
+      setMentors(res.data.mentors || []);
       setPagination(res.data.pagination);
     } catch(e) {
       console.error('Failed to fetch mentors:', e);
@@ -135,7 +131,10 @@ export default function MentorSearchPage() {
 
   useEffect(() => {
     setPage(1);
-    fetchMentors(1);
+  }, [q, domain, serviceType, minRating, maxPrice, language, sort]);
+
+  useEffect(() => {
+    fetchMentors(page);
     // Update URL
     const p = {};
     if (q) p.q = q;
@@ -145,72 +144,104 @@ export default function MentorSearchPage() {
     if (maxPrice) p.maxPrice = maxPrice;
     if (language) p.language = language;
     if (sort !== 'featured') p.sort = sort;
+    if (page > 1) p.page = String(page);
     setSearchParams(p);
-  }, [q, domain, serviceType, minRating, maxPrice, language, sort]);
+  }, [fetchMentors, page, q, domain, serviceType, minRating, maxPrice, language, sort, setSearchParams]);
 
   const hasFilters = domain || serviceType || minRating || maxPrice || language;
-  const clearFilters = () => { setDomain(''); setServiceType(''); setMinRating(''); setMaxPrice(''); setLanguage(''); };
+  const activeFilterCount = [domain, serviceType, minRating, maxPrice, language].filter(Boolean).length;
+  const clearFilters = () => {
+    setDomain('');
+    setServiceType('');
+    setMinRating('');
+    setMaxPrice('');
+    setLanguage('');
+  };
+
+  const totalPages = pagination?.totalPages || 1;
+  const boundedPage = Math.min(Math.max(1, page), totalPages);
+  const pageStart = Math.max(1, boundedPage - 2);
+  const pageEnd = Math.min(totalPages, boundedPage + 2);
+  const pageButtons = [];
+  for (let i = pageStart; i <= pageEnd; i += 1) pageButtons.push(i);
+
+  const from = pagination?.total ? (boundedPage - 1) * 12 + 1 : 0;
+  const to = pagination?.total ? Math.min(boundedPage * 12, pagination.total) : 0;
 
   return (
-    <div style={{ maxWidth:'1100px', margin:'0 auto', padding:'24px 16px', fontFamily:'Inter,sans-serif' }}>
+    <div className="mentor-search-page">
+      <section className="mentor-hero">
+        <h1>Find Your Perfect Mentor</h1>
+        <p>Browse verified mentors, apply filters, and book the right person for your goals.</p>
 
-      {/* Hero search */}
-      <div style={{ background:'linear-gradient(135deg,#4F46E5,#7C3AED)', borderRadius:'20px', padding:'40px 32px', marginBottom:'28px', textAlign:'center', color:'#fff' }}>
-        <h1 style={{ margin:'0 0 8px', fontSize:'28px', fontWeight:800 }}>Find Your Perfect Mentor 🚀</h1>
-        <p style={{ margin:'0 0 24px', opacity:0.85, fontSize:'15px' }}>Connect with industry experts for 1:1 sessions, resume reviews, mock interviews & more</p>
-        <div style={{ background:'#fff', borderRadius:'14px', padding:'6px 6px 6px 16px', display:'flex', gap:'8px', maxWidth:'560px', margin:'0 auto' }}>
-          <Search size={18} color="#94A3B8" style={{ flexShrink:0, alignSelf:'center' }}/>
+        <div className="mentor-search-row">
+          <Search size={18} className="mentor-search-icon" />
           <input
+            className="mentor-search-input"
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="Search by name, skill, domain…"
-            style={{ flex:1, border:'none', outline:'none', fontSize:'15px', color:'#1E293B', background:'transparent' }}
+            placeholder="Search by name, skill, domain"
           />
-          <button onClick={()=>fetchMentors(1)} style={{ background:'#4F46E5', color:'#fff', border:'none', borderRadius:'10px', padding:'10px 20px', fontWeight:600, fontSize:'14px', cursor:'pointer' }}>
+          <button type="button" className="mentor-search-button" onClick={() => setPage(1)}>
             Search
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* Controls row */}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'16px', flexWrap:'wrap', gap:'8px' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
-          <button onClick={()=>setShowFilters(!showFilters)} style={{ display:'flex', alignItems:'center', gap:'6px', background: showFilters?'#4F46E5':'#F1F5F9', color: showFilters?'#fff':'#475569', border:'none', borderRadius:'10px', padding:'8px 14px', fontSize:'13px', fontWeight:600, cursor:'pointer' }}>
-            <Filter size={14}/> Filters {hasFilters && <span style={{ background: showFilters?'rgba(255,255,255,0.3)':'#4F46E5', color:'#fff', borderRadius:'10px', padding:'1px 7px', fontSize:'11px' }}>{[domain,serviceType,minRating,maxPrice].filter(Boolean).length}</span>}
+      <div className="mentor-toolbar">
+        <div className="mentor-toolbar-left">
+          <button
+            type="button"
+            className={`mentor-filter-toggle ${showFilters ? 'active' : ''}`}
+            onClick={() => setShowFilters((prev) => !prev)}
+          >
+            <Filter size={14} />
+            Filters
+            {hasFilters && (
+              <span className={`mentor-filter-count ${showFilters ? '' : 'idle'}`}>
+                {activeFilterCount}
+              </span>
+            )}
           </button>
-          {hasFilters && <button onClick={clearFilters} style={{ display:'flex', alignItems:'center', gap:'4px', background:'none', border:'none', color:'#DC2626', fontSize:'13px', cursor:'pointer' }}><X size={13}/> Clear</button>}
-          {pagination && <span style={{ fontSize:'13px', color:'#94A3B8' }}>{pagination.total} mentor{pagination.total!==1?'s':''} found</span>}
+
+          {hasFilters && (
+            <button type="button" className="mentor-clear-filters" onClick={clearFilters}>
+              <X size={13} /> Clear
+            </button>
+          )}
+
+          {pagination && (
+            <span className="mentor-total-label">
+              {pagination.total} mentor{pagination.total !== 1 ? 's' : ''} found
+            </span>
+          )}
         </div>
 
-        <select value={sort} onChange={e=>setSort(e.target.value)} style={{ border:'1.5px solid #E2E8F0', borderRadius:'10px', padding:'8px 12px', fontSize:'13px', color:'#475569', outline:'none', cursor:'pointer' }}>
+        <select className="mentor-sort-select" value={sort} onChange={e => setSort(e.target.value)}>
           {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       </div>
 
-      {/* Filter panel */}
       {showFilters && (
-        <div style={{ background:'#FAFBFF', border:'1px solid #E8ECF4', borderRadius:'14px', padding:'20px', marginBottom:'20px', display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))', gap:'16px' }}>
-          {/* Domain */}
-          <div>
-            <label style={{ fontSize:'12px', fontWeight:600, color:'#64748B', display:'block', marginBottom:'6px' }}>Domain</label>
-            <select value={domain} onChange={e=>setDomain(e.target.value)} style={{ width:'100%', border:'1.5px solid #E2E8F0', borderRadius:'10px', padding:'8px 10px', fontSize:'13px', color:'#1E293B', outline:'none' }}>
+        <section className="mentor-filters-panel">
+          <div className="mentor-filter-field">
+            <label>Domain</label>
+            <select value={domain} onChange={e => setDomain(e.target.value)}>
               <option value="">All Domains</option>
-              {DOMAINS.map(d=><option key={d} value={d}>{d}</option>)}
+              {DOMAINS.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
           </div>
 
-          {/* Service Type */}
-          <div>
-            <label style={{ fontSize:'12px', fontWeight:600, color:'#64748B', display:'block', marginBottom:'6px' }}>Service Type</label>
-            <select value={serviceType} onChange={e=>setServiceType(e.target.value)} style={{ width:'100%', border:'1.5px solid #E2E8F0', borderRadius:'10px', padding:'8px 10px', fontSize:'13px', color:'#1E293B', outline:'none' }}>
-              {SERVICE_TYPES.map(s=><option key={s.value} value={s.value}>{s.label}</option>)}
+          <div className="mentor-filter-field">
+            <label>Service Type</label>
+            <select value={serviceType} onChange={e => setServiceType(e.target.value)}>
+              {SERVICE_TYPES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
 
-          {/* Min Rating */}
-          <div>
-            <label style={{ fontSize:'12px', fontWeight:600, color:'#64748B', display:'block', marginBottom:'6px' }}>Min Rating</label>
-            <select value={minRating} onChange={e=>setMinRating(e.target.value)} style={{ width:'100%', border:'1.5px solid #E2E8F0', borderRadius:'10px', padding:'8px 10px', fontSize:'13px', color:'#1E293B', outline:'none' }}>
+          <div className="mentor-filter-field">
+            <label>Min Rating</label>
+            <select value={minRating} onChange={e => setMinRating(e.target.value)}>
               <option value="">Any Rating</option>
               <option value="4">⭐ 4+</option>
               <option value="3">⭐ 3+</option>
@@ -218,52 +249,48 @@ export default function MentorSearchPage() {
             </select>
           </div>
 
-          {/* Max Price */}
-          <div>
-            <label style={{ fontSize:'12px', fontWeight:600, color:'#64748B', display:'block', marginBottom:'6px' }}>Max Price</label>
-            <input type="number" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)} placeholder="e.g. 5000" style={{ width:'100%', border:'1.5px solid #E2E8F0', borderRadius:'10px', padding:'8px 10px', fontSize:'13px', color:'#1E293B', outline:'none', boxSizing:'border-box' }}/>
+          <div className="mentor-filter-field">
+            <label>Max Price</label>
+            <input type="number" value={maxPrice} onChange={e => setMaxPrice(e.target.value)} placeholder="e.g. 5000" />
           </div>
 
-          {/* Language */}
-          <div>
-            <label style={{ fontSize:'12px', fontWeight:600, color:'#64748B', display:'block', marginBottom:'6px' }}>Language</label>
-            <select value={language} onChange={e=>setLanguage(e.target.value)} style={{ width:'100%', border:'1.5px solid #E2E8F0', borderRadius:'10px', padding:'8px 10px', fontSize:'13px', color:'#1E293B', outline:'none' }}>
+          <div className="mentor-filter-field">
+            <label>Language</label>
+            <select value={language} onChange={e => setLanguage(e.target.value)}>
               <option value="">All Languages</option>
-              {LANGUAGES.map(l=><option key={l} value={l}>{l}</option>)}
+              {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Active filter chips */}
       {hasFilters && (
-        <div style={{ display:'flex', gap:'8px', flexWrap:'wrap', marginBottom:'16px' }}>
-          {domain && <span style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'4px 12px', fontSize:'12px', fontWeight:600, display:'flex', alignItems:'center', gap:'6px' }}>📂 {domain} <button onClick={()=>setDomain('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, color:'#4F46E5', lineHeight:1 }}>×</button></span>}
-          {serviceType && <span style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'4px 12px', fontSize:'12px', fontWeight:600, display:'flex', alignItems:'center', gap:'6px' }}>🎯 {SERVICE_TYPES.find(s=>s.value===serviceType)?.label} <button onClick={()=>setServiceType('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, color:'#4F46E5', lineHeight:1 }}>×</button></span>}
-          {minRating && <span style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'4px 12px', fontSize:'12px', fontWeight:600, display:'flex', alignItems:'center', gap:'6px' }}>⭐ {minRating}+ stars <button onClick={()=>setMinRating('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, color:'#4F46E5', lineHeight:1 }}>×</button></span>}
-          {maxPrice && <span style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'4px 12px', fontSize:'12px', fontWeight:600, display:'flex', alignItems:'center', gap:'6px' }}>💰 Under ₹{maxPrice} <button onClick={()=>setMaxPrice('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, color:'#4F46E5', lineHeight:1 }}>×</button></span>}
-          {language && <span style={{ background:'#EEF2FF', color:'#4F46E5', borderRadius:'20px', padding:'4px 12px', fontSize:'12px', fontWeight:600, display:'flex', alignItems:'center', gap:'6px' }}>🗣️ {language} <button onClick={()=>setLanguage('')} style={{ background:'none', border:'none', cursor:'pointer', padding:0, color:'#4F46E5', lineHeight:1 }}>×</button></span>}
+        <div className="mentor-active-chips">
+          {domain && <span className="mentor-chip">Domain: {domain} <button type="button" onClick={() => setDomain('')}>x</button></span>}
+          {serviceType && <span className="mentor-chip">Type: {SERVICE_TYPES.find(s => s.value === serviceType)?.label} <button type="button" onClick={() => setServiceType('')}>x</button></span>}
+          {minRating && <span className="mentor-chip">Rating: {minRating}+ <button type="button" onClick={() => setMinRating('')}>x</button></span>}
+          {maxPrice && <span className="mentor-chip">Max: {maxPrice} <button type="button" onClick={() => setMaxPrice('')}>x</button></span>}
+          {language && <span className="mentor-chip">Language: {language} <button type="button" onClick={() => setLanguage('')}>x</button></span>}
         </div>
       )}
 
-      {/* Grid */}
       {loading && mentors.length === 0 ? (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))', gap:'16px' }}>
-          {[...Array(6)].map((_,i) => (
-            <div key={i} style={{ background:'#F8FAFC', borderRadius:'16px', height:'200px', animation:'pulse 1.5s infinite' }}/>
-          ))}
-          <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}`}</style>
+        <div className="mentor-loading">
+          Loading mentors...
         </div>
       ) : mentors.length === 0 ? (
-        <div style={{ textAlign:'center', padding:'80px 20px', color:'#94A3B8' }}>
-          <div style={{ fontSize:'48px', marginBottom:'12px' }}>🔍</div>
-          <h3 style={{ color:'#1E293B', marginBottom:'6px' }}>No mentors found</h3>
-          <p style={{ fontSize:'14px' }}>Try adjusting your search or filters.</p>
-          {hasFilters && <button onClick={clearFilters} style={{ marginTop:'12px', background:'#4F46E5', color:'#fff', border:'none', borderRadius:'10px', padding:'10px 24px', cursor:'pointer', fontWeight:600 }}>Clear all filters</button>}
+        <div className="mentor-empty">
+          <h3>No mentors found</h3>
+          <p>Try adjusting your search or filters.</p>
+          {hasFilters && (
+            <button type="button" className="mentor-search-button" onClick={clearFilters}>
+              Clear all filters
+            </button>
+          )}
         </div>
       ) : (
         <>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))', gap:'16px' }}>
+          <div className="mentor-grid">
             {mentors.map(m => (
               <MentorCard
                 key={m._id}
@@ -273,15 +300,54 @@ export default function MentorSearchPage() {
             ))}
           </div>
 
-          {/* Load more */}
+          {pagination && totalPages > 1 && (
+            <>
+              <div className="mentor-pagination">
+                <button
+                  type="button"
+                  className="mentor-page-button"
+                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                  disabled={boundedPage === 1}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                {pageButtons.map((pg) => (
+                  <button
+                    key={pg}
+                    type="button"
+                    className={`mentor-page-button ${pg === boundedPage ? 'active' : ''}`}
+                    onClick={() => setPage(pg)}
+                  >
+                    {pg}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  className="mentor-page-button"
+                  onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                  disabled={boundedPage === totalPages}
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+
+              <div className="mentor-page-summary">
+                Showing {from}-{to} of {pagination.total} mentors
+              </div>
+            </>
+          )}
+
           {pagination && page < pagination.totalPages && (
-            <div style={{ textAlign:'center', marginTop:'28px' }}>
+            <div className="mentor-pagination">
               <button
-                onClick={() => { const next = page+1; setPage(next); fetchMentors(next); }}
+                type="button"
+                className="mentor-search-button"
+                onClick={() => setPage((prev) => prev + 1)}
                 disabled={loading}
-                style={{ background:'#4F46E5', color:'#fff', border:'none', borderRadius:'12px', padding:'12px 32px', fontSize:'14px', fontWeight:600, cursor:'pointer', opacity: loading?0.7:1 }}
               >
-                {loading ? 'Loading…' : `Load More (${pagination.total - mentors.length} remaining)`}
+                {loading ? 'Loading...' : 'Next page'}
               </button>
             </div>
           )}
