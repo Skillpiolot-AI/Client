@@ -72,33 +72,35 @@ const PersonalInformation = ({ profile, user, saving, onUpdate, onUploadPhoto, o
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-8 lg:px-12 py-8 lg:py-16">
             {/* Header Section */}
-            <header className="mb-12 lg:mb-16 flex justify-between items-start">
+            <header className="mb-12 lg:mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="text-3xl lg:text-4xl font-extrabold font-headline text-primary mb-4">Personal Information</h2>
-                    <p className="text-base lg:text-lg text-secondary leading-relaxed max-w-2xl">
+                    <h2 className="text-3xl lg:text-4xl font-extrabold font-headline text-slate-900 mb-2 tracking-tight">Personal Information</h2>
+                    <p className="text-base lg:text-lg text-slate-600 leading-relaxed max-w-2xl">
                         Manage your personal details and how you appear to mentors and recruiters within the Navigator ecosystem.
                     </p>
                 </div>
                 {!isEditing ? (
                     <button 
                         onClick={() => setIsEditing(true)} 
-                        className="px-6 py-2.5 bg-white border border-outline-variant/30 text-primary rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 transition-colors"
+                        className="px-6 py-2.5 bg-white border border-slate-200 text-slate-800 rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 transition-colors w-full md:w-auto"
                     >
                         Edit Profile
                     </button>
                 ) : (
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
                         <button 
+                            type="button"
                             onClick={handleCancel} 
                             disabled={saving}
-                            className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2"
+                            className="px-4 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
                         >
                             <X size={16} /> Cancel
                         </button>
                         <button 
+                            type="button"
                             onClick={handleSave} 
                             disabled={saving}
-                            className="px-6 py-2.5 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold text-sm shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2"
+                            className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
                         >
                             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                             Save
@@ -275,19 +277,19 @@ const PersonalInformation = ({ profile, user, saving, onUpdate, onUploadPhoto, o
                     </div>
 
                     {isEditing && (
-                        <div className="pt-6 flex items-center justify-end gap-4 border-t border-outline-variant/10">
+                        <div className="pt-6 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 border-t border-slate-200">
                             <button 
                                 type="button" 
                                 onClick={handleCancel}
                                 disabled={saving}
-                                className="px-6 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-800 transition-all"
+                                className="px-6 py-3 text-sm font-bold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-all text-center"
                             >
                                 Discard Changes
                             </button>
                             <button 
                                 type="submit"
                                 disabled={saving}
-                                className="px-8 py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold text-sm shadow-md hover:translate-y-[-2px] hover:shadow-lg transition-all active:scale-[0.99] flex items-center gap-2"
+                                className="px-8 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
                             >
                                 {saving ? <Loader2 size={16} className="animate-spin" /> : null}
                                 Save Profile Information

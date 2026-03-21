@@ -85,23 +85,25 @@ const EducationDetails = ({ profile, saving, onUpdateTenth, onUpdateTwelfth }) =
                     {!isEditing ? (
                         <button 
                             onClick={() => setIsEditing(true)} 
-                            className="px-6 py-2.5 bg-white border border-outline-variant/30 text-primary rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 transition-colors"
+                            className="px-6 py-2.5 bg-white border border-slate-200 text-slate-800 rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 transition-colors w-full sm:w-auto"
                         >
                             Edit Details
                         </button>
                     ) : (
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                             <button 
+                                type="button"
                                 onClick={handleCancel} 
                                 disabled={saving}
-                                className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2"
+                                className="px-4 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
                             >
                                 <X size={16} /> Cancel
                             </button>
                             <button 
+                                type="button"
                                 onClick={handleSave} 
                                 disabled={saving}
-                                className="px-6 py-2.5 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold text-sm shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2"
+                                className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
                             >
                                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                 Save
