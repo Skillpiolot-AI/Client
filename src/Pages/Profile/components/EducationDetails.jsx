@@ -1,18 +1,12 @@
 import { useState } from 'react';
-import { Save, X, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
-import { Label } from '../../../components/ui/label';
+import { Save, X, Loader2, BookOpen, GraduationCap } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const boards = ['CBSE', 'ICSE', 'State Board', 'IB', 'Other'];
 const streams = ['Science', 'Commerce', 'Arts', 'Other'];
 
 const EducationDetails = ({ profile, saving, onUpdateTenth, onUpdateTwelfth }) => {
-    const [tenthExpanded, setTenthExpanded] = useState(true);
-    const [twelfthExpanded, setTwelfthExpanded] = useState(true);
-    const [editingTenth, setEditingTenth] = useState(false);
-    const [editingTwelfth, setEditingTwelfth] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     const [tenthData, setTenthData] = useState({
         percentage: profile?.tenthGrade?.percentage || '',
@@ -31,395 +25,271 @@ const EducationDetails = ({ profile, saving, onUpdateTenth, onUpdateTwelfth }) =
         school: profile?.twelfthGrade?.school || '',
     });
 
-    const handleTenthSave = async () => {
-        const result = await onUpdateTenth(tenthData);
-        if (result.success) {
-            toast.success(result.message);
-            setEditingTenth(false);
-        } else {
-            toast.error(result.message);
+    const handleSave = async () => {
+        try {
+            // Save tenth
+            const tenthResult = await onUpdateTenth(tenthData);
+            if (!tenthResult.success) {
+                toast.error("10th details failed: " + tenthResult.message);
+                return;
+            }
+            // Save twelfth
+            const twelfthResult = await onUpdateTwelfth(twelfthData);
+            if (!twelfthResult.success) {
+                toast.error("12th details failed: " + twelfthResult.message);
+                return;
+            }
+            toast.success("Education details saved successfully!");
+            setIsEditing(false);
+        } catch (error) {
+            toast.error("An error occurred while saving.");
         }
     };
 
-    const handleTwelfthSave = async () => {
-        const result = await onUpdateTwelfth(twelfthData);
-        if (result.success) {
-            toast.success(result.message);
-            setEditingTwelfth(false);
-        } else {
-            toast.error(result.message);
-        }
+    const handleCancel = () => {
+        setTenthData({
+            percentage: profile?.tenthGrade?.percentage || '',
+            cgpa: profile?.tenthGrade?.cgpa || '',
+            board: profile?.tenthGrade?.board || '',
+            year: profile?.tenthGrade?.year || '',
+            school: profile?.tenthGrade?.school || '',
+        });
+        setTwelfthData({
+            percentage: profile?.twelfthGrade?.percentage || '',
+            cgpa: profile?.twelfthGrade?.cgpa || '',
+            board: profile?.twelfthGrade?.board || '',
+            stream: profile?.twelfthGrade?.stream || '',
+            year: profile?.twelfthGrade?.year || '',
+            school: profile?.twelfthGrade?.school || '',
+        });
+        setIsEditing(false);
     };
 
     return (
-        <div className="section-container">
-            <div className="section-header">
-                <h2>Education Details</h2>
-            </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-8 lg:py-16">
+            <header className="mb-12">
+                <h2 className="text-3xl lg:text-4xl font-extrabold font-headline text-primary mb-3 tracking-tight">Academic Foundations</h2>
+                <p className="text-secondary max-w-2xl text-base lg:text-lg leading-relaxed">
+                    Your educational journey defines your core strengths. Manage your institutional history and academic achievements below.
+                </p>
+            </header>
 
-            {/* 10th Grade Section */}
-            <div className="education-card">
-                <div className="card-header" onClick={() => setTenthExpanded(!tenthExpanded)}>
-                    <div className="card-title">
-                        <span className="grade-badge">10th</span>
-                        <h3>10th Grade (Secondary)</h3>
-                    </div>
-                    <div className="card-controls">
-                        {!editingTenth ? (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => { e.stopPropagation(); setEditingTenth(true); }}
-                            >
-                                Edit
-                            </Button>
-                        ) : (
-                            <>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={(e) => { e.stopPropagation(); setEditingTenth(false); }}
-                                    disabled={saving}
-                                >
-                                    <X size={14} />
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    onClick={(e) => { e.stopPropagation(); handleTenthSave(); }}
-                                    disabled={saving}
-                                    className="save-btn"
-                                >
-                                    {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                                    Save
-                                </Button>
-                            </>
-                        )}
-                        {tenthExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                    </div>
-                </div>
-
-                {tenthExpanded && (
-                    <div className="card-content">
-                        <div className="form-grid">
-                            <div className="form-group">
-                                <Label>Percentage</Label>
-                                <Input
-                                    type="number"
-                                    value={tenthData.percentage}
-                                    onChange={(e) => setTenthData(prev => ({ ...prev, percentage: e.target.value }))}
-                                    disabled={!editingTenth}
-                                    placeholder="85.5"
-                                    min="0"
-                                    max="100"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <Label>CGPA (out of 10)</Label>
-                                <Input
-                                    type="number"
-                                    value={tenthData.cgpa}
-                                    onChange={(e) => setTenthData(prev => ({ ...prev, cgpa: e.target.value }))}
-                                    disabled={!editingTenth}
-                                    placeholder="9.2"
-                                    min="0"
-                                    max="10"
-                                    step="0.1"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <Label>Board</Label>
-                                <select
-                                    value={tenthData.board}
-                                    onChange={(e) => setTenthData(prev => ({ ...prev, board: e.target.value }))}
-                                    disabled={!editingTenth}
-                                    className="select-field"
-                                >
-                                    <option value="">Select Board</option>
-                                    {boards.map(b => <option key={b} value={b}>{b}</option>)}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <Label>Passing Year</Label>
-                                <Input
-                                    type="number"
-                                    value={tenthData.year}
-                                    onChange={(e) => setTenthData(prev => ({ ...prev, year: e.target.value }))}
-                                    disabled={!editingTenth}
-                                    placeholder="2020"
-                                    min="1990"
-                                    max="2100"
-                                />
-                            </div>
-                            <div className="form-group full-width">
-                                <Label>School Name</Label>
-                                <Input
-                                    value={tenthData.school}
-                                    onChange={(e) => setTenthData(prev => ({ ...prev, school: e.target.value }))}
-                                    disabled={!editingTenth}
-                                    placeholder="Your school name"
-                                />
-                            </div>
+            <section>
+                <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-teal-700 shadow-sm border border-outline-variant/10">
+                            <BookOpen size={20} />
                         </div>
+                        <h3 className="text-xl md:text-2xl font-bold font-headline text-slate-800">Schooling (10th & 12th)</h3>
                     </div>
-                )}
-            </div>
-
-            {/* 12th Grade Section */}
-            <div className="education-card">
-                <div className="card-header" onClick={() => setTwelfthExpanded(!twelfthExpanded)}>
-                    <div className="card-title">
-                        <span className="grade-badge twelfth">12th</span>
-                        <h3>12th Grade (Higher Secondary)</h3>
-                    </div>
-                    <div className="card-controls">
-                        {!editingTwelfth ? (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => { e.stopPropagation(); setEditingTwelfth(true); }}
+                    {!isEditing ? (
+                        <button 
+                            onClick={() => setIsEditing(true)} 
+                            className="px-6 py-2.5 bg-white border border-outline-variant/30 text-primary rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 transition-colors"
+                        >
+                            Edit Details
+                        </button>
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <button 
+                                onClick={handleCancel} 
+                                disabled={saving}
+                                className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2"
                             >
-                                Edit
-                            </Button>
-                        ) : (
-                            <>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={(e) => { e.stopPropagation(); setEditingTwelfth(false); }}
-                                    disabled={saving}
-                                >
-                                    <X size={14} />
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    onClick={(e) => { e.stopPropagation(); handleTwelfthSave(); }}
-                                    disabled={saving}
-                                    className="save-btn"
-                                >
-                                    {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                                    Save
-                                </Button>
-                            </>
-                        )}
-                        {twelfthExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                    </div>
+                                <X size={16} /> Cancel
+                            </button>
+                            <button 
+                                onClick={handleSave} 
+                                disabled={saving}
+                                className="px-6 py-2.5 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold text-sm shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2"
+                            >
+                                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                Save
+                            </button>
+                        </div>
+                    )}
                 </div>
 
-                {twelfthExpanded && (
-                    <div className="card-content">
-                        <div className="form-grid">
-                            <div className="form-group">
-                                <Label>Percentage</Label>
-                                <Input
-                                    type="number"
-                                    value={twelfthData.percentage}
-                                    onChange={(e) => setTwelfthData(prev => ({ ...prev, percentage: e.target.value }))}
-                                    disabled={!editingTwelfth}
-                                    placeholder="85.5"
-                                    min="0"
-                                    max="100"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <Label>CGPA (out of 10)</Label>
-                                <Input
-                                    type="number"
-                                    value={twelfthData.cgpa}
-                                    onChange={(e) => setTwelfthData(prev => ({ ...prev, cgpa: e.target.value }))}
-                                    disabled={!editingTwelfth}
-                                    placeholder="9.2"
-                                    min="0"
-                                    max="10"
-                                    step="0.1"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <Label>Board</Label>
-                                <select
-                                    value={twelfthData.board}
-                                    onChange={(e) => setTwelfthData(prev => ({ ...prev, board: e.target.value }))}
-                                    disabled={!editingTwelfth}
-                                    className="select-field"
-                                >
-                                    <option value="">Select Board</option>
-                                    {boards.map(b => <option key={b} value={b}>{b}</option>)}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <Label>Stream</Label>
-                                <select
-                                    value={twelfthData.stream}
-                                    onChange={(e) => setTwelfthData(prev => ({ ...prev, stream: e.target.value }))}
-                                    disabled={!editingTwelfth}
-                                    className="select-field"
-                                >
-                                    <option value="">Select Stream</option>
-                                    {streams.map(s => <option key={s} value={s}>{s}</option>)}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <Label>Passing Year</Label>
-                                <Input
-                                    type="number"
-                                    value={twelfthData.year}
-                                    onChange={(e) => setTwelfthData(prev => ({ ...prev, year: e.target.value }))}
-                                    disabled={!editingTwelfth}
-                                    placeholder="2022"
-                                    min="1990"
-                                    max="2100"
-                                />
-                            </div>
-                            <div className="form-group full-width">
-                                <Label>School/College Name</Label>
-                                <Input
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* 12th Standard Card */}
+                    <div className="group bg-surface-container-lowest p-6 md:p-8 rounded-xl border border-outline-variant/10 shadow-sm hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] transition-all duration-300 relative">
+                        <div className="absolute top-0 right-0 p-6 opacity-80 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                            <span className="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold uppercase tracking-widest rounded-full">{twelfthData.school ? 'Completed' : 'Pending'}</span>
+                        </div>
+                        <p className="text-[10px] font-label font-bold text-teal-700 uppercase tracking-[0.2em] mb-4">Secondary Education (12th)</p>
+                        
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">School Name</label>
+                                <input 
+                                    className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-on-surface font-semibold disabled:opacity-70 disabled:bg-transparent disabled:px-0 disabled:py-0 disabled:text-xl md:disabled:text-2xl" 
+                                    type="text" 
                                     value={twelfthData.school}
-                                    onChange={(e) => setTwelfthData(prev => ({ ...prev, school: e.target.value }))}
-                                    disabled={!editingTwelfth}
-                                    placeholder="Your school/college name"
+                                    onChange={e => setTwelfthData(prev => ({...prev, school: e.target.value}))}
+                                    placeholder="e.g. St. Xavier's International Academy"
+                                    disabled={!isEditing}
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">Year of Study</label>
+                                    <input 
+                                        className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-on-surface font-semibold disabled:opacity-70 disabled:bg-transparent disabled:px-0 disabled:py-0 disabled:text-sm" 
+                                        type="number" 
+                                        value={twelfthData.year}
+                                        onChange={e => setTwelfthData(prev => ({...prev, year: e.target.value}))}
+                                        placeholder="2020"
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">Board</label>
+                                    <select 
+                                        className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-on-surface font-semibold disabled:opacity-70 disabled:bg-transparent disabled:appearance-none disabled:px-0 disabled:py-0 disabled:text-sm" 
+                                        value={twelfthData.board}
+                                        onChange={e => setTwelfthData(prev => ({...prev, board: e.target.value}))}
+                                        disabled={!isEditing}
+                                    >
+                                        <option value="">Select Board</option>
+                                        {boards.map(b => <option key={b} value={b}>{b}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 pt-4 border-t border-slate-50 dark:border-slate-800">
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">Percentage</label>
+                                    <div className="relative">
+                                        <input 
+                                            className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-teal-700 font-bold disabled:opacity-90 disabled:bg-transparent disabled:px-0 disabled:py-0 disabled:text-sm" 
+                                            type="number" 
+                                            value={twelfthData.percentage}
+                                            onChange={e => setTwelfthData(prev => ({...prev, percentage: e.target.value}))}
+                                            placeholder="90.5"
+                                            max="100"
+                                            disabled={!isEditing}
+                                        />
+                                        {isEditing && <span className="absolute right-4 top-3.5 text-secondary text-sm font-bold">%</span>}
+                                        {!isEditing && twelfthData.percentage && <span className="text-teal-700 text-sm font-bold inline-block -translate-y-px ml-0.5">%</span>}
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">CGPA</label>
+                                    <input 
+                                        className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-on-surface font-semibold disabled:opacity-70 disabled:bg-transparent disabled:px-0 disabled:py-0 disabled:text-sm" 
+                                        type="number" 
+                                        step="0.1"
+                                        value={twelfthData.cgpa}
+                                        onChange={e => setTwelfthData(prev => ({...prev, cgpa: e.target.value}))}
+                                        placeholder="9.5"
+                                        max="10"
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+                                <div className="space-y-2 col-span-2 lg:col-span-1">
+                                    <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">Stream</label>
+                                    {isEditing ? (
+                                        <select 
+                                            className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-on-surface font-semibold" 
+                                            value={twelfthData.stream}
+                                            onChange={e => setTwelfthData(prev => ({...prev, stream: e.target.value}))}
+                                        >
+                                            <option value="">Stream</option>
+                                            {streams.map(s => <option key={s} value={s}>{s}</option>)}
+                                        </select>
+                                    ) : (
+                                        <div className="flex flex-wrap pt-0 md:pt-1">
+                                            {twelfthData.stream ? (
+                                                <span className="px-3 py-1 bg-surface-container rounded-lg text-xs font-medium text-slate-600">{twelfthData.stream}</span>
+                                            ) : (
+                                                <span className="text-sm font-semibold opacity-70">Not specified</span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
-                )}
-            </div>
 
-            <style jsx>{`
-        .section-container {
-          padding: 32px;
-          background: #ffffff;
-          margin: 24px;
-          border-radius: 16px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-        }
+                    {/* 10th Standard Card */}
+                    <div className="group bg-surface-container-lowest p-6 md:p-8 rounded-xl border border-outline-variant/10 shadow-sm hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] transition-all duration-300">
+                        <p className="text-[10px] font-label font-bold text-teal-700 uppercase tracking-[0.2em] mb-4">Primary Education (10th)</p>
+                        
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">School Name</label>
+                                <input 
+                                    className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-on-surface font-semibold disabled:opacity-70 disabled:bg-transparent disabled:px-0 disabled:py-0 disabled:text-xl md:disabled:text-2xl" 
+                                    type="text" 
+                                    value={tenthData.school}
+                                    onChange={e => setTenthData(prev => ({...prev, school: e.target.value}))}
+                                    placeholder="e.g. Heritage Global School"
+                                    disabled={!isEditing}
+                                />
+                            </div>
 
-        .section-header {
-          margin-bottom: 24px;
-          padding-bottom: 16px;
-          border-bottom: 1px solid #e2e8f0;
-        }
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">Year of Study</label>
+                                    <input 
+                                        className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-on-surface font-semibold disabled:opacity-70 disabled:bg-transparent disabled:px-0 disabled:py-0 disabled:text-sm" 
+                                        type="number" 
+                                        value={tenthData.year}
+                                        onChange={e => setTenthData(prev => ({...prev, year: e.target.value}))}
+                                        placeholder="2018"
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">Board</label>
+                                    <select 
+                                        className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-on-surface font-semibold disabled:opacity-70 disabled:bg-transparent disabled:appearance-none disabled:px-0 disabled:py-0 disabled:text-sm" 
+                                        value={tenthData.board}
+                                        onChange={e => setTenthData(prev => ({...prev, board: e.target.value}))}
+                                        disabled={!isEditing}
+                                    >
+                                        <option value="">Select Board</option>
+                                        {boards.map(b => <option key={b} value={b}>{b}</option>)}
+                                    </select>
+                                </div>
+                            </div>
 
-        .section-header h2 {
-          font-size: 22px;
-          font-weight: 600;
-          color: #1e293b;
-          margin: 0;
-        }
-
-        .education-card {
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
-          overflow: hidden;
-          margin-bottom: 16px;
-        }
-
-        .card-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 16px 20px;
-          cursor: pointer;
-          transition: background 0.2s;
-        }
-
-        .card-header:hover {
-          background: #f1f5f9;
-        }
-
-        .card-title {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .grade-badge {
-          background: linear-gradient(135deg, #f97316, #ea580c);
-          color: white;
-          padding: 4px 10px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 600;
-        }
-
-        .grade-badge.twelfth {
-          background: linear-gradient(135deg, #3b82f6, #2563eb);
-        }
-
-        .card-title h3 {
-          color: #1e293b;
-          font-size: 16px;
-          font-weight: 500;
-          margin: 0;
-        }
-
-        .card-controls {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: #64748b;
-        }
-
-        .save-btn {
-          background: #f97316;
-          color: white;
-        }
-
-        .card-content {
-          padding: 20px;
-          border-top: 1px solid #e2e8f0;
-          background: #ffffff;
-        }
-
-        .form-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 16px;
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .form-group.full-width {
-          grid-column: 1 / -1;
-        }
-
-        .select-field {
-          width: 100%;
-          padding: 10px 12px;
-          border-radius: 8px;
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          color: #1e293b;
-          font-size: 14px;
-          cursor: pointer;
-        }
-
-        .select-field:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          background: #f1f5f9;
-        }
-
-        .select-field:focus {
-          outline: none;
-          border-color: #f97316;
-          box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-        }
-
-        @media (max-width: 768px) {
-          .section-container {
-            padding: 20px;
-            margin: 16px;
-          }
-
-          .form-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
+                            <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-50 dark:border-slate-800">
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">Percentage</label>
+                                    <div className="relative">
+                                        <input 
+                                            className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-teal-700 font-bold disabled:opacity-90 disabled:bg-transparent disabled:px-0 disabled:py-0 disabled:text-sm" 
+                                            type="number" 
+                                            value={tenthData.percentage}
+                                            onChange={e => setTenthData(prev => ({...prev, percentage: e.target.value}))}
+                                            placeholder="90.5"
+                                            max="100"
+                                            disabled={!isEditing}
+                                        />
+                                        {isEditing && <span className="absolute right-4 top-3.5 text-secondary text-sm font-bold">%</span>}
+                                        {!isEditing && tenthData.percentage && <span className="text-teal-700 text-sm font-bold inline-block -translate-y-px ml-0.5">%</span>}
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-label font-bold uppercase tracking-wider text-secondary px-1">CGPA</label>
+                                    <input 
+                                        className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary/20 transition-all text-on-surface font-semibold disabled:opacity-70 disabled:bg-transparent disabled:px-0 disabled:py-0 disabled:text-sm" 
+                                        type="number" 
+                                        step="0.1"
+                                        value={tenthData.cgpa}
+                                        onChange={e => setTenthData(prev => ({...prev, cgpa: e.target.value}))}
+                                        placeholder="9.5"
+                                        max="10"
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 };

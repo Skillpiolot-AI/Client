@@ -1,0 +1,80 @@
+/* MentorFlow.css */
+
+/* Custom Design System Colors from Templates */
+:root {
+  --nav-background: #fff8f5;
+  --nav-on-surface: #1f1b18;
+  --nav-on-surface-variant: #44474c;
+  --nav-tertiary-container: #004944;
+  --nav-on-tertiary-container: #65bbb1;
+  --nav-error: #ba1a1a;
+  --nav-on-tertiary: #ffffff;
+  --nav-tertiary: #00312d;
+  --nav-secondary-container: #d0e1fb;
+  --nav-inverse-on-surface: #f8efeb;
+  --nav-surface-container-highest: #eae1dc;
+  --nav-on-secondary: #ffffff;
+  --nav-secondary: #505f76;
+  --nav-inverse-surface: #342f2d;
+  --nav-on-background: #1f1b18;
+  --nav-surface-variant: #eae1dc;
+  --nav-on-surface-variant-hex: #44474c;
+  --nav-secondary-fixed: #d3e4fe;
+  --nav-surface-dim: #e1d8d4;
+  --nav-surface: #fff8f5;
+  --nav-outline: #75777d;
+  --nav-on-secondary-container: #54647a;
+  --nav-surface-bright: #fff8f5;
+  --nav-surface-container-low: #fbf2ed;
+  --nav-surface-container-high: #f0e6e2;
+  --nav-on-primary: #ffffff;
+  --nav-outline-variant: #c5c6cd;
+  --nav-primary: #1d2b3e;
+  --nav-surface-container-lowest: #ffffff;
+  --nav-surface-container: #f6ece8;
+  --nav-primary-container: #334155;
+}
+
+/* Helper Classes for Tailwind override simulation */
+.bg-nav-background { background-color: var(--nav-background); }
+.bg-nav-surface-container-low { background-color: var(--nav-surface-container-low); }
+.bg-nav-surface-container-lowest { background-color: var(--nav-surface-container-lowest); }
+.bg-nav-surface-container-highest { background-color: var(--nav-surface-container-highest); }
+.bg-nav-primary { background-color: var(--nav-primary); }
+.bg-nav-tertiary-container { background-color: var(--nav-tertiary-container); }
+.bg-nav-secondary-container-30 { background-color: rgba(208, 225, 251, 0.3); }
+
+.text-nav-primary { color: var(--nav-primary); }
+.text-nav-secondary { color: var(--nav-secondary); }
+.text-nav-on-primary { color: var(--nav-on-primary); }
+.text-nav-tertiary-container { color: var(--nav-tertiary-container); }
+.text-nav-on-surface-variant { color: var(--nav-on-surface-variant); }
+
+.border-nav-outline-variant-10 { border-color: rgba(197, 198, 205, 0.1); }
+.border-nav-outline-variant-15 { border-color: rgba(197, 198, 205, 0.15); }
+.border-nav-outline-variant-30 { border-color: rgba(197, 198, 205, 0.3); }
+
+.ambient-shadow {
+  box-shadow: 0px 20px 40px rgba(31, 27, 24, 0.06);
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, #1d2b3e 0%, #334155 100%);
+}
+
+.glass-nav {
+  background: rgba(255, 248, 245, 0.8);
+  backdrop-filter: blur(20px);
+}
+
+.ghost-border {
+  border: 1px solid rgba(197, 198, 205, 0.15);
+}
+
+.font-headline {
+  font-family: 'Manrope', 'Inter', sans-serif;
+}
+
+.font-body {
+  font-family: 'Inter', sans-serif;
+}

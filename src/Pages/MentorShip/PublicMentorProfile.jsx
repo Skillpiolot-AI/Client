@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Star, MapPin, Users, Clock, Video, MessageSquare, FileText,
   HelpCircle, Gift, BookOpen, Calendar, Zap, Share2, ArrowLeft,
   ChevronDown, ChevronUp, CheckCircle, ExternalLink, Tag,
-  Linkedin, Github, Twitter, Globe
+  Linkedin, Github, Twitter, Globe, TrendingUp, Brain, Award, Compass
 } from 'lucide-react';
+import './MentorFlow.css';
 import axios from 'axios';
 import { useCurrency } from '../../CurrencyContext';
 import config from '../../config';
@@ -39,47 +40,37 @@ const ASYNC_TYPES = ['priority_dm','resume_review','portfolio_review','ama','ref
 
 const ServiceCard = ({ service, onBook, preferredCurrency }) => {
   const cfg = SERVICE_CONFIG[service.serviceType] || SERVICE_CONFIG.custom;
-  const [exp, setExp] = useState(false);
   const { convertPrice, currencySymbol } = useCurrency();
-  
+  const IconComponent = {
+    one_on_one: Video,
+    quick_chat: Zap,
+    mock_interview: Star,
+    career_guidance: Compass, // Fallback to Compass or similar
+    resume_review: FileText,
+    priority_dm: MessageSquare,
+  }[service.serviceType] || HelpCircle;
+
   return (
-    <div style={{ border:'1px solid #E8ECF4', borderRadius:'16px', padding:'20px', background:'#fff', marginBottom:'12px' }}>
-      <div style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
-        <div style={{ width:'44px', height:'44px', borderRadius:'12px', background:cfg.bg, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0 }}>
-          {service.emoji || cfg.icon}
+    <div className="group bg-white p-6 rounded-[1.5rem] ghost-border flex flex-col sm:flex-row justify-between items-center gap-6 hover:ambient-shadow transition-all duration-300">
+      <div className="flex items-center gap-6">
+        <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-[#1d2b3e] group-hover:bg-[#1d2b3e] group-hover:text-white transition-colors">
+          {service.emoji ? <span className="text-2xl">{service.emoji}</span> : <IconComponent size={30} />}
         </div>
-        <div style={{ flex:1 }}>
-          <span style={{ fontSize:'11px', fontWeight:700, color:cfg.color, background:cfg.bg, borderRadius:'20px', padding:'2px 10px', textTransform:'uppercase' }}>{cfg.label}</span>
-          <h3 style={{ margin:'6px 0 4px', fontSize:'15px', fontWeight:700, color:'#1E293B' }}>{service.title}</h3>
-          {service.description && (
-            <p style={{ fontSize:'13px', color:'#64748B', margin:'0 0 6px' }}>
-              {exp ? service.description : service.description.slice(0,90) + (service.description.length>90?'…':'')}
-              {service.description.length>90 && <button onClick={e=>{e.stopPropagation();setExp(!exp)}} style={{background:'none',border:'none',color:'#4F46E5',cursor:'pointer',padding:0,fontSize:'13px'}}> {exp?'Less':'More'}</button>}
-            </p>
-          )}
-          <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', fontSize:'12px', color:'#94A3B8' }}>
-            {!ASYNC_TYPES.includes(service.serviceType) && service.duration && <span>⏱ {service.duration} min</span>}
-            {ASYNC_TYPES.includes(service.serviceType) && service.responseTime && <span>⏱ {service.responseTime}</span>}
-            {service.sessionCount>1 && <span>📦 {service.sessionCount} sessions</span>}
-            {service.capacity && <span>👥 Max {service.capacity}</span>}
-          </div>
-          {exp && service.includes?.length>0 && (
-            <ul style={{ margin:'8px 0 0', padding:0, listStyle:'none' }}>
-              {service.includes.map((item,i)=>(
-                <li key={i} style={{ fontSize:'13px', color:'#475569', display:'flex', gap:'6px', marginBottom:'3px' }}>✅ {item}</li>
-              ))}
-            </ul>
-          )}
+        <div>
+          <h4 className="font-headline text-xl font-bold text-[#1d2b3e]">{service.title}</h4>
+          <p className="text-[#44474c] text-sm">{service.description?.slice(0, 100)}{service.description?.length > 100 ? '...' : ''}</p>
         </div>
-        <div style={{ textAlign:'right', flexShrink:0 }}>
-          <div style={{ fontSize:'20px', fontWeight:800, color:'#1E293B' }}>
-            {service.isFree||service.price===0 ? <span style={{color:'#059669'}}>Free</span> : `${currencySymbol}${convertPrice(service.price, preferredCurrency || 'INR')?.toLocaleString()}`}
-          </div>
-          {service.serviceType==='priority_dm' && <div style={{fontSize:'11px',color:'#94A3B8'}}>/month</div>}
-          <button onClick={()=>onBook(service)} style={{ marginTop:'8px', background:service.isFree?'#059669':'#4F46E5', color:'#fff', border:'none', borderRadius:'10px', padding:'8px 16px', fontSize:'13px', fontWeight:600, cursor:'pointer' }}>
-            {service.serviceType==='course'?'Enroll':service.serviceType==='priority_dm'?'Subscribe':service.isFree?'Book Free':'Book Now'}
-          </button>
-        </div>
+      </div>
+      <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
+        <span className="text-2xl font-black font-headline text-[#1d2b3e]">
+          {service.isFree || service.price === 0 ? 'Free' : `${currencySymbol}${convertPrice(service.price, preferredCurrency || 'INR')}`}
+        </span>
+        <button
+          onClick={() => onBook(service)}
+          className="primary-gradient text-white px-8 py-3 rounded-xl font-headline font-bold text-sm active:scale-95 transition-all"
+        >
+          Select
+        </button>
       </div>
     </div>
   );
@@ -146,25 +137,28 @@ export default function PublicMentorProfile() {
     setCouponLoading(false);
   };
 
-  const handleConfirmBooking = async (bookingData) => {
-    setIsSubmitting(true);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please log in to book a session');
-        navigate('/login', { state: { from: `/mentor/${handle}` } });
-        return;
+  const handleConfirmBooking = (bookingData) => {
+    // Instead of booking directly, navigate to checkout page
+    setIsBookingModalOpen(false);
+    
+    // Extract date and time from scheduledAt ISO string
+    const dateObj = new Date(bookingData.scheduledAt);
+    const date = dateObj.toISOString().split('T')[0];
+    const time = dateObj.toTimeString().split(' ')[0].slice(0,5); // "HH:MM"
+
+    navigate(`/mentor/${handle}/checkout`, {
+      state: {
+        date: date,
+        time: time,
+        service: bookingService,
+        mentor: mentor,
+        mentorProfileId: bookingData.mentorProfileId,
+        couponCode: bookingData.couponCode,
+        couponResult: couponResult,
+        remark: bookingData.remark, // Passes any notes filled in modal
+        topics: bookingData.topics
       }
-      await axios.post(`${API_URL}/bookings/book`, bookingData, { headers: { Authorization: `Bearer ${token}` } });
-      alert('🎉 Session booked successfully! Check your email for the meeting link.');
-      setIsBookingModalOpen(false);
-      setBookingService(null);
-      setCouponResult(null);
-      setCouponCode('');
-    } catch (e) {
-      alert(e.response?.data?.error || 'Failed to book session');
-    }
-    setIsSubmitting(false);
+    });
   };
 
   if (loading) return <div style={{display:'flex',justifyContent:'center',alignItems:'center',minHeight:'60vh'}}><div style={{width:'36px',height:'36px',border:'3px solid #4F46E5',borderTopColor:'transparent',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>;
@@ -179,205 +173,171 @@ export default function PublicMentorProfile() {
   const visibleReviews = showAllReviews ? reviews : reviews.slice(0,4);
 
   return (
-    <div style={{ maxWidth:'900px', margin:'0 auto', padding:'24px 16px', fontFamily:'Inter,sans-serif' }}>
-      <button onClick={()=>navigate(-1)} style={{ display:'flex', alignItems:'center', gap:'6px', background:'none', border:'none', color:'#64748B', fontSize:'14px', cursor:'pointer', marginBottom:'20px', padding:0 }}>
-        <ArrowLeft size={16}/> Back
-      </button>
+    <div className="bg-[#fff8f5] min-h-screen text-[#1f1b18] font-body antialiased">
+      <main className="pt-8 pb-20">
+        {/* Hero Profile Section */}
+        <section className="max-w-screen-xl mx-auto px-8 mb-16">
+          <div className="flex flex-col md:flex-row gap-12 items-start">
+            
+            {/* Profile Image & Quick Info (Sticky Sidebar) */}
+            <div className="w-full md:w-1/3 sticky top-32">
+              <div className="bg-white rounded-[2rem] p-4 ambient-shadow overflow-hidden">
+                <img
+                  alt={profile.displayName}
+                  className="w-full aspect-[4/5] object-cover rounded-[1.5rem] mb-6"
+                  src={profile.profileImage || mentor?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.displayName)}&size=300&background=random`}
+                />
+                <div className="px-4 pb-4">
+                  <h1 className="font-headline text-3xl font-extrabold text-[#1d2b3e] mb-1">{profile.displayName}</h1>
+                  <p className="text-[#505f76] font-medium mb-4">{mentor?.jobTitle} {mentor?.company ? `@ ${mentor.company}` : ''}</p>
+                  
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {profile.expertise?.slice(0, 3).map((exp, i) => (
+                      <span key={i} className="bg-[#fbf2ed] text-[#1d2b3e] px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase">
+                        {exp}
+                      </span>
+                    ))}
+                  </div>
 
-      {/* Header */}
-      <div style={{ background:'linear-gradient(135deg,#4F46E5,#7C3AED)', borderRadius:'20px', padding:'32px', color:'#fff', marginBottom:'24px' }}>
-        <div style={{ display:'flex', gap:'20px', alignItems:'flex-start', flexWrap:'wrap' }}>
-          <div style={{ width:'88px', height:'88px', borderRadius:'50%', border:'3px solid rgba(255,255,255,0.4)', overflow:'hidden', flexShrink:0, background:'rgba(255,255,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'32px', fontWeight:800 }}>
-            {(profile.profileImage||mentor?.imageUrl) ? <img src={profile.profileImage||mentor.imageUrl} alt={profile.displayName} style={{width:'100%',height:'100%',objectFit:'cover'}}/> : profile.displayName?.[0]?.toUpperCase()}
-          </div>
-          <div style={{ flex:1 }}>
-            <h1 style={{ margin:'0 0 2px', fontSize:'24px', fontWeight:800 }}>{profile.displayName}</h1>
-            {profile.handle && <div style={{ fontSize:'13px', opacity:0.7 }}>@{profile.handle}</div>}
-            {profile.tagline && <p style={{ margin:'8px 0 0', fontSize:'14px', opacity:0.9 }}>{profile.tagline}</p>}
-            {mentor?.jobTitle && <p style={{ margin:'6px 0 0', fontSize:'13px', opacity:0.8 }}>{mentor.jobTitle}{mentor.company?` @ ${mentor.company}`:''}</p>}
-            {profile.location?.city && <div style={{ display:'flex', alignItems:'center', gap:'4px', marginTop:'6px', fontSize:'12px', opacity:0.7 }}><MapPin size={11}/> {profile.location.city}{profile.location.country?`, ${profile.location.country}`:''}</div>}
-            {profile.expertise?.length>0 && (
-              <div style={{ display:'flex', gap:'6px', flexWrap:'wrap', marginTop:'10px' }}>
-                {profile.expertise.map((t,i)=><span key={i} style={{ background:'rgba(255,255,255,0.2)', borderRadius:'20px', padding:'3px 10px', fontSize:'12px', fontWeight:600 }}>{t}</span>)}
+                  <div className="space-y-3">
+                    {profile.location?.city && (
+                      <div className="flex items-center gap-3 text-[#44474c]">
+                        <MapPin size={18} className="text-[#004944]" />
+                        <span className="text-sm">{profile.location.city}, {profile.location.country}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 text-[#44474c]">
+                      <Clock size={18} className="text-[#004944]" />
+                      <span className="text-sm">{profile.experienceYears || '12+'} Years Experience</span>
+                    </div>
+                    {profile.averageRating > 0 && (
+                      <div className="flex items-center gap-3 text-[#44474c]">
+                        <Star size={18} className="text-yellow-400 fill-current" />
+                        <span className="text-sm font-bold">{profile.averageRating.toFixed(1)} ({profile.totalReviews} Reviews)</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
-            {profile.languages?.length>0 && (
-              <div style={{ display:'flex', gap:'6px', flexWrap:'wrap', marginTop:'8px' }}>
-                <span style={{ fontSize:'12px', opacity:0.7 }}>🗣️</span>
-                {profile.languages.map((lang,i)=><span key={i} style={{ background:'rgba(255,255,255,0.15)', borderRadius:'20px', padding:'3px 10px', fontSize:'11px', fontWeight:600 }}>{lang}</span>)}
-              </div>
-            )}
-          </div>
-          <div style={{ textAlign:'right', flexShrink:0 }}>
-            <button onClick={()=>{navigator.clipboard.writeText(window.location.href);}} style={{ background:'rgba(255,255,255,0.2)', border:'1px solid rgba(255,255,255,0.3)', borderRadius:'10px', padding:'7px 14px', color:'#fff', cursor:'pointer', fontSize:'13px', fontWeight:600, display:'flex', alignItems:'center', gap:'5px' }}>
-              <Share2 size={13}/> Share
-            </button>
-            <div style={{ display:'flex', gap:'16px', marginTop:'14px', justifyContent:'flex-end' }}>
-              {profile.totalMentees>0 && <div style={{textAlign:'center'}}><div style={{fontSize:'20px',fontWeight:800}}>{profile.totalMentees}</div><div style={{fontSize:'11px',opacity:0.7}}>Mentees</div></div>}
-              {profile.averageRating>0 && <div style={{textAlign:'center'}}><div style={{fontSize:'20px',fontWeight:800}}>⭐{profile.averageRating.toFixed(1)}</div><div style={{fontSize:'11px',opacity:0.7}}>{profile.totalReviews} reviews</div></div>}
             </div>
-          </div>
-        </div>
-        {/* Social links */}
-        {profile.socialLinks && Object.values(profile.socialLinks).some(v=>v) && (
-          <div style={{ display:'flex', gap:'8px', flexWrap:'wrap', marginTop:'16px' }}>
-            {profile.socialLinks.linkedIn && <a href={profile.socialLinks.linkedIn} target="_blank" rel="noreferrer" style={{ color:'rgba(255,255,255,0.8)', textDecoration:'none', background:'rgba(255,255,255,0.15)', borderRadius:'8px', padding:'4px 12px', fontSize:'12px', display:'flex', alignItems:'center', gap:'4px' }}><Linkedin size={12}/> LinkedIn</a>}
-            {profile.socialLinks.github && <a href={profile.socialLinks.github} target="_blank" rel="noreferrer" style={{ color:'rgba(255,255,255,0.8)', textDecoration:'none', background:'rgba(255,255,255,0.15)', borderRadius:'8px', padding:'4px 12px', fontSize:'12px', display:'flex', alignItems:'center', gap:'4px' }}><Github size={12}/> GitHub</a>}
-            {profile.socialLinks.twitter && <a href={profile.socialLinks.twitter} target="_blank" rel="noreferrer" style={{ color:'rgba(255,255,255,0.8)', textDecoration:'none', background:'rgba(255,255,255,0.15)', borderRadius:'8px', padding:'4px 12px', fontSize:'12px', display:'flex', alignItems:'center', gap:'4px' }}><Twitter size={12}/> Twitter</a>}
-            {profile.socialLinks.portfolio && <a href={profile.socialLinks.portfolio} target="_blank" rel="noreferrer" style={{ color:'rgba(255,255,255,0.8)', textDecoration:'none', background:'rgba(255,255,255,0.15)', borderRadius:'8px', padding:'4px 12px', fontSize:'12px', display:'flex', alignItems:'center', gap:'4px' }}><Globe size={12}/> Portfolio</a>}
-          </div>
-        )}
-      </div>
 
-      {/* Coupon URL auto-detected banner */}
-      {couponCode && (
-        <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:'12px', padding:'12px 16px', marginBottom:'20px', display:'flex', alignItems:'center', gap:'10px' }}>
-          <Tag size={15} color="#059669"/>
-          <span style={{ fontSize:'14px', color:'#065F46', fontWeight:600 }}>🎟️ Coupon <strong>{couponCode}</strong> will auto-apply at checkout!</span>
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div style={{ display:'flex', borderBottom:'2px solid #E8ECF4', marginBottom:'24px' }}>
-        {[['services','Services'],['reviews','Reviews'],['about','About']].map(([k,l])=>(
-          <button key={k} onClick={()=>setActiveTab(k)} style={{ background:'none', border:'none', borderBottom: activeTab===k?'2px solid #4F46E5':'2px solid transparent', marginBottom:'-2px', padding:'10px 20px', fontSize:'14px', fontWeight:600, color:activeTab===k?'#4F46E5':'#64748B', cursor:'pointer' }}>
-            {l}{k==='reviews'&&reviews.length>0&&<span style={{ marginLeft:'6px', background:'#EEF2FF', color:'#4F46E5', borderRadius:'10px', padding:'1px 7px', fontSize:'12px' }}>{reviews.length}</span>}
-          </button>
-        ))}
-      </div>
-
-      {/* Services Tab */}
-      {activeTab==='services' && (
-        <div>
-          {services.length===0 ? <p style={{textAlign:'center',color:'#94A3B8',padding:'40px'}}>No services listed yet.</p> : (
-            <>
-              {grouped.live?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',marginBottom:'12px'}}>📅 Live Sessions</h2>{grouped.live.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService} preferredCurrency={data?.preferredCurrency}/>)}</>}
-              {grouped.async?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',margin:'20px 0 12px'}}>💬 Async / On-Demand</h2>{grouped.async.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService} preferredCurrency={data?.preferredCurrency}/>)}</>}
-              {grouped.group?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',margin:'20px 0 12px'}}>👥 Group Events</h2>{grouped.group.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService} preferredCurrency={data?.preferredCurrency}/>)}</>}
-              {grouped.products?.length>0 && <><h2 style={{fontSize:'13px',fontWeight:700,color:'#94A3B8',textTransform:'uppercase',letterSpacing:'0.8px',margin:'20px 0 12px'}}>🎓 Digital Products</h2>{grouped.products.map(s=><ServiceCard key={s._id} service={s} onBook={s.serviceType==='priority_dm'?setDmService:setBookingService} preferredCurrency={data?.preferredCurrency}/>)}</>}
-            </>
-          )}
-        </div>
-      )}
-
-
-      {/* Reviews Tab */}
-      {activeTab==='reviews' && (
-        <div>
-          {reviews.length===0 ? <p style={{textAlign:'center',color:'#94A3B8',padding:'40px'}}>No reviews yet.</p> : (
-            <>
-              <div style={{ background:'linear-gradient(135deg,#EEF2FF,#F5F3FF)', borderRadius:'16px', padding:'24px', textAlign:'center', marginBottom:'20px' }}>
-                <div style={{ fontSize:'48px', fontWeight:800, color:'#4F46E5' }}>{profile.averageRating?.toFixed(1)}</div>
-                <div style={{ margin:'6px 0', fontSize:'20px' }}>{[1,2,3,4,5].map(s=>s<=Math.round(profile.averageRating)?'⭐':'☆').join('')}</div>
-                <div style={{ color:'#64748B', fontSize:'14px' }}>{profile.totalReviews} reviews</div>
-              </div>
-              {visibleReviews.map((r,i)=><ReviewCard key={i} review={r}/>)}
-              {reviews.length>4&&<button onClick={()=>setShowAllReviews(!showAllReviews)} style={{ display:'flex', alignItems:'center', gap:'6px', margin:'12px auto 0', background:'none', border:'1px solid #E8ECF4', borderRadius:'10px', padding:'8px 18px', color:'#4F46E5', fontSize:'14px', fontWeight:600, cursor:'pointer' }}>
-                {showAllReviews?<><ChevronUp size={15}/> Show less</>:<><ChevronDown size={15}/> All {reviews.length} reviews</>}
-              </button>}
-            </>
-          )}
-        </div>
-      )}
-
-      {/* About Tab */}
-      {activeTab==='about' && (
-        <div>
-          {profile.customSections?.filter(s=>s.isVisible).sort((a,b)=>a.sortOrder-b.sortOrder).map((sec,i)=>(
-            <div key={i} style={{ marginBottom:'24px' }}>
-              {sec.title && <h3 style={{ fontSize:'17px', fontWeight:700, color:'#1E293B', marginBottom:'8px' }}>{sec.title}</h3>}
-              {sec.content && <p style={{ fontSize:'14px', color:'#475569', lineHeight:'1.8', whiteSpace:'pre-wrap', marginBottom:'10px' }}>{sec.content}</p>}
-              {sec.images?.length>0 && <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>{sec.images.map((img,j)=><img key={j} src={img} alt="" onClick={()=>setLightboxImg(img)} style={{ width:'150px', height:'105px', objectFit:'cover', borderRadius:'10px', cursor:'pointer', border:'1px solid #E2E8F0' }}/>)}</div>}
-            </div>
-          ))}
-          {profile.bio && <>
-            <h2 style={{ fontSize:'18px', fontWeight:700, color:'#1E293B', marginBottom:'10px' }}>About Me</h2>
-            <p style={{ fontSize:'14px', color:'#475569', lineHeight:'1.8', whiteSpace:'pre-wrap' }}>{profile.bio}</p>
-          </>}
-          {profile.education?.length>0 && <><h3 style={{fontSize:'16px',fontWeight:700,color:'#1E293B',margin:'20px 0 8px'}}>Education</h3>{profile.education.map((e,i)=><p key={i} style={{fontSize:'14px',color:'#475569'}}><strong>{e.degree}</strong> in {e.field} — {e.institution} {e.year&&`(${e.year})`}</p>)}</>}
-          {profile.certifications?.length>0 && <><h3 style={{fontSize:'16px',fontWeight:700,color:'#1E293B',margin:'20px 0 8px'}}>Certifications</h3>{profile.certifications.map((c,i)=><div key={i} style={{fontSize:'14px',color:'#475569',marginBottom:'4px',display:'flex',alignItems:'center',gap:'6px'}}>✅ {c.name} — {c.issuer}{c.credentialUrl&&<a href={c.credentialUrl} target="_blank" rel="noreferrer"><ExternalLink size={11} color="#4F46E5"/></a>}</div>)}</>}
-          {profile.referralsInTopCompanies&&profile.topCompanies?.length>0&&(
-            <div style={{ background:'#FFF7ED', border:'1px solid #FED7AA', borderRadius:'12px', padding:'16px', marginTop:'20px' }}>
-              <p style={{ fontWeight:700, color:'#C2410C', marginBottom:'8px' }}>🤝 Referrals Available to:</p>
-              <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>{profile.topCompanies.map((c,i)=><span key={i} style={{background:'#FFEDD5',borderRadius:'8px',padding:'4px 12px',fontSize:'13px',fontWeight:600,color:'#9A3412'}}>{c}</span>)}</div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Lightbox */}
-      {lightboxImg && (
-        <div onClick={()=>setLightboxImg(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.8)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:9999 }}>
-          <img src={lightboxImg} alt="full" style={{ maxWidth:'90vw', maxHeight:'85vh', borderRadius:'12px' }}/>
-        </div>
-      )}
-
-      {/* Booking Modal */}
-      {bookingService && (
-        <div onClick={()=>{setBookingService(null);setCouponResult(null);}} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:999, padding:'16px' }}>
-          <div onClick={e=>e.stopPropagation()} style={{ background:'#fff', borderRadius:'20px', padding:'28px', maxWidth:'480px', width:'100%' }}>
-            <h2 style={{ margin:'0 0 4px', fontSize:'18px', fontWeight:800, color:'#1E293B' }}>{bookingService.title}</h2>
-            <p style={{ fontSize:'13px', color:'#64748B', margin:'0 0 20px' }}>with {profile.displayName}</p>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'20px' }}>
+            {/* Bio & Expertise (Right Column) */}
+            <div className="flex-1 space-y-12">
               <div>
-                <div style={{ fontSize:'28px', fontWeight:800, color:'#1E293B' }}>
-                  {couponResult?.valid
-                    ? <>₹{couponResult.finalPrice} <span style={{fontSize:'15px',textDecoration:'line-through',color:'#94A3B8'}}>₹{bookingService.price}</span></>
-                    : bookingService.isFree ? <span style={{color:'#059669'}}>Free</span> : `₹${bookingService.price?.toLocaleString('en-IN')}`}
-                </div>
-                {couponResult?.valid && <div style={{fontSize:'13px',color:'#059669',fontWeight:600}}>✅ Saved ₹{couponResult.discountAmount}!</div>}
-                {couponResult&&!couponResult.valid && <div style={{fontSize:'13px',color:'#DC2626'}}>❌ {couponResult.reason}</div>}
-              </div>
-              {!ASYNC_TYPES.includes(bookingService.serviceType) && <span style={{fontSize:'13px',color:'#64748B'}}>⏱ {bookingService.duration} min</span>}
-            </div>
-            {!bookingService.isFree && (
-              <div style={{ marginBottom:'20px' }}>
-                <label style={{ fontSize:'13px', fontWeight:600, color:'#475569', display:'block', marginBottom:'6px' }}>🎟️ Have a coupon?</label>
-                <div style={{ display:'flex', gap:'8px' }}>
-                  <input value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setCouponResult(null);}} placeholder="SAVE15" style={{ flex:1, border:'1.5px solid #E2E8F0', borderRadius:'10px', padding:'9px 12px', fontSize:'14px', outline:'none' }}/>
-                  <button onClick={()=>handleValidateCoupon(bookingService)} disabled={couponLoading||!couponCode.trim()} style={{ background:'#4F46E5', color:'#fff', border:'none', borderRadius:'10px', padding:'9px 16px', fontSize:'13px', fontWeight:600, cursor:'pointer' }}>
-                    {couponLoading?'…':'Apply'}
-                  </button>
+                <h2 className="font-headline text-4xl font-extrabold text-[#1d2b3e] mb-6 tracking-tight">The Professional Navigator</h2>
+                <div className="space-y-4 text-[#505f76] leading-relaxed text-lg max-w-2xl">
+                  {profile.bio ? (
+                    <p>{profile.bio}</p>
+                  ) : (
+                    <p>I specialize in bridging the gap between high-scale product infrastructure and human-centric marketing. I help startups and established tech giants find their voice in complex markets.</p>
+                  )}
                 </div>
               </div>
-            )}
-            <div style={{ display:'flex', gap:'10px' }}>
-              <button onClick={()=>{
-                if (!user) { navigate('/login', { state: { from: `/mentor/${handle}` } }); return; }
-                setIsBookingModalOpen(true);
-              }} style={{ flex:1, background:'#4F46E5', color:'#fff', border:'none', borderRadius:'12px', padding:'14px', fontSize:'15px', fontWeight:700, cursor:'pointer' }}>
-                {bookingService.isFree ? 'Book Free Session' : 'Proceed to Book'}
-              </button>
-              <button onClick={()=>{setBookingService(null);setCouponResult(null);}} style={{ background:'#F1F5F9', color:'#64748B', border:'none', borderRadius:'12px', padding:'14px 16px', cursor:'pointer' }}>
 
-                Cancel
-              </button>
+              {/* Expertise Bento Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-[#fbf2ed] p-8 rounded-[1.5rem]">
+                  <TrendingUp size={30} className="text-[#004944] mb-4" />
+                  <h3 className="font-headline text-xl font-bold mb-2">Market Strategy</h3>
+                  <p className="text-[#44474c] text-sm leading-relaxed">Defining GTM strategies for fintech and SaaS platforms looking to scale internationally.</p>
+                </div>
+                <div className="bg-[#004944] p-8 rounded-[1.5rem] text-white">
+                  <Brain size={30} className="text-[#9cf2e8] mb-4" />
+                  <h3 className="font-headline text-xl font-bold mb-2">Leadership Coaching</h3>
+                  <p className="text-white/80 text-sm leading-relaxed">Transitioning from Individual Contributor to Management within high-growth orgs.</p>
+                </div>
+                
+                {profile.customSections?.filter(s => s.title?.toLowerCase().includes('achievement') || s.title?.toLowerCase().includes('highlight')).map((sec, i) => (
+                  <div key={i} className="col-span-1 md:col-span-2 bg-[#eae1dc] p-8 rounded-[1.5rem]">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-headline text-xl font-bold">{sec.title}</h3>
+                      <Award size={24} className="text-[#1d2b3e]" />
+                    </div>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {sec.content.split('\n').map((item, j) => (
+                        <li key={j} className="flex items-start gap-2">
+                          <CheckCircle size={16} className="text-[#004944] mt-1 fill-current" />
+                          <span className="text-sm font-medium">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+
+                {/* Fallback Achievements if none found in profile */}
+                {(!profile.customSections || !profile.customSections.some(s => s.title?.toLowerCase().includes('achievement'))) && (
+                  <div className="col-span-1 md:col-span-2 bg-[#eae1dc] p-8 rounded-[1.5rem]">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-headline text-xl font-bold">Key Achievements</h3>
+                      <Award size={24} className="text-[#1d2b3e]" />
+                    </div>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-[#004944] mt-1 fill-current" />
+                        <span className="text-sm font-medium">Led GTM for key product expansion</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-[#004944] mt-1 fill-current" />
+                        <span className="text-sm font-medium">Industry Recognition and Awards</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-[#004944] mt-1 fill-current" />
+                        <span className="text-sm font-medium">Mentored 50+ directors into VP roles</span>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Services Section */}
+              <div id="services">
+                <div className="flex items-baseline justify-between mb-8">
+                  <h2 className="font-headline text-3xl font-extrabold text-[#1d2b3e]">Services</h2>
+                  <p className="text-[#505f76] text-sm font-medium">Available for booking this month</p>
+                </div>
+                <div className="grid grid-cols-1 gap-6">
+                  {services.map(s => (
+                    <ServiceCard 
+                      key={s._id} 
+                      service={s} 
+                      onBook={s.serviceType === 'priority_dm' 
+                        ? (svc) => { if (!user) navigate('/login', { state: { from: `/mentor/${handle}` } }); else setDmService(svc); }
+                        : (svc) => { 
+                            if (!user) {
+                              navigate('/login', { state: { from: `/mentor/${handle}` } }); 
+                            } else { 
+                              navigate(`/mentor/${handle}/checkout`, {
+                                state: {
+                                  mentor,
+                                  mentorProfileId: profile._id,
+                                  service: svc,
+                                  couponCode: couponResult?.valid ? couponCode : undefined,
+                                  couponResult: couponResult?.valid ? couponResult : undefined
+                                }
+                              });
+                            } 
+                          }
+                      } 
+                      preferredCurrency={data?.preferredCurrency} 
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        </section>
+      </main>
+
 
       {/* Priority DM Send Modal */}
       {dmService && (
         <SendDMModal
           mentor={mentor}
           service={dmService}
-          onClose={()=>setDmService(null)}
+          onClose={() => setDmService(null)}
         />
       )}
 
-      {/* Date/Time Booking Modal */}
-      <BookingModal
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-        mentor={mentor}
-        mentorProfileId={profile._id}
-        bookingService={bookingService}
-        couponCode={couponResult?.valid ? couponCode : null}
-        couponResult={couponResult}
-        onConfirmBooking={handleConfirmBooking}
-        isBooking={isSubmitting}
-      />
     </div>
   );
 }

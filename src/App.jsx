@@ -47,6 +47,8 @@ const MentorSessions = lazy(() => import('./Pages/MentorShip/Bookings/MentorSess
 const RateSession = lazy(() => import('./Pages/MentorShip/RateSession'));
 const MentorSearchPage = lazy(() => import('./Pages/MentorShip/MentorSearchPage'));
 const PublicMentorProfile = lazy(() => import('./Pages/MentorShip/PublicMentorProfile'));
+const CheckoutPage = lazy(() => import('./Pages/MentorShip/Bookings/CheckoutPage'));
+const SuccessPage = lazy(() => import('./Pages/MentorShip/Bookings/SuccessPage'));
 const BecomeMentorFlow = lazy(() => import('./Pages/MentorShip/BecomeMentorFlow'));
 const MentorDashboardNew = lazy(() => import('./Pages/MentorShip/MentorDashboardNew'));
 const MenteeDMInbox = lazy(() => import('./Pages/MentorShip/DM/MenteeDMInbox'));
@@ -189,6 +191,8 @@ function App() {
           {/* Mentor search & public profile (Topmate-style) */}
           <Route path="/mentors" element={<MentorSearchPage />} />
           <Route path="/mentor/:handle" element={<PublicMentorProfile />} />
+          <Route path="/mentor/:handle/checkout" element={<CheckoutPage />} />
+          <Route path="/mentor/:handle/success" element={<SuccessPage />} />
           <Route path="/become-a-mentor" element={<BecomeMentorFlow />} />
           <Route path="/mentor-dashboard" element={
             <RoleGuard roles={['Mentor', 'Admin']}>
