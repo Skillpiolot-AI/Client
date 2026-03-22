@@ -106,6 +106,18 @@ const ModernCommunityPage = lazy(() => import('./Pages/community/community'));
 const UpdatesPage = lazy(() => import('./Pages/updates/UpdatesPage'));
 const AdminUpdatesPage = lazy(() => import('./Pages/updates/AdminUpdatesPage'));
 
+// 👥 Group Pages
+const CommunityLayout = lazy(() => import('./Pages/community/CommunityLayout'));
+const CommunityHomePage = lazy(() => import('./Pages/community/CommunityHomePage'));
+const CreateGroupPage = lazy(() => import('./Pages/community/CreateGroupPage'));
+const GroupDetailPage = lazy(() => import('./Pages/community/GroupDetailPage'));
+const GroupChatPage = lazy(() => import('./Pages/community/GroupChatPage'));
+const GroupSettingsPage = lazy(() => import('./Pages/community/GroupSettingsPage'));
+const MyGroupsPage = lazy(() => import('./Pages/community/MyGroupsPage'));
+const GroupDiscoveryPage = lazy(() => import('./Pages/community/GroupDiscoveryPage'));
+const GroupAdminPage = lazy(() => import('./Pages/community/GroupAdminPage'));
+const JoinGroupPage = lazy(() => import('./Pages/community/JoinGroupPage'));
+
 // 🎓 Other
 const CollegeList = lazy(() => import('./Pages/Colleges/CollegeList'));
 const AIlandingpage = lazy(() => import("./AILandingpage/AILandingPage"));
@@ -113,6 +125,7 @@ const DocsPage = lazy(() => import('./Pages/Docs/DocsPage'));
 
 // 🌐 Global Components
 import Navbar from "./homepage/landing/Navbar"
+import { GroupProvider } from './contexts/GroupContext';
 import FooterSection from "./homepage/components/FooterSection"
 import ChatBot1 from './chatbot/ChatBot';
 
@@ -145,8 +158,8 @@ function App() {
   return (
     <>
       <Navbar />
-
-      <Suspense fallback={<PageLoading />}>
+      <GroupProvider>
+        <Suspense fallback={<PageLoading />}>
         <Routes>
           {/* 🌍 Public Routes */}
           <Route path="/" element={<Landingpage />} />
@@ -166,6 +179,20 @@ function App() {
           <Route path="/view-books" element={<ViewBooksPage />} />
           <Route path="/userFeedback" element={<MentorFeedback />} />
           <Route path="/community" element={<ModernCommunityPage />} />
+          
+          {/* 👥 Group & Community Routes */}
+          <Route path="/groups" element={<CommunityLayout />}>
+            <Route index element={<CommunityHomePage />} />
+            <Route path="discover" element={<GroupDiscoveryPage />} />
+            <Route path="create" element={<CreateGroupPage />} />
+            <Route path="my-groups" element={<MyGroupsPage />} />
+            <Route path="groups/:groupId" element={<GroupDetailPage />} />
+            <Route path=":groupId" element={<GroupDetailPage />} /> 
+            <Route path=":groupId/chat" element={<GroupChatPage />} />
+            <Route path=":groupId/settings" element={<GroupSettingsPage />} />
+            <Route path=":groupId/admin" element={<GroupAdminPage />} />
+            <Route path=":groupId/join" element={<JoinGroupPage />} />
+          </Route>
           <Route path="/roadmap" element={<FrontendRoadmap />} />
           <Route path="/mentorDashboard" element={<CoachProfile />} />
           <Route path="/mentorDashboard/modern" element={<MentorDashboardModern />} />
@@ -269,6 +296,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+    </GroupProvider>
 
       <ChatBot1 />
       <FooterSection />
