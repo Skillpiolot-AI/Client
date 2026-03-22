@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Briefcase, TrendingUp, DollarSign, GraduationCap } from 'lucide-react';
+import { DollarSign, GraduationCap, MapPin, ArrowRight } from 'lucide-react';
 
 const CareerRecommendations = ({ careers }) => {
   const [filter, setFilter] = useState('all');
@@ -14,81 +14,66 @@ const CareerRecommendations = ({ careers }) => {
     return `₹${(salary_from / 100000).toFixed(1)}L - ₹${(salary_to / 100000).toFixed(1)}L`;
   };
 
-  const getGrowthColor = (value) => {
-    if (value >= 4) return '#047857';
-    if (value >= 3) return '#0f766e';
-    if (value >= 2) return '#c2410c';
-    return '#64748b';
+  const getMatchLabel = (value) => {
+    if (value >= 4) return { label: 'Perfect Fit', style: 'bg-[#9cf2e8] text-[#00504a]' };
+    if (value >= 3) return { label: 'High Match', style: 'bg-[#d3e4fe] text-[#0b1c30]' };
+    if (value >= 2) return { label: 'Strategic', style: 'bg-[#d0e1fb] text-[#1d2b3e]' };
+    return { label: 'Potential', style: 'bg-[#eae1dc] text-[#44474c]' };
   };
 
   return (
-    <div className="career-recommendations">
-      <div className="recommendations-header">
-        <h2 className="section-title">
-          <Briefcase size={24} />
-          Recommended Careers
-        </h2>
-        <div className="filter-buttons">
-          <button 
-            className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-            onClick={() => setFilter('all')}
-          >
-            All
-          </button>
-          <button 
-            className={`filter-btn ${filter === 'Professional' ? 'active' : ''}`}
-            onClick={() => setFilter('Professional')}
-          >
-            Professional
-          </button>
-          <button 
-            className={`filter-btn ${filter === 'Vocational' ? 'active' : ''}`}
-            onClick={() => setFilter('Vocational')}
-          >
-            Vocational
-          </button>
+    <section className="space-y-12 mt-16 font-sans">
+      <div className="text-center space-y-4">
+        <h2 className="text-4xl font-serif font-extrabold tracking-tight text-[#1d2b3e]">Tailored Opportunities</h2>
+        <p className="text-[#515f74] max-w-2xl mx-auto">Selected career paths that maximize the intersection of your primary personality drivers.</p>
+        
+        {/* Simple Filters */}
+        <div className="flex justify-center gap-3 pt-6">
+          {['all', 'Professional', 'Vocational'].map(type => (
+             <button 
+                key={type}
+                onClick={() => setFilter(type)}
+                className={`px-5 py-2 rounded-full text-xs font-bold transition-colors ${filter === type ? 'bg-[#1d2b3e] text-white shadow-md' : 'bg-white text-[#515f74] hover:bg-[#fbf2ed] border border-[#eae1dc]'}`}
+             >
+                {type === 'all' ? 'All Roles' : type}
+             </button>
+          ))}
         </div>
       </div>
 
-      <div className="careers-grid">
-        {filteredCareers.map((career, idx) => (
-          <div key={idx} className="career-card">
-            <div className="career-header">
-              <div className="career-info">
-                <h4 className="career-name">{career.name}</h4>
-                <span className="career-type">{career.career_type}</span>
-              </div>
-            </div>
-
-            <div className="career-cluster">
-              <GraduationCap size={14} />
-              <span>{career.cluster}</span>
-            </div>
-
-            <div className="career-details">
-              {career.salary_range && career.salary_range['0_2'] && (
-                <div className="detail-item">
-                  <DollarSign size={16} />
-                  <span>{formatSalary(career.salary_range)}</span>
-                </div>
-              )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredCareers.map((career, idx) => {
+          const match = getMatchLabel(career.future_growth?.very_long_term?.value || 3);
+          
+          return (
+            <div key={idx} className="bg-white border border-[#eae1dc] p-6 rounded-[2rem] hover:-translate-y-2 transition-transform duration-300 shadow-sm hover:shadow-[0_20px_40px_rgba(31,27,24,0.06)] flex flex-col h-full">
               
-              {career.future_growth && career.future_growth.very_long_term && (
-                <div className="detail-item">
-                  <TrendingUp 
-                    size={16} 
-                    color={getGrowthColor(career.future_growth.very_long_term.value)}
-                  />
-                  <span style={{ color: getGrowthColor(career.future_growth.very_long_term.value) }}>
-                    {career.future_growth.very_long_term.text}
-                  </span>
+              <div className="aspect-video w-full rounded-2xl bg-[#fbf2ed] mb-6 overflow-hidden flex items-center justify-center relative">
+                 <div className="absolute inset-0 bg-gradient-to-br from-[#1d2b3e]/5 to-[#004944]/10"></div>
+                 <GraduationCap size={48} strokeWidth={1} className="text-[#515f74]/30" />
+              </div>
+
+              <div className="flex justify-between items-start mb-4 gap-4 flex-1">
+                <div>
+                  <h4 className="text-xl font-bold font-serif text-[#1d2b3e] leading-snug mb-1">{career.name}</h4>
+                  <p className="text-sm text-[#515f74]">{career.cluster || career.career_type}</p>
                 </div>
-              )}
+                <span className={`px-3 py-1 text-[10px] font-black uppercase rounded-lg whitespace-nowrap ${match.style}`}>
+                   {match.label}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4 text-xs font-medium text-[#515f74] pt-4 border-t border-[#eae1dc]/50 mt-auto">
+                <span className="flex items-center gap-1.5"><DollarSign size={14} className="text-[#1d2b3e]" />{formatSalary(career.salary_range)}</span>
+                <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#1d2b3e]" />Flexible</span>
+              </div>
+
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-    </div>
+
+    </section>
   );
 };
 

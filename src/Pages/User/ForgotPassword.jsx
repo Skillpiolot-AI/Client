@@ -1,25 +1,19 @@
-"use client"
-
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Eye, EyeOff, ArrowLeft, Mail, Lock, CheckCircle, Loader2, AlertCircle } from "lucide-react"
+import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle } from "lucide-react"
 import axios from "axios"
 import { toast } from "react-hot-toast"
 import config from "../../config"
-import { Link, useNavigate, useLocation } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 export default function ForgotPassword() {
   const navigate = useNavigate()
-  const location = useLocation()
   const [step, setStep] = useState(1) // 1: Email, 2: OTP, 3: New Password, 4: Success
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [countdown, setCountdown] = useState(0)
 
-  // Auto-start countdown if we arrive at step 2 (e.g. via resend or manual step change)
+  // Auto-start countdown if we arrive at step 2
   useEffect(() => {
     if (step === 2 && countdown === 0) {
       startCountdown()
@@ -78,41 +72,23 @@ export default function ForgotPassword() {
     setIsLoading(true)
 
     try {
-      console.log('🔐 Sending forgot password request...')
-      console.log('Email:', formData.email)
-
       const { data } = await axios.post(`${config.API_BASE_URL}/auth/forgot-password`, {
         email: formData.email
       })
-
-      console.log('📨 Response:', data)
 
       if (data.success) {
         toast.success(data.message)
         setStep(2)
         startCountdown()
 
-        // Show debug info in development
         if (data.debug) {
-          console.log('🔑 DEBUG - OTP:', data.debug.otp)
-          console.log('⏰ Expires in:', data.debug.expiresIn)
           toast.success(`DEBUG: OTP is ${data.debug.otp}`, { duration: 10000 })
-        }
-
-        // Show preview URL in console for testing
-        if (data.previewUrl) {
-          console.log('📧 Preview Email:', data.previewUrl)
         }
       }
     } catch (error) {
-      console.error("❌ Request OTP error:", error)
-      console.error("Error response:", error.response?.data)
-
-      const data = error.response?.data;
-      const errorMessage = data?.message || error.message || "Failed to send reset code. Please try again.";
-      const diagnosticInfo = data?.errorCode ? ` [Code: ${data.errorCode}]` : '';
-
-      toast.error(`${errorMessage}${diagnosticInfo}`);
+      const data = error.response?.data
+      const errorMessage = data?.message || error.message || "Failed to send reset code. Please try again."
+      toast.error(errorMessage)
       setErrors({ ...errors, email: errorMessage })
     } finally {
       setIsLoading(false)
@@ -136,16 +112,10 @@ export default function ForgotPassword() {
     setIsLoading(true)
 
     try {
-      console.log('🔍 Verifying OTP...')
-      console.log('Email:', formData.email)
-      console.log('OTP:', formData.otp)
-
       const { data } = await axios.post(`${config.API_BASE_URL}/auth/verify-otp`, {
         email: formData.email,
         otp: formData.otp
       })
-
-      console.log('📨 Verify response:', data)
 
       if (data.success) {
         toast.success(data.message)
@@ -153,9 +123,6 @@ export default function ForgotPassword() {
         setStep(3)
       }
     } catch (error) {
-      console.error("❌ Verify OTP error:", error)
-      console.error("Error response:", error.response?.data)
-
       const errorMessage = error.response?.data?.message || "Invalid OTP. Please try again."
       toast.error(errorMessage)
       setErrors({ ...errors, otp: errorMessage })
@@ -171,31 +138,20 @@ export default function ForgotPassword() {
     setIsLoading(true)
 
     try {
-      console.log('🔄 Resending OTP...')
-
       const { data } = await axios.post(`${config.API_BASE_URL}/auth/resend-otp`, {
         email: formData.email
       })
-
-      console.log('📨 Resend response:', data)
 
       if (data.success) {
         toast.success(data.message)
         setFormData({ ...formData, otp: "" })
         startCountdown()
 
-        // Show debug info
         if (data.debug) {
-          console.log('🔑 DEBUG - New OTP:', data.debug.otp)
           toast.success(`DEBUG: New OTP is ${data.debug.otp}`, { duration: 10000 })
-        }
-
-        if (data.previewUrl) {
-          console.log('📧 Preview Email:', data.previewUrl)
         }
       }
     } catch (error) {
-      console.error("❌ Resend OTP error:", error)
       toast.error(error.response?.data?.message || "Failed to resend code")
     } finally {
       setIsLoading(false)
@@ -224,29 +180,21 @@ export default function ForgotPassword() {
     setIsLoading(true)
 
     try {
-      console.log('🔒 Resetting password...')
-
       const { data } = await axios.post(`${config.API_BASE_URL}/auth/reset-password`, {
         resetToken: formData.resetToken,
         newPassword: formData.newPassword,
         confirmPassword: formData.confirmPassword
       })
 
-      console.log('📨 Reset response:', data)
-
       if (data.success) {
         toast.success(data.message)
         setStep(4)
 
-        // Redirect after 3 seconds
         setTimeout(() => {
           navigate('/login')
-        }, 3000)
+        }, 5000)
       }
     } catch (error) {
-      console.error("❌ Reset password error:", error)
-      console.error("Error response:", error.response?.data)
-
       const errorMessage = error.response?.data?.message || "Failed to reset password. Please try again."
       toast.error(errorMessage)
       setErrors({ ...errors, password: errorMessage })
@@ -255,310 +203,219 @@ export default function ForgotPassword() {
     }
   }
 
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60)
+    const s = seconds % 60
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+  }
+
+  const stepLabels = [
+    { num: 1, label: "Identity" },
+    { num: 2, label: "Verify" },
+    { num: 3, label: "Reset" },
+    { num: 4, label: "Done" }
+  ]
+
   return (
-    <div className="min-h-screen flex font-sans">
-      {/* Left side */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ backgroundColor: "#3F3FF3" }}>
-        <div className="relative z-10 flex flex-col justify-between w-full px-12 py-12">
-          <div className="flex-1 flex flex-col justify-center">
-            <h2 className="text-4xl text-white mb-6 leading-tight">Reset Your Password</h2>
-            <p className="text-white/90 text-lg leading-relaxed">
-              Don't worry! It happens. Enter your email and we'll send you a code to reset your password.
-            </p>
-          </div>
-
-          <div className="flex justify-between items-center text-white/70 text-sm">
-            <span>Copyright © 2025 SkillPilot</span>
-            <span className="cursor-pointer hover:text-white/90">Privacy Policy</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Right side */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
-        <div className="w-full max-w-md space-y-8">
-          {/* Back to login */}
-          <Link
-            to="/login"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Login
-          </Link>
-
-          {/* Step 1: Email Input */}
-          {step === 1 && (
-            <div className="space-y-6">
-              <div className="space-y-2 text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="h-8 w-8 text-[#3F3FF3]" />
+    <div className="bg-[#fff8f5] font-sans text-[#1f1b18] min-h-screen flex flex-col selection:bg-[#b9c7e0] selection:text-[#0d1c2f]">
+        
+        {/* TopAppBar Fake Nav Segment */}
+        <header className="sticky top-0 z-50 bg-[#fff8f5]/80 backdrop-blur-xl border-b border-[#eae1dc]/30">
+            <div className="max-w-7xl mx-auto px-8 py-6 flex justify-between items-center w-full">
+                <div className="text-2xl font-black text-[#1d2b3e] font-serif tracking-tight">
+                    SkillPilot
                 </div>
-                <h2 className="text-3xl text-foreground font-semibold">Forgot Password?</h2>
-                <p className="text-muted-foreground">
-                  Enter your email address and we'll send you a code to reset your password.
-                </p>
-              </div>
-
-              <form onSubmit={handleRequestOTP} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-foreground">
-                    Email Address
-                  </Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email address"
-                    required
-                    className={`h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.email ? 'border-red-300 focus:border-red-500' : ''
-                      }`}
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-red-600 flex items-center space-x-1">
-                      <AlertCircle className="h-4 w-4" />
-                      <span>{errors.email}</span>
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full h-12 text-sm font-medium text-white bg-[#6366F1] hover:bg-[#4F46E5] transition-all duration-200 rounded-lg shadow-none cursor-pointer"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Sending Code...
-                    </>
-                  ) : (
-                    'Send Reset Code'
-                  )}
-                </Button>
-              </form>
+                <Link to="/login" className="text-[#1d2b3e] font-medium flex items-center gap-2 hover:opacity-70 transition-opacity">
+                    <span className="material-symbols-outlined text-sm" style={{fontVariationSettings: "'FILL' 1"}}>arrow_back</span>
+                    <span className="font-sans uppercase tracking-widest text-[10px] font-bold">Back to login</span>
+                </Link>
             </div>
-          )}
+        </header>
 
-          {/* Step 2: OTP Verification */}
-          {step === 2 && (
-            <div className="space-y-6">
-              <div className="space-y-2 text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="h-8 w-8 text-[#3F3FF3]" />
-                </div>
-                <h2 className="text-3xl text-foreground font-semibold">Verify Code</h2>
-                <p className="text-muted-foreground">
-                  We've sent a 6-digit code to <strong>{formData.email}</strong>
-                </p>
-              </div>
-
-              <form onSubmit={handleVerifyOTP} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="otp" className="text-sm font-medium text-foreground">
-                    Enter 6-Digit Code
-                  </Label>
-                  <Input
-                    id="otp"
-                    name="otp"
-                    type="text"
-                    maxLength={6}
-                    value={formData.otp}
-                    onChange={handleChange}
-                    placeholder="000000"
-                    required
-                    className={`h-12 text-center text-2xl tracking-widest border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.otp ? 'border-red-300 focus:border-red-500' : ''
-                      }`}
-                  />
-                  {errors.otp && (
-                    <p className="text-sm text-red-600 flex items-center space-x-1">
-                      <AlertCircle className="h-4 w-4" />
-                      <span>{errors.otp}</span>
-                    </p>
-                  )}
+        <main className="flex-grow flex items-center justify-center px-6 py-12">
+            <div className="w-full max-w-xl">
+                
+                {/* Progress Tracker */}
+                <div className="flex justify-between mb-12 px-4 relative max-w-md mx-auto">
+                    <div className="absolute top-1/2 left-4 right-4 h-[1px] bg-[#eae1dc] -z-10 -translate-y-1/2"></div>
+                    
+                    {stepLabels.map((s) => {
+                        const isActive = step >= s.num;
+                        const isCurrent = step === s.num;
+                        return (
+                            <div key={s.num} className="flex flex-col items-center gap-2">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-4 ring-[#fff8f5] transition-all ${isActive ? 'bg-[#1d2b3e] text-white' : 'bg-[#eae1dc] text-[#75777d]'}`}>
+                                    {isActive && !isCurrent && s.num < 4 ? <span className="material-symbols-outlined text-[16px]">check</span> : s.num}
+                                </div>
+                                <span className={`font-sans text-[10px] uppercase tracking-tighter font-bold ${isActive ? 'text-[#1d2b3e]' : 'text-[#75777d]'}`}>{s.label}</span>
+                            </div>
+                        )
+                    })}
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full h-12 text-sm font-medium text-white bg-[#6366F1] hover:bg-[#4F46E5] transition-all duration-200 rounded-lg shadow-none cursor-pointer"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Verifying...
-                    </>
-                  ) : (
-                    'Verify Code'
-                  )}
-                </Button>
-
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    Didn't receive the code?{' '}
-                    {countdown > 0 ? (
-                      <span className="text-gray-400">Resend in {countdown}s</span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={handleResendOTP}
-                        disabled={isLoading}
-                        className="font-medium text-[#3F3FF3] hover:text-[#2F2FD3]"
-                      >
-                        Resend Code
-                      </button>
+                {/* Card Container */}
+                <div className="bg-white rounded-[2rem] p-10 shadow-[0px_20px_40px_rgba(31,27,24,0.06)] ring-1 ring-[#c5c6cd]/15">
+                    
+                    {/* STEP 1: EMAIL REQUEST */}
+                    {step === 1 && (
+                        <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="space-y-2">
+                                <h1 className="font-serif text-3xl font-extrabold text-[#1d2b3e] tracking-tight">Forgot password?</h1>
+                                <p className="text-[#44474c] text-sm leading-relaxed">Enter the email address associated with your SkillPilot account and we'll send you a 6-digit verification code.</p>
+                            </div>
+                            
+                            <form onSubmit={handleRequestOTP} className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="font-sans text-[11px] uppercase tracking-widest font-semibold text-[#75777d]" htmlFor="email">Email Address</label>
+                                    <input 
+                                        className={`w-full bg-[#eae1dc]/30 border-0 rounded-xl px-4 py-4 text-[#1f1b18] focus:ring-2 focus:ring-[#1d2b3e]/20 focus:bg-[#fbf2ed] transition-all outline-none ${errors.email ? 'ring-2 ring-[#ba1a1a]/50' : ''}`}
+                                        id="email" name="email" type="email" placeholder="name@company.com"
+                                        value={formData.email} onChange={handleChange}
+                                    />
+                                    {errors.email && <p className="text-[#ba1a1a] text-xs font-bold flex items-center gap-1 mt-1"><AlertCircle size={14} />{errors.email}</p>}
+                                </div>
+                                <button 
+                                    type="submit" disabled={isLoading}
+                                    className="w-full bg-gradient-to-br from-[#1d2b3e] to-[#334155] text-white py-4 rounded-full font-bold text-sm shadow-xl shadow-[#1d2b3e]/20 hover:-translate-y-0.5 transition-transform active:scale-[0.98] disabled:opacity-70 flex justify-center items-center gap-2"
+                                >
+                                    {isLoading ? <><Loader2 className="w-4 h-4 animate-spin"/> Processing...</> : 'Send Verification Code'}
+                                </button>
+                            </form>
+                        </section>
                     )}
-                  </p>
+
+                    {/* STEP 2: OTP INPUT */}
+                    {step === 2 && (
+                        <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="space-y-2 text-center">
+                                <h1 className="font-serif text-3xl font-extrabold text-[#1d2b3e] tracking-tight">Verify Identity</h1>
+                                <p className="text-[#44474c] text-sm leading-relaxed">We've sent a code to <span className="font-bold text-[#1d2b3e] italic">{formData.email}</span></p>
+                            </div>
+                            
+                            <form onSubmit={handleVerifyOTP} className="space-y-8">
+                                <div className="space-y-2">
+                                    <input 
+                                        className={`w-full h-16 text-center text-3xl tracking-[1em] bg-[#eae1dc]/30 border-0 rounded-xl focus:ring-2 focus:ring-[#1d2b3e]/20 focus:bg-[#fbf2ed] text-[#1f1b18] font-bold ${errors.otp ? 'ring-2 ring-[#ba1a1a]/50' : ''}`}
+                                        maxLength={6} type="text" placeholder="------"
+                                        name="otp" value={formData.otp} onChange={handleChange} autoFocus
+                                    />
+                                    {errors.otp && <p className="text-[#ba1a1a] text-xs font-bold flex justify-center items-center gap-1 mt-1"><AlertCircle size={14} />{errors.otp}</p>}
+                                </div>
+                                <div className="text-center">
+                                    {countdown > 0 ? (
+                                        <p className="text-xs text-[#75777d] font-medium">Resend code in <span className="text-[#1d2b3e] font-bold">{formatTime(countdown)}</span></p>
+                                    ) : (
+                                        <button type="button" onClick={handleResendOTP} disabled={isLoading} className="text-xs text-[#1d2b3e] font-bold hover:underline">Resend Code Now</button>
+                                    )}
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <button 
+                                        type="submit" disabled={isLoading}
+                                        className="w-full bg-gradient-to-br from-[#1d2b3e] to-[#334155] text-white py-4 rounded-full font-bold text-sm shadow-xl shadow-[#1d2b3e]/20 hover:-translate-y-0.5 transition-transform active:scale-[0.98] disabled:opacity-70 flex justify-center items-center gap-2"
+                                    >
+                                        {isLoading ? <><Loader2 className="w-4 h-4 animate-spin"/> Verifying...</> : 'Verify & Proceed'}
+                                    </button>
+                                    <button type="button" onClick={() => setStep(1)} className="text-[#75777d] text-xs font-bold uppercase tracking-widest hover:text-[#1d2b3e]">
+                                        Change Email
+                                    </button>
+                                </div>
+                            </form>
+                        </section>
+                    )}
+
+                    {/* STEP 3: NEW PASSWORD */}
+                    {step === 3 && (
+                        <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="space-y-2">
+                                <h1 className="font-serif text-3xl font-extrabold text-[#1d2b3e] tracking-tight">New Password</h1>
+                                <p className="text-[#44474c] text-sm leading-relaxed">Set a strong password to protect your professional journey.</p>
+                            </div>
+                            
+                            <form onSubmit={handleResetPassword} className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="font-sans text-[11px] uppercase tracking-widest font-semibold text-[#75777d]">New Password</label>
+                                    <div className="relative">
+                                        <input 
+                                            className={`w-full bg-[#eae1dc]/30 border-0 rounded-xl px-4 py-4 focus:ring-2 focus:ring-[#1d2b3e]/20 focus:bg-[#fbf2ed] transition-all outline-none text-[#1f1b18] ${errors.password ? 'ring-2 ring-[#ba1a1a]/50' : ''}`}
+                                            placeholder="••••••••" type={showPassword ? 'text' : 'password'}
+                                            name="newPassword" value={formData.newPassword} onChange={handleChange}
+                                        />
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#75777d] hover:text-[#1d2b3e]">
+                                            {showPassword ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="font-sans text-[11px] uppercase tracking-widest font-semibold text-[#75777d]">Confirm Password</label>
+                                    <div className="relative">
+                                        <input 
+                                            className={`w-full bg-[#eae1dc]/30 border-0 rounded-xl px-4 py-4 focus:ring-2 focus:ring-[#1d2b3e]/20 focus:bg-[#fbf2ed] transition-all outline-none text-[#1f1b18] ${errors.password ? 'ring-2 ring-[#ba1a1a]/50' : ''}`}
+                                            placeholder="••••••••" type={showConfirmPassword ? 'text' : 'password'}
+                                            name="confirmPassword" value={formData.confirmPassword} onChange={handleChange}
+                                        />
+                                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#75777d] hover:text-[#1d2b3e]">
+                                            {showConfirmPassword ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
+                                        </button>
+                                    </div>
+                                    {errors.password && <p className="text-[#ba1a1a] text-xs font-bold flex items-center gap-1 mt-1"><AlertCircle size={14} />{errors.password}</p>}
+                                </div>
+                                
+                                <div className="bg-[#fbf2ed] p-4 rounded-xl space-y-2 border border-[#c5c6cd]/10">
+                                    <p className="text-[10px] uppercase tracking-widest font-bold text-[#75777d]">Security Strength</p>
+                                    <div className="h-1 w-full bg-[#eae1dc] rounded-full overflow-hidden">
+                                        {/* Auto-calculate simple visual strength */}
+                                        <div className={`h-full transition-all ${formData.newPassword.length > 8 ? 'bg-[#004944] w-3/4' : formData.newPassword.length > 5 ? 'bg-[#80d5cb] w-1/2' : 'bg-[#ba1a1a]/50 w-1/4'}`}></div>
+                                    </div>
+                                    {formData.newPassword.length > 8 ? (
+                                        <p className="text-[10px] text-[#00312d] font-medium">Strong: Contains sufficient characters.</p>
+                                    ) : (
+                                        <p className="text-[10px] text-[#75777d] font-medium text-opacity-80">Minimum 6 characters required.</p>
+                                    )}
+                                </div>
+
+                                <button 
+                                    type="submit" disabled={isLoading}
+                                    className="w-full bg-gradient-to-br from-[#1d2b3e] to-[#334155] text-white py-4 rounded-full font-bold text-sm shadow-xl shadow-[#1d2b3e]/20 hover:-translate-y-0.5 transition-transform active:scale-[0.98] disabled:opacity-70 flex justify-center items-center gap-2"
+                                >
+                                    {isLoading ? <><Loader2 className="w-4 h-4 animate-spin"/> Processing...</> : 'Update Password'}
+                                </button>
+                            </form>
+                        </section>
+                    )}
+
+                    {/* STEP 4: SUCCESS */}
+                    {step === 4 && (
+                        <section className="space-y-8 text-center py-6 animate-in fade-in zoom-in-95 duration-500">
+                            <div className="flex justify-center">
+                                <div className="w-20 h-20 bg-[#9cf2e8] rounded-full flex items-center justify-center text-[#00312d]">
+                                    <CheckCircle className="w-10 h-10" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <h1 className="font-serif text-3xl font-extrabold text-[#1d2b3e] tracking-tight">Success!</h1>
+                                <p className="text-[#44474c] text-sm leading-relaxed px-4">Your password has been updated. You can now use your new credentials to sign in.</p>
+                            </div>
+                            <div className="pt-4">
+                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-[#f6ece8] rounded-full">
+                                    <div className="w-5 h-5 border-2 border-[#1d2b3e]/20 border-t-[#1d2b3e] rounded-full animate-spin"></div>
+                                    <span className="text-xs font-bold text-[#1d2b3e] uppercase tracking-widest">Redirecting to Login...</span>
+                                </div>
+                            </div>
+                            <button onClick={() => navigate('/login')} className="w-full bg-[#eae1dc]/30 text-[#1d2b3e] py-4 rounded-full font-bold text-sm hover:bg-[#eae1dc] transition-colors mt-6">
+                                Sign In Now
+                            </button>
+                        </section>
+                    )}
+
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="w-full text-sm text-gray-600 hover:text-gray-900"
-                >
-                  Change email address
-                </button>
-              </form>
+                {/* Contextual Footer Help */}
+                <div className="mt-12 text-center">
+                    <p className="text-xs text-[#75777d] font-medium">Having trouble? <Link to="/contact" className="text-[#1d2b3e] underline decoration-[#1d2b3e]/20 underline-offset-4 hover:decoration-[#1d2b3e] transition-all font-bold">Contact Support</Link></p>
+                </div>
+
             </div>
-          )}
-
-          {/* Step 3: New Password */}
-          {step === 3 && (
-            <div className="space-y-6">
-              <div className="space-y-2 text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Lock className="h-8 w-8 text-[#3F3FF3]" />
-                </div>
-                <h2 className="text-3xl text-foreground font-semibold">Create New Password</h2>
-                <p className="text-muted-foreground">
-                  Your new password must be different from previously used passwords.
-                </p>
-              </div>
-
-              <form onSubmit={handleResetPassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword" className="text-sm font-medium text-foreground">
-                    New Password
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="newPassword"
-                      name="newPassword"
-                      type={showPassword ? "text" : "password"}
-                      value={formData.newPassword}
-                      onChange={handleChange}
-                      placeholder="Enter new password"
-                      required
-                      className={`h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.password ? 'border-red-300 focus:border-red-500' : ''
-                        }`}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent cursor-pointer"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
-                    Confirm New Password
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      placeholder="Confirm new password"
-                      required
-                      className={`h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.password ? 'border-red-300 focus:border-red-500' : ''
-                        }`}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent cursor-pointer"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </Button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-sm text-red-600 flex items-center space-x-1">
-                      <AlertCircle className="h-4 w-4" />
-                      <span>{errors.password}</span>
-                    </p>
-                  )}
-                </div>
-
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-xs text-gray-600">
-                    Password must be at least 6 characters long
-                  </p>
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full h-12 text-sm font-medium text-white bg-[#6366F1] hover:bg-[#4F46E5] transition-all duration-200 rounded-lg shadow-none cursor-pointer"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Resetting Password...
-                    </>
-                  ) : (
-                    'Reset Password'
-                  )}
-                </Button>
-              </form>
-            </div>
-          )}
-
-          {/* Step 4: Success */}
-          {step === 4 && (
-            <div className="space-y-6 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="h-8 w-8 text-green-600" />
-              </div>
-              <div className="space-y-2">
-                <h2 className="text-3xl text-foreground font-semibold">Password Reset Successfully!</h2>
-                <p className="text-muted-foreground">
-                  Your password has been reset successfully. You can now log in with your new password.
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <Button
-                  onClick={() => navigate('/login')}
-                  className="w-full h-12 text-sm font-medium text-white bg-[#6366F1] hover:bg-[#4F46E5] transition-all duration-200 rounded-lg shadow-none cursor-pointer"
-                >
-                  Go to Login
-                </Button>
-                <p className="text-sm text-gray-500">
-                  Redirecting to login in 3 seconds...
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+        </main>
     </div>
   )
 }

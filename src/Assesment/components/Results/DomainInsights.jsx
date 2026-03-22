@@ -1,245 +1,90 @@
 import React from 'react';
-import { Wrench, Microscope, Palette, Users, Briefcase, BarChart3 } from 'lucide-react';
+import { Users, TrendingUp, Presentation, Briefcase, Search, LayoutTemplate } from 'lucide-react';
 
-const DOMAIN_INFO = {
+const DOMAIN_DETAILS = {
   R: {
     name: 'Realistic',
-    Icon: Wrench,
-    color: '#166534',
-    description: 'You enjoy hands-on, practical work with tools, machines, and nature. You prefer working with your hands to create tangible results.',
-    characteristics: ['Mechanical', 'Practical', 'Physical', 'Outdoor-oriented'],
-    careers: ['Engineer', 'Technician', 'Mechanic', 'Construction Worker']
+    icon: <Briefcase size={20} />,
+    description: 'The "Doers". You are practical, mechanical, and realistic. You prefer working with things, tools, and machines rather than ideas or people.',
+    focusArea: 'Action & Execution',
+    focusExample: 'Engineering, logistics, hands-on development.'
   },
   I: {
     name: 'Investigative',
-    Icon: Microscope,
-    color: '#0f766e',
-    description: 'You enjoy analyzing problems, conducting research, and learning about scientific topics. You prefer intellectual challenges.',
-    characteristics: ['Analytical', 'Curious', 'Intellectual', 'Methodical'],
-    careers: ['Scientist', 'Researcher', 'Analyst', 'Doctor']
+    icon: <Search size={20} />,
+    description: 'The "Thinkers". You are analytical, intellectual, and scientific. You prefer observing, learning, evaluating, and solving complex problems.',
+    focusArea: 'Analysis & Logic',
+    focusExample: 'Data science, research, strategic planning.'
   },
   A: {
     name: 'Artistic',
-    Icon: Palette,
-    color: '#9f1239',
-    description: 'You enjoy creative expression through art, design, and performance. You prefer unstructured environments.',
-    characteristics: ['Creative', 'Imaginative', 'Expressive', 'Original'],
-    careers: ['Artist', 'Designer', 'Writer', 'Musician']
+    icon: <LayoutTemplate size={20} />,
+    description: 'The "Creators". You are innovative, intuitive, and expressive. You prefer unstructured environments that allow for imagination and originality.',
+    focusArea: 'Design & Creativity',
+    focusExample: 'Creative direction, UX design, content strategy.'
   },
   S: {
     name: 'Social',
-    Icon: Users,
-    color: '#047857',
-    description: 'You enjoy helping, teaching, and working with people. You are empathetic and collaborative.',
-    characteristics: ['Helpful', 'Empathetic', 'Cooperative', 'Patient'],
-    careers: ['Teacher', 'Counselor', 'Nurse', 'Social Worker']
+    icon: <Users size={20} />,
+    description: 'The "Helpers". You excel in environments that prioritize interpersonal relationships, teaching, and wellness. Your strength lies in empathetic communication.',
+    focusArea: 'Work Environment',
+    focusExample: 'Educational institutions, non-profits, HR hubs.'
   },
   E: {
     name: 'Enterprising',
-    Icon: Briefcase,
-    color: '#b45309',
-    description: 'You enjoy leading, persuading, and managing others. You are comfortable taking risks and making decisions.',
-    characteristics: ['Ambitious', 'Persuasive', 'Confident', 'Energetic'],
-    careers: ['Manager', 'Entrepreneur', 'Sales Professional', 'Lawyer']
+    icon: <TrendingUp size={20} />,
+    description: 'The "Persuaders". You are naturally drawn to leadership, risk-taking, and public speaking. You enjoy influencing others to achieve goals.',
+    focusArea: 'Skill Focus',
+    focusExample: 'Public speaking, negotiation, resource allocation.'
   },
   C: {
     name: 'Conventional',
-    Icon: BarChart3,
-    color: '#1e40af',
-    description: 'You enjoy organizing, managing data, and following procedures. You are detail-oriented and systematic.',
-    characteristics: ['Organized', 'Detail-oriented', 'Systematic', 'Efficient'],
-    careers: ['Accountant', 'Administrator', 'Analyst', 'Banker']
+    icon: <Presentation size={20} />,
+    description: 'The "Organizers". You value order, data integrity, and clear protocols. Your work is marked by high precision and reliability.',
+    focusArea: 'Ideal Tasks',
+    focusExample: 'Managing databases, financial reporting, logic auditing.'
   }
 };
 
 const DomainInsights = ({ results }) => {
-  const topThree = results.sorted.slice(0, 3);
+  const { topThreeDomains } = results;
 
   return (
-    <div className="domain-insights">
-      <h2 className="section-title">Your Top Personality Traits</h2>
-
-      <div className="insights-grid">
-        {topThree.map(({ domain, score }, index) => {
-          const info = DOMAIN_INFO[domain];
-          const Icon = info.Icon;
+    <section className="space-y-10 mt-16 font-sans">
+      <h2 className="text-3xl font-serif font-bold tracking-tight text-center text-[#1d2b3e]">Top Domain Insights</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {topThreeDomains.map((domainCode, index) => {
+          const detail = DOMAIN_DETAILS[domainCode];
+          if (!detail) return null;
 
           return (
-            <div key={domain} className="insight-card">
-              <div className="insight-header">
-                <div className="insight-rank" style={{ backgroundColor: info.color }}>
-                  #{index + 1}
-                </div>
-                <div className="insight-info">
-                  <div className="insight-icon" style={{ backgroundColor: `${info.color}15` }}>
-                    <Icon size={24} color={info.color} />
-                  </div>
-                  <div>
-                    <h3 className="insight-name" style={{ color: info.color }}>
-                      {info.name}
-                    </h3>
-                    <span className="insight-score">{score}% match</span>
-                  </div>
-                </div>
+            <div 
+              key={index} 
+              className="group bg-[#fbf2ed] hover:bg-white transition-all duration-300 p-8 rounded-[2.5rem] space-y-6 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] border border-transparent hover:border-[#c5c6cd]/20"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-[#1d2b3e] to-[#334155] rounded-2xl flex items-center justify-center text-white shadow-md">
+                {detail.icon}
               </div>
-
-              <p className="insight-description">{info.description}</p>
-
-              <div className="insight-characteristics">
-                <h4 className="characteristics-title">Key Characteristics:</h4>
-                <div className="characteristics-tags">
-                  {info.characteristics.map((char, idx) => (
-                    <span
-                      key={idx}
-                      className="characteristic-tag"
-                      style={{
-                        backgroundColor: `${info.color}10`,
-                        color: info.color,
-                        borderColor: `${info.color}30`
-                      }}
-                    >
-                      {char}
-                    </span>
-                  ))}
+              <h3 className="text-2xl font-serif font-bold text-[#1d2b3e]">{detail.name}</h3>
+              <p className="text-sm text-[#515f74] leading-relaxed min-h-[80px]">
+                {detail.description}
+              </p>
+              
+              <div className="space-y-3 pt-4 border-t border-[#c5c6cd]/10">
+                <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-[#004944]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#004944]"></span>
+                  {detail.focusArea}
                 </div>
-              </div>
-
-              <div className="insight-careers">
-                <h4 className="careers-title">Related Careers:</h4>
-                <div className="careers-tags">
-                  {info.careers.map((career, idx) => (
-                    <span key={idx} className="career-tag">
-                      {career}
-                    </span>
-                  ))}
-                </div>
+                <p className="text-sm font-medium text-[#1f1b18]">
+                    {detail.focusExample}
+                </p>
               </div>
             </div>
           );
         })}
       </div>
-
-      <style>{`
-        .domain-insights {
-          margin-bottom: 32px;
-        }
-
-        .section-title {
-          font-size: 20px;
-          font-weight: 600;
-          color: #111827;
-          margin-bottom: 20px;
-        }
-
-        .insights-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
-        }
-
-        .insight-card {
-          background: white;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          padding: 24px;
-        }
-
-        .insight-header {
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-          margin-bottom: 16px;
-        }
-
-        .insight-rank {
-          width: 28px;
-          height: 28px;
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 12px;
-          font-weight: 700;
-          flex-shrink: 0;
-        }
-
-        .insight-info {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          flex: 1;
-        }
-
-        .insight-icon {
-          width: 44px;
-          height: 44px;
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .insight-name {
-          font-size: 16px;
-          font-weight: 600;
-          margin: 0 0 2px 0;
-        }
-
-        .insight-score {
-          font-size: 13px;
-          color: #6b7280;
-        }
-
-        .insight-description {
-          color: #4b5563;
-          font-size: 14px;
-          line-height: 1.6;
-          margin-bottom: 16px;
-        }
-
-        .characteristics-title,
-        .careers-title {
-          font-size: 13px;
-          font-weight: 600;
-          color: #374151;
-          margin: 0 0 8px 0;
-        }
-
-        .characteristics-tags,
-        .careers-tags {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 6px;
-        }
-
-        .characteristic-tag {
-          padding: 4px 10px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 500;
-          border: 1px solid;
-        }
-
-        .career-tag {
-          padding: 4px 10px;
-          background: #f3f4f6;
-          border-radius: 6px;
-          font-size: 12px;
-          color: #374151;
-        }
-
-        .insight-characteristics {
-          margin-bottom: 16px;
-        }
-
-        @media (max-width: 1024px) {
-          .insights-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
-    </div>
+    </section>
   );
 };
 

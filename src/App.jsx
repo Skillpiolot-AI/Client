@@ -263,7 +263,7 @@ function App() {
           </Route>
 
           {/* ❌ 404 */}
-          <Route path="/assessment" element={<AssessmentApp />} />
+          <Route path="/assessment/*" element={<AssessmentApp />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

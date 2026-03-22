@@ -1,10 +1,9 @@
 import React from 'react';
-import { Share2, Download, Home, CheckCircle, History } from 'lucide-react';
+import { Share2, Download, Home, CheckCircle, History, Verified } from 'lucide-react';
 import ChartsSection from './ChartsSection';
 import CareerRecommendations from './CareerRecommendations';
 import DomainInsights from './DomainInsights';
 import GeminiInsights from './GeminiInsights';
-import '../../styles/results.css';
 
 const ResultsPage = ({ assessmentData, onStartNew, onViewHistory }) => {
   // Extract data from the backend response
@@ -32,280 +31,136 @@ const ResultsPage = ({ assessmentData, onStartNew, onViewHistory }) => {
   };
 
   const handleShare = async () => {
-    const text = `My Holland Code is ${results.hollandCode}! I just discovered my ideal career path.`;
-
+    const text = `My Holland Code is ${results.hollandCode}! I just discovered my ideal career profile.`;
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'My RIASEC Career Assessment Results',
-          text,
-          url: window.location.href
-        });
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          fallbackShare(text);
-        }
-      }
-    } else {
-      fallbackShare(text);
-    }
+      try { await navigator.share({ title: 'My RIASEC Career Assessment Results', text, url: window.location.href }); } catch (err) { fallbackShare(text); }
+    } else { fallbackShare(text); }
   };
 
   const fallbackShare = (text) => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(`${text}\n${window.location.href}`);
-      alert('Link copied to clipboard!');
-    } else {
-      alert(text);
-    }
+    if (navigator.clipboard) { navigator.clipboard.writeText(`${text}\n${window.location.href}`); alert('Link copied!'); } else { alert(text); }
   };
 
-  const handleDownload = () => {
-    alert('PDF download feature coming soon!');
-  };
+  const handleDownload = () => alert('PDF download feature coming soon!');
 
-  // Check if we have valid data
-  if (!sorted.length || sorted.length === 0) {
+  if (!sorted.length) {
     return (
-      <div className="results-page">
-        <div className="results-container">
-          <div className="error-state">
-            <h2>No Results Available</h2>
-            <p>Unable to load assessment results. Please try again.</p>
-            <button onClick={onStartNew} className="btn-primary">
-              <Home size={18} />
-              <span>Return Home</span>
-            </button>
-          </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#fff8f5] px-4 font-sans text-[#1f1b18]">
+        <div className="bg-white p-12 rounded-3xl border border-[#c5c6cd]/30 text-center max-w-lg shadow-sm">
+          <h2 className="text-2xl font-bold mb-4 font-serif">No Results Available</h2>
+          <p className="text-[#515f74] mb-8">Unable to load assessment findings.</p>
+          <button onClick={onStartNew} className="bg-[#1d2b3e] text-white px-8 py-3 rounded-xl font-semibold">Return Home</button>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="results-page">
-      <div className="results-container">
-        {/* Header */}
-        <div className="results-header">
-          <div className="completion-badge">
-            <CheckCircle size={16} />
-            <span>Assessment Complete</span>
-          </div>
-          <h1 className="results-title">Your Career Profile</h1>
-          <p className="results-subtitle">
-            Based on your responses, here's your personalized career guidance
-          </p>
+  // Helper strings for UI
+  const getArchetype = (code) => {
+    const map = {
+      'SEC': 'Community Architect',
+      'IRE': 'Strategic Innovator',
+      'AIR': 'Creative Builder',
+      'SRE': 'Frontline Leader',
+      'IEC': 'Analytical Strategist',
+      'ASE': 'Visionary Director'
+    };
+    return map[code] || 'Professional Navigator';
+  };
 
-          {/* Holland Code Display */}
-          <div className="holland-code-box">
-            <span className="holland-label">Holland Code:</span>
-            <span className="results-holland-code">{results.hollandCode}</span>
+  const topString = sorted.length >= 3 ? `${sorted[0].domain} · ${sorted[1].domain} · ${sorted[2].domain}` : 'RIASEC Profile';
+
+  return (
+    <div className="bg-[#fff8f5] text-[#1f1b18] min-h-screen font-sans selection:bg-[#d0e1fb]">
+      
+      {/* Header Section (TopAppBar Shared Component Simulation) */}
+      <header className="relative w-full bg-[#fff8f5] shadow-sm px-4 md:px-8 py-4 flex flex-col sm:flex-row items-center justify-between border-b border-[#eae1dc] gap-4">
+        <div className="flex items-center gap-2">
+            <span className="font-serif font-extrabold text-xl tracking-tight text-[#1d2b3e]">Career Navigator</span>
+        </div>
+        <div className="flex items-center gap-3">
+            <button onClick={handleShare} className="flex items-center gap-2 px-4 py-2 rounded-xl text-[#1d2b3e] font-medium hover:bg-[#fbf2ed] transition-all active:scale-95 border border-[#eae1dc]">
+                <Share2 size={16} />
+                <span className="text-xs uppercase tracking-wider font-semibold">Share</span>
+            </button>
+            <button onClick={handleDownload} className="flex items-center gap-2 px-4 py-2 rounded-xl text-[white] bg-[#1d2b3e] font-medium hover:bg-[#004944] transition-all active:scale-95">
+                <Download size={16} />
+                <span className="text-xs uppercase tracking-wider font-semibold">Download</span>
+            </button>
+            <button onClick={onViewHistory} className="flex items-center gap-2 px-4 py-2 rounded-xl text-[#1d2b3e] font-medium hover:bg-[#fbf2ed] transition-all active:scale-95 border border-[#eae1dc]">
+                <History size={16} />
+                <span className="text-xs uppercase tracking-wider font-semibold">History</span>
+            </button>
+        </div>
+      </header>
+
+      <main className="pt-12 pb-20 max-w-7xl mx-auto px-4 md:px-8 space-y-16">
+        
+        {/* Section 1: Core RIASEC Profile */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004944]/10 text-[#004944] rounded-full">
+                <Verified size={14} className="fill-current" />
+                <span className="text-xs font-bold uppercase tracking-widest">Assessment Finalized</span>
+            </div>
+            
+            <h1 className="text-6xl md:text-8xl font-serif font-extrabold text-[#1d2b3e] tracking-widest leading-none">
+                {hollandCode.split('').join(' ')}
+            </h1>
+            
+            <p className="text-xl text-[#44474c] max-w-xl font-sans leading-relaxed">
+                {topString}. You are a <span className="text-[#1d2b3e] font-semibold">{getArchetype(hollandCode)}</span>—driven by your unique combination of traits.
+            </p>
+            
             {improvement && improvement.hasImproved !== null && (
-              <span className={`improvement-badge ${improvement.hasImproved ? 'positive' : 'negative'}`}>
-                {improvement.hasImproved ? '+' : ''}{improvement.percentageChange}% from last assessment
-              </span>
+                <div className="flex items-center gap-4 pt-2">
+                    <div className="px-4 py-2 bg-[#fbf2ed] rounded-xl flex items-center gap-3">
+                        <TrendingUp size={18} className={improvement.hasImproved ? "text-[#004944]" : "text-[#ba1a1a]"} />
+                        <span className="text-sm font-medium">{improvement.percentageChange}% Change from previous</span>
+                    </div>
+                </div>
             )}
           </div>
-        </div>
+          
+          <div className="lg:col-span-5 relative group mt-8 lg:mt-0">
+            <div className="absolute inset-0 bg-[#334155] rounded-3xl rotate-3 opacity-5 transition-transform group-hover:rotate-1"></div>
+            <div className="bg-white p-8 rounded-3xl relative border border-[#c5c6cd]/15 shadow-sm">
+                <div className="space-y-4">
+                    <h3 className="font-serif font-bold text-2xl mb-6">Trait Summary</h3>
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center text-sm border-b border-[#c5c6cd]/10 pb-3">
+                            <span className="text-[#44474c]">Primary Driver</span>
+                            <span className="font-semibold">{results.sorted[0]?.domain}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm border-b border-[#c5c6cd]/10 pb-3">
+                            <span className="text-[#44474c]">Secondary Catalyst</span>
+                            <span className="font-semibold">{results.sorted[1]?.domain}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-[#44474c]">Tertiary Support</span>
+                            <span className="font-semibold">{results.sorted[2]?.domain}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </section>
 
-        {/* Action Buttons */}
-        <div className="action-buttons">
-          <button onClick={handleShare} className="btn-secondary">
-            <Share2 size={16} />
-            <span>Share Results</span>
-          </button>
-          <button onClick={handleDownload} className="btn-secondary">
-            <Download size={16} />
-            <span>Download PDF</span>
-          </button>
-          <button onClick={onViewHistory} className="btn-secondary">
-            <History size={16} />
-            <span>View History</span>
-          </button>
-          <button onClick={onStartNew} className="btn-primary">
-            <Home size={16} />
-            <span>Start New</span>
-          </button>
-        </div>
-
-        {/* Gemini AI Personality Analysis */}
+        {/* Section 2: Gemini AI Personality Analysis */}
         <GeminiInsights results={results} />
 
-        {/* Charts Section */}
+        {/* Section 3: Visual Data & Breakdown */}
         <ChartsSection results={results} />
 
-        {/* Domain Insights */}
+        {/* Section 4: Detailed Domain Insights */}
         <DomainInsights results={results} />
 
-        {/* Career Recommendations */}
+        {/* Section 5: Curated Career Recommendations */}
         {results.recommendedCareers.length > 0 && (
           <CareerRecommendations careers={results.recommendedCareers} />
         )}
-      </div>
-
-      <style>{`
-        .results-page {
-          min-height: 100vh;
-          background: #f8fafc;
-          padding: 80px 24px 40px;
-        }
-
-        .results-container {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .results-header {
-          text-align: center;
-          margin-bottom: 28px;
-        }
-
-        .completion-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          background: #dcfce7;
-          color: #166534;
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-size: 13px;
-          font-weight: 500;
-          margin-bottom: 16px;
-        }
-
-        .results-title {
-          font-size: 28px;
-          font-weight: 700;
-          color: #111827;
-          margin: 0 0 8px 0;
-        }
-
-        .results-subtitle {
-          font-size: 15px;
-          color: #6b7280;
-          margin: 0 0 20px 0;
-        }
-
-        .holland-code-box {
-          display: inline-flex;
-          align-items: center;
-          gap: 12px;
-          background: white;
-          border: 1px solid #e5e7eb;
-          padding: 12px 24px;
-          border-radius: 12px;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
-
-        .holland-label {
-          font-size: 14px;
-          color: #6b7280;
-        }
-
-        .results-holland-code {
-          font-size: 24px;
-          font-weight: 800;
-          color: #000000 !important;
-          background: #dcfce7 !important;
-          -webkit-text-fill-color: initial !important;
-          -webkit-background-clip: initial !important;
-          background-clip: initial !important;
-          padding: 8px 20px;
-          border-radius: 8px;
-          letter-spacing: 4px;
-        }
-
-        .improvement-badge {
-          font-size: 12px;
-          padding: 5px 10px;
-          border-radius: 16px;
-          font-weight: 500;
-        }
-
-        .improvement-badge.positive {
-          background: #dcfce7;
-          color: #166534;
-        }
-
-        .improvement-badge.negative {
-          background: #fef2f2;
-          color: #991b1b;
-        }
-
-        .action-buttons {
-          display: flex;
-          justify-content: center;
-          gap: 12px;
-          margin-bottom: 28px;
-          flex-wrap: wrap;
-        }
-
-        .btn-primary,
-        .btn-secondary {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 10px 18px;
-          border-radius: 8px;
-          font-size: 13px;
-          font-weight: 500;
-          cursor: pointer;
-          border: none;
-          transition: all 0.2s;
-        }
-
-        .btn-primary {
-          background: #166534;
-          color: white;
-        }
-
-        .btn-primary:hover {
-          background: #14532d;
-        }
-
-        .btn-secondary {
-          background: white;
-          color: #374151;
-          border: 1px solid #e5e7eb;
-        }
-
-        .btn-secondary:hover {
-          background: #f9fafb;
-        }
-
-        .error-state {
-          text-align: center;
-          padding: 60px 20px;
-          background: white;
-          border-radius: 12px;
-          border: 1px solid #e5e7eb;
-        }
-
-        .error-state h2 {
-          color: #111827;
-          margin-bottom: 8px;
-        }
-
-        .error-state p {
-          color: #6b7280;
-          margin-bottom: 20px;
-        }
-
-        @media (max-width: 640px) {
-          .results-page {
-            padding: 70px 16px 30px;
-          }
-
-          .results-title {
-            font-size: 24px;
-          }
-
-          .holland-code {
-            font-size: 18px;
-          }
-        }
-      `}</style>
+        
+      </main>
     </div>
   );
 };

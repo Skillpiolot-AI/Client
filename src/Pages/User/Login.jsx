@@ -1,8 +1,5 @@
-
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react"
 import { GoogleLogin } from '@react-oauth/google'
 import axios from "axios"
@@ -46,14 +43,12 @@ export default function LoginPage() {
   const redirectBasedOnRole = (userRole) => {
     console.log("Redirecting user with role:", userRole)
 
-    // If user was trying to access a specific page before login, redirect them there
     if (from) {
       console.log("Redirecting to previous page:", from)
       window.location.href = from
       return
     }
 
-    // Otherwise, redirect based on role
     switch (userRole) {
       case "Admin":
         window.location.href = "/amdashboard"
@@ -223,280 +218,199 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex font-sans">
-      {/* Left side - Brand section */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ backgroundColor: "#3F3FF3" }}>
-        <div className="relative z-10 flex flex-col justify-between w-full px-12 py-12">
-
-
-          <div className="flex-1 flex flex-col justify-center">
-            <h2 className="text-4xl text-white mb-6 leading-tight font-bold">
-              Effortlessly manage your career guidance.
-            </h2>
-            <p className="text-white/90 text-lg leading-relaxed">
-              Log in to access your portal and manage your career path.
-            </p>
-          </div>
-
-          <div className="flex justify-between items-center text-white/70 text-sm">
-            <span>Copyright © 2025 SkillPilot</span>
-            <span className="cursor-pointer hover:text-white/90 transition-colors">
-              Privacy Policy
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Right side - Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
-        <div className="w-full max-w-md space-y-8">
-          {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-3"
-              style={{ backgroundColor: "#3F3FF3" }}
-            >
-              <div className="w-4 h-4 bg-white rounded-sm"></div>
-            </div>
-            <h1 className="text-xl font-semibold text-foreground">SkillPilot</h1>
-          </div>
-
-          <div className="space-y-6">
-            {/* Header */}
-            <div className="space-y-2 text-center">
-              <h2 className="text-3xl text-foreground font-semibold">Welcome Back</h2>
-              <p className="text-muted-foreground">
-                Enter your credentials to access your account.
-              </p>
-            </div>
-
-            {/* General Error Message */}
-            {errors.general && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm text-red-800">{errors.general}</p>
-                  {errors.general.includes("No account found") && (
-                    <Link
-                      to="/signup"
-                      className="text-sm font-medium text-red-600 hover:text-red-700 mt-1 inline-block"
-                    >
-                      Create an account →
-                    </Link>
-                  )}
-                  {errors.general.includes("locked") && (
-                    <Link
-                      to="/forgot-password"
-                      className="text-sm font-medium text-red-600 hover:text-red-700 mt-1 inline-block"
-                    >
-                      Reset your password →
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Login Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Username/Email Input */}
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-sm font-medium text-foreground">
-                  Username / Email / Registration Number
-                </Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  value={form.username}
-                  onChange={handleChange}
-                  placeholder="Enter your username, email, or registration number"
-                  required
-                  className={`h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.username ? 'border-red-300 focus:border-red-500' : ''
-                    }`}
-                />
-                {errors.username && (
-                  <p className="text-sm text-red-600 flex items-center space-x-1">
-                    <AlertCircle className="h-4 w-4" />
-                    <span>{errors.username}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Password Input */}
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">
-                  Password
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Enter your password"
-                    required
-                    className={`h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white focus:border-[#3F3FF3] ${errors.password ? 'border-red-300 focus:border-red-500' : ''
-                      }`}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent cursor-pointer"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </Button>
-                </div>
-                {errors.password && (
-                  <p className="text-sm text-red-600 flex items-center space-x-1">
-                    <AlertCircle className="h-4 w-4" />
-                    <span>{errors.password}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Forgot Password Link */}
-              <div className="flex items-center justify-between">
-                <div className="text-sm">
-                  <Link
-                    to="/forgot-password"
-                    className="font-medium text-[#3F3FF3] hover:text-[#2F2FD3] transition-colors"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-              </div>
-
-              {/* Login Button */}
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer transition-opacity"
-                style={{ backgroundColor: "#3F3FF3" }}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Logging in...
-                  </>
-                ) : (
-                  "Log In"
-                )}
-              </Button>
-            </form>
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-muted-foreground">Or continue with</span>
-              </div>
-            </div>
-
-            {/* Google Login Button */}
-            <div className="flex justify-center">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                useOneTap
-                theme="outline"
-                size="large"
-                text="signin_with"
-                shape="rectangular"
-                width="384"
-              />
-            </div>
-
-            {/* Sign Up Link */}
-            <div className="text-center text-sm">
-              <span className="text-muted-foreground">Don't have an account? </span>
-              <Link
-                to="/signup"
-                className="font-medium text-[#3F3FF3] hover:text-[#2F2FD3] transition-colors"
-              >
-                Sign up
-              </Link>
-            </div>
-
-            {/* Quick Login Shortcuts */}
-            <div style={{ marginTop: '24px', borderTop: '1px solid #E2E8F0', paddingTop: '16px' }}>
-              <p style={{ fontSize: '12px', color: '#94A3B8', textAlign: 'center', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
-                ⚡ Quick Login (Dev)
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {/* Admin */}
-                <div>
-                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#DC2626', marginBottom: '4px' }}>🛡️ Admin</p>
-                  <button
-                    type="button"
-                    onClick={() => setForm({ username: 'admin@skillpilot.dev', password: 'Admin@Skill2024!' })}
-                    style={{ width: '100%', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#991B1B', cursor: 'pointer', textAlign: 'left', fontWeight: 500 }}
-                  >
-                    Super Admin — admin@skillpilot.dev
-                  </button>
+    <div className="min-h-screen bg-[#fff8f5] font-sans text-[#1f1b18] selection:bg-[#b9c7e0] selection:text-[#0d1c2f]">
+        
+        {/* Navbar area placeholder for spacing if needed */}
+        <main className="min-h-screen flex items-center justify-center px-6 py-12 lg:py-24">
+            
+            {/* Main Layout Container: Intentional Asymmetry */}
+            <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                {/* Branding/Editorial Column */}
+                <div className="lg:col-span-5 space-y-8">
+                    <div className="inline-block">
+                        <span className="font-serif font-black text-4xl tracking-tight text-[#1d2b3e]">SkillPilot</span>
+                    </div>
+                    
+                    <h1 className="font-serif font-extrabold text-5xl lg:text-6xl text-[#1f1b18] leading-[1.1] tracking-tight">
+                        Secure your next <span className="text-[#004944] bg-[#9cf2e8] px-2 rounded-xl">milestone.</span>
+                    </h1>
+                    
+                    <p className="text-[#44474c] text-lg leading-relaxed max-w-md">
+                        Access your personalized career dashboard, connect with top-tier mentors, and track your professional trajectory with precision.
+                    </p>
+                    
+                    <div className="hidden lg:block pt-12">
+                        <div className="bg-[#fbf2ed] p-8 rounded-full border border-[#c5c6cd]/15 relative overflow-hidden">
+                            <div className="relative z-10 flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-full bg-[#334155] flex items-center justify-center text-white">
+                                    <span className="material-symbols-outlined">shield_person</span>
+                                </div>
+                                <div>
+                                    <p className="font-serif font-bold text-[#1f1b18]">Trusted Identity</p>
+                                    <p className="text-sm text-[#44474c]">Enterprise-grade security for your data.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Mentors */}
-                <div>
-                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#7C3AED', marginBottom: '4px' }}>👨‍🏫 Mentors</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    {[
-                      { name: 'Arjun Sharma', email: 'arjun.sharma@skillpilot.dev', tag: 'DSA, Java' },
-                      { name: 'Priya Nair', email: 'priya.nair@skillpilot.dev', tag: 'React, TS' },
-                      { name: 'Rahul Kapoor', email: 'rahul.kapoor@skillpilot.dev', tag: 'Full Mentor' },
-                      { name: 'Rohan Mehta', email: 'rohan.mehta@skillpilot.dev', tag: 'ML, Python' },
-                    ].map((m, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setForm({ username: m.email, password: m.email === 'rahul.kapoor@skillpilot.dev' ? 'FullMentor@2024!' : 'Mentor@1234' })}
-                        style={{ width: '100%', background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: '8px', padding: '7px 12px', fontSize: '12px', color: '#5B21B6', cursor: 'pointer', textAlign: 'left', fontWeight: 500, display: 'flex', justifyContent: 'space-between' }}
-                      >
-                        <span>{m.name}</span>
-                        <span style={{ opacity: 0.6, fontSize: '11px' }}>{m.tag}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                {/* Login Form Column */}
+                <div className="lg:col-span-7 flex justify-center">
+                    <div className="w-full max-w-md bg-white p-8 lg:p-12 rounded-[2.5rem] shadow-[0px_20px_40px_rgba(31,27,24,0.06)] border border-[#c5c6cd]/15 relative">
+                        
+                        <div className="mb-10">
+                            <h2 className="font-serif font-bold text-2xl text-[#1f1b18] mb-2">Welcome Back</h2>
+                            <p className="text-[#44474c] text-sm">Please enter your details to continue your journey.</p>
+                        </div>
 
-                {/* Users */}
-                <div>
-                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#059669', marginBottom: '4px' }}>👤 Users</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    {[
-                      { name: 'Ravi Gupta', email: 'ravi.gupta@user.dev', tag: 'JS, React' },
-                      { name: 'Pooja Verma', email: 'pooja.verma@user.dev', tag: 'Python' },
-                      { name: 'Akash Tiwari', email: 'akash.tiwari@user.dev', tag: 'Java' },
-                      { name: 'Neha Malhotra', email: 'neha.malhotra@user.dev', tag: 'C++, DSA' },
-                    ].map((u, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setForm({ username: u.email, password: 'User@1234' })}
-                        style={{ width: '100%', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: '8px', padding: '7px 12px', fontSize: '12px', color: '#065F46', cursor: 'pointer', textAlign: 'left', fontWeight: 500, display: 'flex', justifyContent: 'space-between' }}
-                      >
-                        <span>{u.name}</span>
-                        <span style={{ opacity: 0.6, fontSize: '11px' }}>{u.tag}</span>
-                      </button>
-                    ))}
-                  </div>
+                        {/* General Error State */}
+                        {errors.general && (
+                            <div className="mb-6 p-4 bg-[#ffdad6]/40 rounded-xl flex items-start gap-3 border border-[#ba1a1a]/10">
+                                <span className="material-symbols-outlined text-[#ba1a1a] mt-0.5" style={{fontVariationSettings: "'FILL' 1"}}>error</span>
+                                <div>
+                                    <p className="text-[#93000a] text-sm font-semibold">Security Alert</p>
+                                    <p className="text-[#93000a] text-xs opacity-80">{errors.general}</p>
+                                    {errors.general.includes("locked") && (
+                                        <Link to="/forgot-password" className="text-xs font-bold text-[#ba1a1a] hover:underline mt-1 block">
+                                            Reset your password →
+                                        </Link>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            
+                            {/* Identity Input */}
+                            <div className="space-y-2">
+                                <label className="font-sans text-xs font-bold uppercase tracking-wider text-[#44474c]" htmlFor="username">
+                                    Username, Email, or Reg. No
+                                </label>
+                                <div className="relative group">
+                                    <input 
+                                        className={`w-full h-14 px-5 bg-[#eae1dc] rounded-xl border-0 focus:ring-0 focus:bg-white transition-all duration-300 placeholder:text-[#75777d] text-[#1f1b18] ${errors.username ? 'ring-2 ring-[#ba1a1a]/50' : ''}`}
+                                        id="username" 
+                                        name="username" 
+                                        type="text"
+                                        placeholder="e.g. navigator_pro"
+                                        value={form.username}
+                                        onChange={handleChange}
+                                    />
+                                    <div className="absolute inset-0 pointer-events-none rounded-xl ring-1 ring-[#1d2b3e]/5 group-focus-within:ring-[#1d2b3e]/20 transition-all"></div>
+                                </div>
+                                {errors.username && <p className="text-[#ba1a1a] text-xs mt-1">{errors.username}</p>}
+                            </div>
+
+                            {/* Password Input */}
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <label className="font-sans text-xs font-bold uppercase tracking-wider text-[#44474c]" htmlFor="password">
+                                        Password
+                                    </label>
+                                    <Link className="text-xs font-medium text-[#1d2b3e] hover:underline underline-offset-4" to="/forgot-password">
+                                        Forgot?
+                                    </Link>
+                                </div>
+                                <div className="relative group">
+                                    <input 
+                                        className={`w-full h-14 px-5 bg-[#eae1dc] rounded-xl border-0 focus:ring-0 focus:bg-white transition-all duration-300 placeholder:text-[#75777d] text-[#1f1b18] pr-12 ${errors.password ? 'ring-2 ring-[#ba1a1a]/50' : ''}`}
+                                        id="password" 
+                                        name="password" 
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="••••••••"
+                                        value={form.password}
+                                        onChange={handleChange}
+                                    />
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[#75777d] hover:text-[#1f1b18] cursor-pointer outline-none"
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                    <div className="absolute inset-0 pointer-events-none rounded-xl ring-1 ring-[#1d2b3e]/5 group-focus-within:ring-[#1d2b3e]/20 transition-all"></div>
+                                </div>
+                                {errors.password && <p className="text-[#ba1a1a] text-xs mt-1">{errors.password}</p>}
+                            </div>
+
+                            {/* Sign In Button */}
+                            <button 
+                                type="submit"
+                                disabled={isLoading}
+                                className="bg-gradient-to-br from-[#1d2b3e] to-[#334155] w-full h-14 rounded-full text-white font-serif font-bold flex items-center justify-center gap-2 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#1d2b3e]/10 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? (
+                                    <><Loader2 className="w-5 h-5 animate-spin" /> Verifying...</>
+                                ) : (
+                                    <>Sign In <span className="material-symbols-outlined text-sm">arrow_forward</span></>
+                                )}
+                            </button>
+
+                            <div className="relative py-4">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-[#c5c6cd]/30"></div>
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
+                                    <span className="bg-white px-4 text-[#75777d]">or continue with</span>
+                                </div>
+                            </div>
+
+                            {/* Google Sign In Area */}
+                            <div className="w-full flex justify-center [&>div]:w-full [&_iframe]:w-full rounded-full overflow-hidden border border-[#c5c6cd]/15">
+                                <GoogleLogin
+                                    onSuccess={handleGoogleSuccess}
+                                    onError={handleGoogleError}
+                                    useOneTap
+                                    theme="outline"
+                                    size="large"
+                                    text="signin_with"
+                                    shape="circle"
+                                    width="100%"
+                                />
+                            </div>
+
+                        </form>
+
+                        <p className="mt-8 text-center text-sm text-[#44474c]">
+                            Don't have an account?{' '}
+                            <Link className="text-[#1d2b3e] font-bold hover:underline underline-offset-4" to="/signup">
+                                Get Started
+                            </Link>
+                        </p>
+
+                        
+                        {/* Quick Login Shortcuts for Development */}
+                        {import.meta.env.DEV && (
+                            <div className="mt-8 pt-4 border-t border-[#c5c6cd]/30 hidden md:block">
+                            <p className="text-[10px] text-[#75777d] text-center font-bold uppercase tracking-widest mb-3">
+                                ⚡ Dev Quick Login
+                            </p>
+                            <div className="flex flex-col gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                                <button
+                                    type="button"
+                                    onClick={() => setForm({ username: 'admin@skillpilot.dev', password: 'Admin@Skill2024!' })}
+                                    className="w-full bg-[#fbf2ed] text-left px-3 py-2 border border-[#eae1dc] text-[#93000a] text-xs rounded-lg hover:bg-white transition-colors font-medium flex justify-between"
+                                >
+                                    <span>🛡️ Super Admin</span>
+                                    <span>admin@skillpilot.dev</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setForm({ username: 'ravi.gupta@user.dev', password: 'User@1234' })}
+                                    className="w-full bg-[#fbf2ed] text-left px-3 py-2 border border-[#eae1dc] text-[#00504a] text-xs rounded-lg hover:bg-white transition-colors font-medium flex justify-between"
+                                >
+                                    <span>👤 User (Ravi)</span>
+                                    <span>ravi.gupta@user.dev</span>
+                                </button>
+                            </div>
+                            </div>
+                        )}
+
+                    </div>
                 </div>
-              </div>
-              <p style={{ fontSize: '10px', color: '#CBD5E1', textAlign: 'center', marginTop: '8px' }}>
-                Click to auto-fill, then hit "Log In"
-              </p>
             </div>
-          </div>
-        </div>
-      </div>
+        </main>
     </div>
   )
 }
