@@ -236,16 +236,7 @@ export default function PublicMentorProfile() {
 
               {/* Expertise Bento Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-[#fbf2ed] p-8 rounded-[1.5rem]">
-                  <TrendingUp size={30} className="text-[#004944] mb-4" />
-                  <h3 className="font-headline text-xl font-bold mb-2">Market Strategy</h3>
-                  <p className="text-[#44474c] text-sm leading-relaxed">Defining GTM strategies for fintech and SaaS platforms looking to scale internationally.</p>
-                </div>
-                <div className="bg-[#004944] p-8 rounded-[1.5rem] text-white">
-                  <Brain size={30} className="text-[#9cf2e8] mb-4" />
-                  <h3 className="font-headline text-xl font-bold mb-2">Leadership Coaching</h3>
-                  <p className="text-white/80 text-sm leading-relaxed">Transitioning from Individual Contributor to Management within high-growth orgs.</p>
-                </div>
+
                 
                 {profile.customSections?.filter(s => s.title?.toLowerCase().includes('achievement') || s.title?.toLowerCase().includes('highlight')).map((sec, i) => (
                   <div key={i} className="col-span-1 md:col-span-2 bg-[#eae1dc] p-8 rounded-[1.5rem]">
@@ -264,29 +255,7 @@ export default function PublicMentorProfile() {
                   </div>
                 ))}
 
-                {/* Fallback Achievements if none found in profile */}
-                {(!profile.customSections || !profile.customSections.some(s => s.title?.toLowerCase().includes('achievement'))) && (
-                  <div className="col-span-1 md:col-span-2 bg-[#eae1dc] p-8 rounded-[1.5rem]">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-headline text-xl font-bold">Key Achievements</h3>
-                      <Award size={24} className="text-[#1d2b3e]" />
-                    </div>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle size={16} className="text-[#004944] mt-1 fill-current" />
-                        <span className="text-sm font-medium">Led GTM for key product expansion</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle size={16} className="text-[#004944] mt-1 fill-current" />
-                        <span className="text-sm font-medium">Industry Recognition and Awards</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle size={16} className="text-[#004944] mt-1 fill-current" />
-                        <span className="text-sm font-medium">Mentored 50+ directors into VP roles</span>
-                      </li>
-                    </ul>
-                  </div>
-                )}
+
               </div>
 
               {/* Services Section */}
