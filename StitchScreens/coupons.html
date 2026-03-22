@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SkillPilot Mentor Dashboard - Coupons</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-primary": "#b9c7e0",
+                        "primary-fixed-dim": "#b9c7e0",
+                        "on-primary-fixed-variant": "#3a485c",
+                        "inverse-surface": "#342f2d",
+                        "surface": "#fff8f5",
+                        "surface-variant": "#eae1dc",
+                        "secondary-fixed": "#d3e4fe",
+                        "secondary-container": "#d0e1fb",
+                        "secondary": "#505f76",
+                        "primary-fixed": "#d5e3fd",
+                        "outline-variant": "#c5c6cd",
+                        "tertiary-container": "#004944",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f8efeb",
+                        "surface-container-low": "#fbf2ed",
+                        "on-primary": "#ffffff",
+                        "background": "#fff8f5",
+                        "tertiary-fixed-dim": "#80d5cb",
+                        "surface-bright": "#fff8f5",
+                        "primary": "#1d2b3e",
+                        "on-primary-container": "#9eadc5",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-tertiary-fixed": "#00201d",
+                        "on-secondary-container": "#54647a",
+                        "on-primary-fixed": "#0d1c2f",
+                        "surface-tint": "#515f74",
+                        "primary-container": "#334155",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#9cf2e8",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#f0e6e2",
+                        "on-surface": "#1f1b18",
+                        "tertiary": "#00312d",
+                        "surface-container": "#f6ece8",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-background": "#1f1b18",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#e1d8d4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container-highest": "#eae1dc",
+                        "on-tertiary-container": "#65bbb1",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#44474c",
+                        "outline": "#75777d",
+                        "error-container": "#ffdad6"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            background: rgba(255, 248, 245, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #1d2b3e 0%, #334155 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200/50 dark:border-slate-800/50 py-8 px-4 z-50">
+<div class="mb-10 px-4">
+<span class="font-manrope font-bold text-slate-900 dark:text-slate-100 text-xl tracking-tight">SkillPilot</span>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 rounded-xl font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Overview
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 rounded-xl font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined">payments</span>
+                Services
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 rounded-xl font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined">forum</span>
+                DM Inbox
+            </a>
+<!-- Active Tab: Coupons -->
+<a class="flex items-center gap-3 px-4 py-3 text-slate-900 dark:text-white font-bold border-r-2 border-slate-900 dark:border-white bg-slate-100 dark:bg-slate-800 transition-colors duration-200 font-manrope text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">confirmation_number</span>
+                Coupons
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 rounded-xl font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined">dashboard_customize</span>
+                Custom Sections
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 rounded-xl font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined">event_available</span>
+                Schedule &amp; Profile
+            </a>
+</nav>
+<div class="mt-auto border-t border-slate-200/50 pt-6 space-y-1">
+<div class="flex items-center gap-3 px-4 mb-6">
+<img alt="Mentor profile picture" class="w-10 h-10 rounded-full bg-slate-200" data-alt="Close up professional portrait of a mentor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAry-E1f1qrWqhfaqVPSLWIF33p7rOz1D0wDosvJZAwZdISIP5xefC5Hf3nhwuTvHT7_cXF9vIb7aC_VxJzz7J4CfzYNbSEqjjX_FgP3UnEzeRRA2FqgYvorT1B4RG3Wq1wlLFzO3ikcBGNuQM6kRLMbDkSNF38USFUgXZu6f3UqULYkq46twK8GHsv-FlBgNfMYufbnN21EG9syj3mI97iPgsy_AjeocVzCHVXz8A4dYe8MXSgZyrzrZMylCTPM9tyyndIWt2pLNs"/>
+<div>
+<p class="text-sm font-bold text-slate-900 dark:text-slate-100">Mentor Name</p>
+<p class="text-xs text-slate-500">@skillpilot_handle</p>
+</div>
+</div>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-slate-700 transition-colors text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-lg">visibility</span>
+                View Public Profile
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-slate-700 transition-colors text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-lg">settings</span>
+                Edit Profile Setup
+            </a>
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 shadow-sm">
+<div class="flex items-center gap-4">
+<h1 class="text-xl font-black text-slate-900 tracking-tight">Coupons</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all w-64" placeholder="Search codes..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-slate-500">
+<button class="hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-24 pb-12 px-8 min-h-screen">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-12">
+<div>
+<span class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant font-bold">Incentives Engine</span>
+<h2 class="font-headline text-4xl font-extrabold text-primary mt-2">Manage Promotions</h2>
+<p class="text-on-surface-variant mt-2 max-w-lg">Create, monitor, and scale your mentorship reach through targeted discount strategies.</p>
+</div>
+<button class="signature-gradient text-on-primary px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg hover:-translate-y-0.5 transition-all">
+<span class="material-symbols-outlined">add</span>
+                Create New Coupon
+            </button>
+</div>
+<!-- Bento Grid Analytics -->
+<div class="grid grid-cols-12 gap-6 mb-12">
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">trending_up</span>
+</div>
+<span class="text-xs font-bold text-tertiary-container">+12% this month</span>
+</div>
+<p class="text-sm text-on-surface-variant">Total Savings Generated</p>
+<h3 class="text-3xl font-black text-primary mt-1">₹45,200</h3>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">group</span>
+</div>
+<span class="text-xs font-bold text-on-surface-variant">84 New Mentees</span>
+</div>
+<p class="text-sm text-on-surface-variant">Total Conversions</p>
+<h3 class="text-3xl font-black text-primary mt-1">214</h3>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-primary text-white p-6 rounded-xl shadow-lg relative overflow-hidden">
+<div class="relative z-10">
+<p class="text-sm text-on-primary-container">Active Campaigns</p>
+<h3 class="text-3xl font-black mt-1">08</h3>
+<div class="mt-4 flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-primary bg-slate-400"></div>
+<div class="w-8 h-8 rounded-full border-2 border-primary bg-slate-500"></div>
+<div class="w-8 h-8 rounded-full border-2 border-primary bg-slate-600"></div>
+<div class="w-8 h-8 rounded-full border-2 border-primary bg-slate-700 flex items-center justify-center text-[10px]">+5</div>
+</div>
+</div>
+<div class="absolute right-[-20px] bottom-[-20px] opacity-10">
+<span class="material-symbols-outlined text-9xl">confirmation_number</span>
+</div>
+</div>
+</div>
+<!-- Coupon List -->
+<div class="space-y-4">
+<div class="flex items-center justify-between px-6 py-2">
+<h4 class="font-headline font-bold text-lg">Active Coupons</h4>
+<div class="flex gap-4 text-xs font-bold text-on-surface-variant">
+<span>NAME &amp; CODE</span>
+<span class="ml-auto mr-48">STATUS &amp; USAGE</span>
+</div>
+</div>
+<!-- Coupon Card 1 -->
+<div class="group bg-surface-container-lowest p-6 rounded-xl flex items-center justify-between hover:shadow-xl transition-all duration-300">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-xl bg-surface-container-low flex flex-col items-center justify-center border border-outline-variant/10">
+<span class="text-xs font-black text-primary">20%</span>
+<span class="text-[10px] font-bold text-on-surface-variant">OFF</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-headline font-extrabold text-primary">SAVE20</span>
+<button class="material-symbols-outlined text-sm text-slate-400 hover:text-primary">content_copy</button>
+</div>
+<p class="text-sm text-on-surface-variant">Early Bird Launch Promotion</p>
+<div class="flex gap-2 mt-2">
+<span class="px-2 py-0.5 bg-surface-container-high rounded text-[10px] font-bold text-on-surface-variant">ALL SERVICES</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="text-right">
+<p class="text-sm font-bold text-primary">42 / 100 Uses</p>
+<div class="w-32 h-1.5 bg-surface-container-high rounded-full mt-2 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 42%;"></div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+<button class="p-2 hover:bg-error/10 text-on-surface-variant hover:text-error rounded-lg transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Coupon Card 2 -->
+<div class="group bg-surface-container-lowest p-6 rounded-xl flex items-center justify-between hover:shadow-xl transition-all duration-300">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-xl bg-tertiary-container/5 flex flex-col items-center justify-center border border-outline-variant/10">
+<span class="text-xs font-black text-on-tertiary-container">₹500</span>
+<span class="text-[10px] font-bold text-on-tertiary-container">OFF</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-headline font-extrabold text-primary">PILOT500</span>
+<button class="material-symbols-outlined text-sm text-slate-400 hover:text-primary">content_copy</button>
+</div>
+<p class="text-sm text-on-surface-variant">Special Referral Reward</p>
+<div class="flex gap-2 mt-2">
+<span class="px-2 py-0.5 bg-secondary-container rounded text-[10px] font-bold text-on-secondary-container">SELECTED: 1-on-1 MENTORSHIP</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="text-right">
+<p class="text-sm font-bold text-primary">12 / 50 Uses</p>
+<div class="w-32 h-1.5 bg-surface-container-high rounded-full mt-2 overflow-hidden">
+<div class="bg-on-tertiary-container h-full rounded-full" style="width: 24%;"></div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+<button class="p-2 hover:bg-error/10 text-on-surface-variant hover:text-error rounded-lg transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Coupon Card 3 (Expired) -->
+<div class="group bg-surface-container-low opacity-60 p-6 rounded-xl flex items-center justify-between grayscale">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-xl bg-surface-variant flex flex-col items-center justify-center">
+<span class="text-xs font-black text-slate-500">10%</span>
+<span class="text-[10px] font-bold text-slate-500">OFF</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-headline font-extrabold text-slate-500">WINTER10</span>
+<span class="px-2 py-0.5 bg-slate-200 text-[8px] font-black rounded">EXPIRED</span>
+</div>
+<p class="text-sm text-slate-500">Winter Sale 2023</p>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="text-right">
+<p class="text-sm font-bold text-slate-500">50 / 50 Uses</p>
+<div class="w-32 h-1.5 bg-slate-200 rounded-full mt-2">
+<div class="bg-slate-400 h-full rounded-full w-full"></div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<label class="relative inline-flex items-center opacity-50">
+<input class="sr-only peer" disabled="" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-300 rounded-full"></div>
+</label>
+<button class="p-2 text-slate-400 rounded-lg">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 z-[60] bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4">
+<!-- Add Coupon Modal -->
+<div class="bg-surface-bright w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+<div class="p-8">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="font-headline text-2xl font-extrabold text-primary">Add New Coupon</h3>
+<p class="text-sm text-on-surface-variant mt-1">Configure your discount rules and limits.</p>
+</div>
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="space-y-6">
+<!-- Code & Scope -->
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-primary-container tracking-wider uppercase">Coupon Code</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 transition-all font-bold tracking-widest placeholder:font-normal placeholder:tracking-normal" placeholder="e.g. SUMMER50" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-primary-container tracking-wider uppercase">Applicable Scope</label>
+<select class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 transition-all appearance-none">
+<option>All Services</option>
+<option>1-on-1 Sessions Only</option>
+<option>Masterclasses Only</option>
+<option>Resources &amp; Assets</option>
+</select>
+</div>
+</div>
+<!-- Type & Amount -->
+<div class="grid grid-cols-3 gap-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-primary-container tracking-wider uppercase">Type</label>
+<select class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 transition-all">
+<option>Percentage (%)</option>
+<option>Fixed Amount (₹)</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-primary-container tracking-wider uppercase">Amount</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="20" type="number"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-primary-container tracking-wider uppercase">Max Uses</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="100" type="number"/>
+</div>
+</div>
+<!-- Description & Expiry -->
+<div class="grid grid-cols-12 gap-6">
+<div class="col-span-12 md:col-span-8 space-y-2">
+<label class="text-xs font-bold text-primary-container tracking-wider uppercase">Description (Internal)</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Why are you creating this coupon?" type="text"/>
+</div>
+<div class="col-span-12 md:col-span-4 space-y-2">
+<label class="text-xs font-bold text-primary-container tracking-wider uppercase">Expiry Date</label>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 transition-all" type="date"/>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="pt-8 flex justify-end gap-4">
+<button class="px-6 py-3 rounded-xl font-bold text-primary hover:bg-surface-container-high transition-all" type="button">Cancel</button>
+<button class="signature-gradient text-on-primary px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all" type="submit">Create Coupon</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</body></html>

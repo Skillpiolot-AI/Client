@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SkillPilot | Mentor Priority DM Inbox</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-primary": "#b9c7e0",
+              "primary-fixed-dim": "#b9c7e0",
+              "on-primary-fixed-variant": "#3a485c",
+              "inverse-surface": "#342f2d",
+              "surface": "#fff8f5",
+              "surface-variant": "#eae1dc",
+              "secondary-fixed": "#d3e4fe",
+              "secondary-container": "#d0e1fb",
+              "secondary": "#505f76",
+              "primary-fixed": "#d5e3fd",
+              "outline-variant": "#c5c6cd",
+              "tertiary-container": "#004944",
+              "on-error-container": "#93000a",
+              "inverse-on-surface": "#f8efeb",
+              "surface-container-low": "#fbf2ed",
+              "on-primary": "#ffffff",
+              "background": "#fff8f5",
+              "tertiary-fixed-dim": "#80d5cb",
+              "surface-bright": "#fff8f5",
+              "primary": "#1d2b3e",
+              "on-primary-container": "#9eadc5",
+              "on-secondary-fixed": "#0b1c30",
+              "on-tertiary-fixed": "#00201d",
+              "on-secondary-container": "#54647a",
+              "on-primary-fixed": "#0d1c2f",
+              "surface-tint": "#515f74",
+              "primary-container": "#334155",
+              "on-error": "#ffffff",
+              "tertiary-fixed": "#9cf2e8",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#f0e6e2",
+              "on-surface": "#1f1b18",
+              "tertiary": "#00312d",
+              "surface-container": "#f6ece8",
+              "secondary-fixed-dim": "#b7c8e1",
+              "on-secondary": "#ffffff",
+              "on-tertiary-fixed-variant": "#00504a",
+              "on-background": "#1f1b18",
+              "error": "#ba1a1a",
+              "surface-dim": "#e1d8d4",
+              "on-secondary-fixed-variant": "#38485d",
+              "surface-container-highest": "#eae1dc",
+              "on-tertiary-container": "#65bbb1",
+              "on-tertiary": "#ffffff",
+              "on-surface-variant": "#44474c",
+              "outline": "#75777d",
+              "error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chat-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-scrollbar::-webkit-scrollbar-thumb {
+            background: #eae1dc;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-primary">
+<!-- SideNavBar Component -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-slate-50 border-r border-slate-200/50 py-8 px-4 z-50">
+<div class="mb-10 px-4">
+<span class="font-manrope font-bold text-slate-900 text-xl tracking-tight">SkillPilot</span>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-100" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-manrope text-sm font-medium tracking-tight">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-100" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-manrope text-sm font-medium tracking-tight">Services</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-900 font-bold border-r-2 border-slate-900 bg-slate-100" href="#">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-manrope text-sm font-medium tracking-tight">DM Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-100" href="#">
+<span class="material-symbols-outlined">confirmation_number</span>
+<span class="font-manrope text-sm font-medium tracking-tight">Coupons</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-100" href="#">
+<span class="material-symbols-outlined">dashboard_customize</span>
+<span class="font-manrope text-sm font-medium tracking-tight">Custom Sections</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-100" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-manrope text-sm font-medium tracking-tight">Schedule &amp; Profile</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-slate-200 pt-6 space-y-1">
+<div class="flex items-center gap-3 px-4 mb-6">
+<img alt="Mentor profile picture" class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Close up of a professional male mentor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVhEprxngqPvTt5yP9P2SRai1iL0LjZOtQWgkoKZPJ6NIq1UydeigxZk50iJUVkKcjV4z33wzyp5F0USWMM-Uk6FAb5Js1kiBUSq4jsXbkyfE46KkA3mksoXvPlHdLbnsAsm1XpIP-bRuedzrb4SN_iohYUE-e-LoxzLicGufrWiZdJCPO4igoQlt74HVyKSsY8J_ujdbx52MmxE20cqhhKd0aoL54VItyolbK1JnnfjFyDqpF1P6U7UdUVkKoEVhTklobtnvUeBU"/>
+<div class="flex flex-col overflow-hidden">
+<span class="text-slate-900 font-bold text-sm truncate">Mentor Name</span>
+<span class="text-slate-500 text-xs truncate">@skillpilot_handle</span>
+</div>
+</div>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">visibility</span>
+<span class="font-manrope text-sm font-medium">View Public Profile</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="font-manrope text-sm font-medium">Edit Profile Setup</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar Component -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-white/80 backdrop-blur-md flex items-center justify-between px-8">
+<div class="flex items-center gap-2">
+<h1 class="font-headline font-extrabold text-primary text-xl tracking-tight">Priority Inbox</h1>
+<span class="bg-primary-container text-on-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest ml-2">Mentor Access</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-lg">search</span>
+<input class="bg-surface-container-highest border-none rounded-full py-2 pl-10 pr-4 text-sm w-64 focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-slate-500" placeholder="Search threads..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 hover:opacity-70 transition-opacity relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full ring-2 ring-white"></span>
+</button>
+<button class="text-slate-500 hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 pt-16 h-screen overflow-hidden flex bg-surface">
+<!-- Left Panel: Thread Selection -->
+<section class="w-[380px] flex-shrink-0 flex flex-col border-r border-outline-variant/10 bg-surface-container-low">
+<!-- Filter Header -->
+<div class="p-6 pb-2">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-headline font-bold text-lg text-primary">Messages</h2>
+<button class="bg-primary text-on-primary rounded-full p-2 flex items-center justify-center hover:opacity-90 transition-all shadow-md active:scale-95">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+<button class="px-4 py-1.5 rounded-full bg-primary text-on-primary text-xs font-semibold whitespace-nowrap">All</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-highest text-secondary text-xs font-semibold whitespace-nowrap hover:bg-outline-variant/20 transition-colors">Open</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-highest text-secondary text-xs font-semibold whitespace-nowrap hover:bg-outline-variant/20 transition-colors">Active</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-highest text-secondary text-xs font-semibold whitespace-nowrap hover:bg-outline-variant/20 transition-colors">Closed</button>
+</div>
+</div>
+<!-- Thread List -->
+<div class="flex-1 overflow-y-auto chat-scrollbar p-3 space-y-2">
+<!-- Active Thread Card -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm border border-primary/5 cursor-pointer hover:shadow-md transition-all">
+<div class="flex gap-3">
+<div class="relative flex-shrink-0">
+<img alt="Mentee" class="w-12 h-12 rounded-xl object-cover" data-alt="Portrait of a young female mentee" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMOYZbKIi3eVq3TlvkpvRRZhaekT66Cwoq7T3hMn4aI9cbEigXjIjg_aKX9v0DjKRpl4ussOsR3bcFBlwKfdjShBlaGy1zE_99TI9B_OjDjfoURgm7VWM8KI24BXx4PfpPxelzPIztT6IMdLpleOilVN3Mnd4GBvcpOVhmuK7EZIiUTX7rrA2kt6vMHxXLAWBqPPwE5Eirw88RukgCQIv2ejSQjmThvQwuln1y4WlwcVpYCtV0UDlRdJ5OXJ9V-IPOkpjB07pWEWc"/>
+<span class="absolute -bottom-1 -right-1 w-4 h-4 bg-tertiary rounded-full border-2 border-white ring-offset-1"></span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-primary text-sm truncate">Elena Vance</h3>
+<span class="text-[10px] text-slate-400 font-medium">12m ago</span>
+</div>
+<p class="text-xs text-secondary font-medium mt-0.5 truncate">I've completed the first module...</p>
+<div class="flex items-center justify-between mt-2">
+<span class="text-[10px] uppercase tracking-tighter font-bold text-tertiary-container bg-tertiary-fixed px-2 py-0.5 rounded">Strategy Audit</span>
+<span class="bg-primary text-white text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center">2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Thread Card 2 -->
+<div class="p-4 rounded-xl bg-transparent hover:bg-white/50 transition-all cursor-pointer">
+<div class="flex gap-3">
+<div class="relative flex-shrink-0">
+<img alt="Mentee" class="w-12 h-12 rounded-xl object-cover grayscale opacity-80" data-alt="Portrait of a male mentee in glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmTw2exsZk7tezn1tz5X7zBm9OTBUWvl4SO0M3sM3OAy2X8NWZj1NpcSaYmkA_DrVTMJCkvPkiZa1LVQFkRjUsv_EBSpLeJgo66Cj9Oqb_RC5L9tYDCf2uv9kb25IR2wQh2Z7xgmDcdMlBzRN2MNZGSAhfKsNRw22q6mlG3sra6Avu_4caMu2aslJuLLheNsiBV8Q-Hx-D_--bsFcplxRcXTYYEa1uF1hnD-dxHKeRnBtDFFOMP2lyjYpybBx3sHvITD_EHCBi-fA"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-primary text-sm truncate">Marcus Chen</h3>
+<span class="text-[10px] text-slate-400 font-medium">2h ago</span>
+</div>
+<p class="text-xs text-slate-500 mt-0.5 truncate">Thanks for the feedback on my portfolio!</p>
+<div class="flex items-center justify-between mt-2">
+<span class="text-[10px] uppercase tracking-tighter font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded">Portfolio Review</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Thread Card 3 -->
+<div class="p-4 rounded-xl bg-transparent hover:bg-white/50 transition-all cursor-pointer">
+<div class="flex gap-3">
+<div class="relative flex-shrink-0">
+<img alt="Mentee" class="w-12 h-12 rounded-xl object-cover" data-alt="Smiling woman with curly hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCleayJLA8ObuaULMmfCIqelN11U13zKZ_eb6bmJpC22n-jp5TTdb4MQM9ywnl7wMl0DTNEeIYMEfB936Sg4tbFEUDw8PjIOtyAtKshM1obVfXQIaIOkM2MA-yxXVyM9N88HY5-dtEgzH4MQGkjCtAt3tE-vluJp07A7xAV7pOqnYEsdmN4LosfkVFyOh5L2GWAiBUwm9p-n6Ru1oIWP4ua34vrc0zaF9Q35JfVZZiRZnqXIDEyShu4B2c53agq8L6Tx95ucW_Pj0I"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-primary text-sm truncate">Sarah Jenkins</h3>
+<span class="text-[10px] text-slate-400 font-medium">Yesterday</span>
+</div>
+<p class="text-xs text-slate-500 mt-0.5 truncate">The networking session was incredible.</p>
+<div class="flex items-center justify-between mt-2">
+<span class="text-[10px] uppercase tracking-tighter font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded">Career Coaching</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Thread Card 4 -->
+<div class="p-4 rounded-xl bg-transparent hover:bg-white/50 transition-all cursor-pointer">
+<div class="flex gap-3">
+<div class="relative flex-shrink-0">
+<div class="w-12 h-12 rounded-xl bg-primary-container flex items-center justify-center text-on-primary font-bold">JD</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-primary text-sm truncate">James D.</h3>
+<span class="text-[10px] text-slate-400 font-medium">Oct 12</span>
+</div>
+<p class="text-xs text-slate-500 mt-0.5 truncate">Can we reschedule the audit call?</p>
+<div class="flex items-center justify-between mt-2">
+<span class="text-[10px] uppercase tracking-tighter font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded">Onboarding</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Panel: Full-Thread Chat Workspace -->
+<section class="flex-1 flex flex-col bg-surface overflow-hidden">
+<!-- Chat Header -->
+<div class="h-20 flex-shrink-0 flex items-center justify-between px-8 border-b border-outline-variant/10">
+<div class="flex items-center gap-4">
+<img alt="Elena Vance" class="w-10 h-10 rounded-full object-cover" data-alt="Female mentee avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5KOZPLvvFQm-5Q0Q_4BPQBS4DUISMmcoxSBPfxZ1TTEvCzvRP99DHs0pIKq9rP5TvZosUPbqa3363NworlbStfpTBT8wfBEgRhRb1GHBF2WwW6AMEyalxKpNsGccTJQBgGBOCnXR4Ube0ut4RcdsTzwpV8majt39Hew7-jTQGrQ8RM7o0cvD-YineEcPcZjLpfretqK_2WLZDbkNjeFLMfpw2iJBdUKDRHLpDv8Y_-W97qM85gK_LtAcFZYjxBVLl5wBzR0hppsE"/>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline font-extrabold text-primary">Elena Vance</h2>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+</div>
+<p class="text-xs text-secondary font-medium">Senior Product Strategist Journey • Strategy Audit</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg text-secondary hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-xl">history</span>
+<span class="text-xs font-bold uppercase tracking-wider">History</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-high text-primary hover:bg-outline-variant/30 transition-all">
+<span class="material-symbols-outlined text-xl">check_circle</span>
+<span class="text-xs font-bold uppercase tracking-wider">Close Thread</span>
+</button>
+</div>
+</div>
+<!-- Deadline Banner -->
+<div class="bg-secondary-container/30 px-8 py-2.5 flex items-center justify-between">
+<div class="flex items-center gap-3 text-on-secondary-container">
+<span class="material-symbols-outlined text-lg">timer</span>
+<span class="text-xs font-semibold">Guaranteed response deadline: <span class="font-bold">2h 45m remaining</span></span>
+</div>
+<button class="text-[10px] font-bold uppercase tracking-widest text-secondary hover:underline">SLA Policies</button>
+</div>
+<!-- Scrollable Message Feed -->
+<div class="flex-1 overflow-y-auto chat-scrollbar p-8 space-y-8 flex flex-col">
+<div class="flex flex-col items-center">
+<span class="bg-surface-container-high px-4 py-1 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-widest">October 14, 2023</span>
+</div>
+<!-- Mentee Message -->
+<div class="flex gap-4 max-w-[80%]">
+<img alt="Elena" class="w-8 h-8 rounded-full flex-shrink-0 self-end" data-alt="Mentee avatar profile thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBnKFUo81CRXo0NwUGQz43-Y6UmY3o31W6RfCsnwEsqDv_bmVFdquMV49APs65ltOMjAS3jeuCNrTI9jalxcYRvgBW86F7KukACyt-EZQ-ny__TqtMZtrPTagTrczxRZVBn_Ic7SBkWHUaTm7jJGR6sf9iI5el025pU3mvVWxiL6Qovzeu3aFNtetlzxAuJXi7X_pC9QhlAWL_ff3qKNE8S7B_C0BenhLwcQg-WwxWNsLDTXkCjyKe3BDAntfWgrquE7l5p0VRka4"/>
+<div>
+<div class="bg-surface-container-lowest p-5 rounded-2xl rounded-bl-none shadow-sm border border-outline-variant/10 text-on-surface text-sm leading-relaxed">
+                            Hello Mentor! I just finished the market analysis module you suggested. The section on competitor whitespace was incredibly revealing. I've uploaded the draft to my dashboard—could you take a look at the SWOT section?
+                        </div>
+<span class="text-[10px] text-slate-400 mt-2 block ml-1">10:42 AM</span>
+</div>
+</div>
+<!-- Mentor Message -->
+<div class="flex gap-4 max-w-[80%] self-end flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-primary flex-shrink-0 self-end flex items-center justify-center text-[10px] text-white font-bold">MN</div>
+<div class="flex flex-col items-end">
+<div class="bg-primary text-white p-5 rounded-2xl rounded-br-none shadow-md text-sm leading-relaxed">
+                            Great work on the timing, Elena. I'm pulling up the draft now. The whitespace analysis is often where the most significant pivots happen. I'll have detailed feedback for you in the next few hours.
+                        </div>
+<div class="flex items-center gap-1 mt-2 mr-1">
+<span class="text-[10px] text-slate-400">10:55 AM</span>
+<span class="material-symbols-outlined text-xs text-tertiary" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</div>
+</div>
+</div>
+<!-- Mentee Message 2 -->
+<div class="flex gap-4 max-w-[80%]">
+<img alt="Elena" class="w-8 h-8 rounded-full flex-shrink-0 self-end" data-alt="Mentee avatar profile thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBU9-BDikJWhaU0K5BQ6XLgyqn_GS2-XDMt9O6nH1yfhwrVSkzWtTVCRE12C5ihJ_d_amuxFXjLuljIa4Ck6t5W2jfDHUPKbHb2GYb3kTzedqietTEUzmpUnAiaMAXHO00-CSYu-RpWMzEUjcEejCikYdUVFNY1Q2Tjk5nK4WTZrYHdbswfAgVNLzzHJ3A0Y4EiNORvGDGGAWqPkYPg6VO2xSd9FnKDuF_meFKvW4SJW9cqaU7Sl2atV89AX-Loz4xqI_isfZrFfS4"/>
+<div>
+<div class="bg-surface-container-lowest p-5 rounded-2xl rounded-bl-none shadow-sm border border-outline-variant/10 text-on-surface text-sm leading-relaxed">
+                            Perfect, thank you! One quick question: should I prioritize the B2B segment or focus on the consumer side for this initial pilot phase? I noticed some friction in the B2B user flow.
+                        </div>
+<span class="text-[10px] text-slate-400 mt-2 block ml-1">11:15 AM</span>
+</div>
+</div>
+</div>
+<!-- Chat Footer: Composer -->
+<div class="p-8 pt-0 bg-surface">
+<!-- Quick Responders -->
+<div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar py-1">
+<button class="flex-shrink-0 px-4 py-1.5 rounded-full border border-outline-variant/30 text-xs font-medium text-secondary hover:border-primary hover:text-primary transition-all">"Looking into it now."</button>
+<button class="flex-shrink-0 px-4 py-1.5 rounded-full border border-outline-variant/30 text-xs font-medium text-secondary hover:border-primary hover:text-primary transition-all">"Can we hop on a quick call?"</button>
+<button class="flex-shrink-0 px-4 py-1.5 rounded-full border border-outline-variant/30 text-xs font-medium text-secondary hover:border-primary hover:text-primary transition-all">"Check the resources tab."</button>
+<button class="flex-shrink-0 px-4 py-1.5 rounded-full border border-outline-variant/30 text-xs font-medium text-secondary hover:border-primary hover:text-primary transition-all">"Great progress!"</button>
+</div>
+<!-- Rich Input -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant/20 overflow-hidden focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+<div class="flex items-center gap-1 p-2 border-b border-outline-variant/10 bg-surface-container-high/30">
+<button class="p-1.5 text-secondary hover:bg-white rounded-lg transition-colors"><span class="material-symbols-outlined text-lg">format_bold</span></button>
+<button class="p-1.5 text-secondary hover:bg-white rounded-lg transition-colors"><span class="material-symbols-outlined text-lg">format_italic</span></button>
+<button class="p-1.5 text-secondary hover:bg-white rounded-lg transition-colors"><span class="material-symbols-outlined text-lg">link</span></button>
+<button class="p-1.5 text-secondary hover:bg-white rounded-lg transition-colors ml-2"><span class="material-symbols-outlined text-lg">attach_file</span></button>
+<button class="p-1.5 text-secondary hover:bg-white rounded-lg transition-colors"><span class="material-symbols-outlined text-lg">image</span></button>
+</div>
+<textarea class="w-full h-24 p-4 border-none focus:ring-0 text-sm placeholder:text-slate-400 resize-none" placeholder="Type your strategic guidance here..."></textarea>
+<div class="flex items-center justify-between p-4 bg-surface-container-high/10">
+<div class="flex items-center gap-2 text-slate-400">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-[10px] font-medium">Scheduled for 12:00 PM (optional)</span>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2 rounded-xl bg-surface-container-highest text-primary text-xs font-bold hover:bg-outline-variant/30 transition-all">Save Draft</button>
+<button class="px-6 py-2 rounded-xl bg-primary text-on-primary text-xs font-bold shadow-lg shadow-primary/20 hover:translate-y-[-1px] active:translate-y-0 transition-all flex items-center gap-2">
+<span>Send Message</span>
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Element: Perspective Switch -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="group bg-tertiary p-4 rounded-full text-on-tertiary shadow-2xl flex items-center gap-0 hover:gap-3 transition-all duration-300">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap text-sm font-bold">Analysis Mode</span>
+</button>
+</div>
+</body></html>

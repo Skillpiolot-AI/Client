@@ -113,59 +113,78 @@ export default function CustomSectionsTab() {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#1E293B' }}>Custom Profile Sections</h2>
-          <p style={{ margin: '2px 0 0', fontSize: '13px', color: C.slate }}>Add rich text, markdown, and images to your public profile.</p>
+          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Custom Sections</h2>
+          <p className="text-slate-500 text-sm mt-1">Add rich text, markdown, and images to your public profile.</p>
         </div>
-        <button onClick={openNew} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: C.indigo, color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 18px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
-          <Plus size={15} /> Add Section
+        <button onClick={openNew} className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2.5 flex items-center gap-2 text-sm font-bold shadow-sm transition-all">
+          <Plus size={18} /> Add Section
         </button>
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '48px' }}><Loader2 size={24} style={{ animation: 'spin 0.8s linear infinite', color: C.indigo }} /></div>
+        <div className="flex justify-center p-12 text-slate-400"><Loader2 size={32} className="animate-spin" /></div>
       ) : sections.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', border: `2px dashed ${C.border}`, borderRadius: '16px' }}>
-          <p style={{ fontSize: '32px', margin: '0 0 8px' }}>📝</p>
-          <p style={{ fontSize: '15px', fontWeight: 700, color: '#1E293B', margin: '0 0 4px' }}>No custom sections yet</p>
-          <p style={{ fontSize: '13px', color: C.slate, margin: '0 0 16px' }}>Add sections like "My Journey", "Testimonials", or "Setup" to build trust.</p>
-          <button onClick={openNew} style={{ background: C.indigo, color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>+ Add First Section</button>
+        <div className="text-center p-12 bg-white border border-dashed border-slate-200 rounded-2xl max-w-lg mx-auto shadow-sm">
+          <p className="text-4xl mb-3">📝</p>
+          <p className="font-bold text-slate-800 mb-1">No custom sections yet</p>
+          <p className="text-slate-500 text-xs mb-6">Add items like "My Journey", "Testimonials" to build trust with mentees.</p>
+          <button onClick={openNew} className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 shadow-sm">+ Create Section</button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div className="space-y-4">
           {sections.map((sec, index) => (
-            <div key={sec._id} style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: '14px', padding: '16px 20px', display: 'flex', gap: '14px', opacity: sec.isVisible ? 1 : 0.6 }}>
-              <div style={{ color: '#CBD5E1', cursor: 'grab', marginTop: '4px' }} title="Drag to reorder (Coming soon)">
-                <GripVertical size={18} />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                  <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#1E293B' }}>{sec.title || 'Untitled Section'}</h3>
-                  {!sec.isVisible && <span style={{ fontSize: '11px', background: '#F1F5F9', color: C.slate, padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>Hidden</span>}
+            <div key={sec._id} className={`group bg-white p-6 rounded-2xl flex items-center justify-between border border-slate-200/40 hover:shadow-md transition-all duration-300 ${!sec.isVisible ? 'opacity-60 bg-slate-50/50' : 'shadow-sm'}`}>
+              <div className="flex items-start gap-4 flex-1">
+                <div className="text-slate-300 cursor-grab mt-1 group-hover:text-slate-400 transition-colors" title="Drag to reorder">
+                  <GripVertical size={18} />
                 </div>
-                {sec.content && (
-                  <p style={{ margin: '0 0 8px', fontSize: '13px', color: C.slate, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {sec.content.replace(/[#_*~]/g, '')}
-                  </p>
-                )}
-                {sec.images?.length > 0 && (
-                  <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
-                    {sec.images.map((img, i) => (
-                      <div key={i} style={{ width: '40px', height: '40px', borderRadius: '6px', overflow: 'hidden', border: `1px solid ${C.border}` }}>
-                        <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
-                    ))}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-slate-800 text-sm">{sec.title || 'Untitled Section'}</h3>
+                    {!sec.isVisible && (
+                      <span className="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold text-slate-500">Hidden</span>
+                    )}
                   </div>
-                )}
+                  {sec.content && (
+                    <p className="text-xs text-slate-500 line-clamp-1 leading-relaxed">
+                      {sec.content.replace(/[#_*~]/g, '')}
+                    </p>
+                  )}
+                  {sec.images?.length > 0 && (
+                    <div className="flex gap-1.5 mt-2">
+                      {sec.images.map((img, i) => (
+                        <div key={i} className="w-8 h-8 rounded-lg overflow-hidden border border-slate-100 shadow-sm">
+                          <img src={img} alt="" className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: '6px', flexShrink: 0, alignItems: 'flex-start' }}>
-                <button onClick={() => toggleVisibility(sec)} title={sec.isVisible ? 'Hide from profile' : 'Show on profile'} style={{ background: C.bg, border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer', color: C.indigo }}>
-                  {sec.isVisible ? <EyeOff size={14} /> : <Eye size={14} />}
+
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button 
+                  onClick={() => toggleVisibility(sec)} 
+                  title={sec.isVisible ? 'Hide from profile' : 'Show on profile'}
+                  className={`p-1.5 rounded-lg transition-colors ${sec.isVisible ? 'text-indigo-600 hover:bg-indigo-50' : 'text-slate-400 hover:bg-slate-100'}`}
+                >
+                  {sec.isVisible ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
-                <button onClick={() => openEdit(sec)} style={{ background: C.bg, border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer', color: C.indigo }}><Edit2 size={14} /></button>
-                <button onClick={() => del(sec._id)} style={{ background: '#FEF2F2', border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer', color: C.red }}><Trash2 size={14} /></button>
+                <button 
+                  onClick={() => openEdit(sec)} 
+                  className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-colors"
+                >
+                  <Edit2 size={15} />
+                </button>
+                <button 
+                  onClick={() => del(sec._id)} 
+                  className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-lg transition-colors"
+                >
+                  <Trash2 size={15} />
+                </button>
               </div>
             </div>
           ))}
@@ -174,85 +193,75 @@ export default function CustomSectionsTab() {
 
       {/* Form Modal */}
       {showModal && (
-        <div onClick={() => setShowModal(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '16px', backdropFilter: 'blur(4px)' }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px', padding: '28px', maxWidth: '640px', width: '100%', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontWeight: 800, color: '#1E293B', fontSize: '18px' }}>{editId ? 'Edit Section' : 'Add Profile Section'}</h3>
-              <button onClick={() => setShowModal(false)} style={{ background: '#F1F5F9', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer' }}><X size={16} /></button>
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Section Title</label>
-              <input 
-                value={form.title} 
-                onChange={e => setForm(f => ({ ...f, title: e.target.value }))} 
-                placeholder="e.g. My Career Journey" 
-                style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '12px', padding: '12px 16px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} 
-              />
-            </div>
-
-            <div style={{ marginBottom: '20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: C.slate }}>Content (Rich Text / Markdown)</label>
-                <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '8px', padding: '2px' }}>
-                  <button onClick={() => setPreviewMode(false)} style={{ background: !previewMode ? '#fff' : 'transparent', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', fontWeight: 600, color: !previewMode ? '#1E293B' : C.slate, cursor: 'pointer', boxShadow: !previewMode ? '0 1px 2px rgba(0,0,0,0.05)' : 'none' }}>Write</button>
-                  <button onClick={() => setPreviewMode(true)} style={{ background: previewMode ? '#fff' : 'transparent', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', fontWeight: 600, color: previewMode ? '#1E293B' : C.slate, cursor: 'pointer', boxShadow: previewMode ? '0 1px 2px rgba(0,0,0,0.05)' : 'none' }}>Preview</button>
-                </div>
+        <div onClick={() => setShowModal(false)} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div onClick={e => e.stopPropagation()} className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold text-slate-800">{editId ? 'Edit Section' : 'Add Profile Section'}</h3>
+                <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-50 transition-all">
+                  <X size={18} />
+                </button>
               </div>
 
-              {previewMode ? (
-                <div style={{ width: '100%', height: '200px', border: `1.5px solid ${C.border}`, borderRadius: '12px', padding: '12px 16px', fontSize: '14px', overflowY: 'auto', background: '#FAFBFF', boxSizing: 'border-box' }}>
-                  {form.content ? <ReactMarkdown>{form.content}</ReactMarkdown> : <span style={{ color: '#94A3B8' }}>Nothing to preview...</span>}
+              <form className="space-y-4" onSubmit={e => { e.preventDefault(); save(); }}>
+                <div>
+                  <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Section Title</label>
+                  <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. My Career Journey" className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/10 outline-none required" required />
                 </div>
-              ) : (
-                <textarea 
-                  value={form.content} 
-                  onChange={e => setForm(f => ({ ...f, content: e.target.value }))} 
-                  rows={8}
-                  placeholder="Tell your story using markdown for **bold**, *italic*, lists, etc..." 
-                  style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '12px', padding: '12px 16px', fontSize: '14px', outline: 'none', resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }} 
-                />
-              )}
-            </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '8px' }}>Images attached to this section</label>
-              
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                {form.images.map((img, idx) => (
-                  <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '10px', border: `1px solid ${C.border}`, overflow: 'hidden' }}>
-                    <img src={img} alt="uploaded" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    <button onClick={() => removeImage(idx)} style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                      <X size={12} />
-                    </button>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block">Content (Markdown)</label>
+                    <div className="flex bg-slate-100 rounded-lg p-0.5">
+                      <button type="button" onClick={() => setPreviewMode(false)} className={`px-2 py-1 text-[10px] font-bold rounded-md ${!previewMode ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500'}`}>Write</button>
+                      <button type="button" onClick={() => setPreviewMode(true)} className={`px-2 py-1 text-[10px] font-bold rounded-md ${previewMode ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500'}`}>Preview</button>
+                    </div>
                   </div>
-                ))}
-                
-                <label style={{ width: '80px', height: '80px', borderRadius: '10px', border: `2px dashed ${C.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: C.slate, cursor: uploadingImg ? 'wait' : 'pointer', background: '#F8FAFC' }}>
-                  {uploadingImg ? <Loader2 size={20} style={{ animation: 'spin 0.8s linear infinite' }} /> : <><ImageIcon size={20} style={{ marginBottom: '4px' }} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Upload</span></>}
-                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploadingImg} style={{ display: 'none' }} />
-                </label>
-              </div>
-            </div>
+                  
+                  {previewMode ? (
+                    <div className="w-full min-h-[160px] bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm overflow-y-auto prose prose-sm max-w-none">
+                      {form.content ? <ReactMarkdown>{form.content}</ReactMarkdown> : <span className="text-slate-400 italic">Nothing to preview...</span>}
+                    </div>
+                  ) : (
+                    <textarea value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} rows={6} placeholder="Tell your story using markdown for **bold**, *italic*, lists, etc..." className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/10 outline-none resize-none" />
+                  )}
+                </div>
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '24px', fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
-              <input type="checkbox" checked={form.isVisible} onChange={e => setForm(f => ({ ...f, isVisible: e.target.checked }))} style={{ accentColor: C.indigo, width: '16px', height: '16px' }} />
-              Make this section visible on my public profile
-            </label>
+                <div>
+                  <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-2">Images attached</label>
+                  <div className="flex gap-2 flex-wrap">
+                    {form.images.map((img, idx) => (
+                      <div key={idx} className="relative w-16 h-16 rounded-xl border border-slate-200/60 overflow-hidden shadow-sm">
+                        <img src={img} alt="uploaded" className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => removeImage(idx)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 hover:bg-black/80">
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                    <label className={`w-16 h-16 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 cursor-pointer hover:bg-slate-50 transition-all ${uploadingImg && 'animate-pulse'}`}>
+                      {uploadingImg ? <Loader2 size={16} className="animate-spin" /> : <><ImageIcon size={18} /><span className="text-[8px] font-bold mt-1">Upload</span></>}
+                      <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploadingImg} className="hidden" />
+                    </label>
+                  </div>
+                </div>
 
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setShowModal(false)} style={{ background: '#F1F5F9', color: '#475569', border: 'none', borderRadius: '12px', padding: '14px 24px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-              <button onClick={save} disabled={saving} style={{ flex: 1, background: C.indigo, color: '#fff', border: 'none', borderRadius: '12px', padding: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                {saving && <Loader2 size={16} style={{ animation: 'spin 0.8s linear infinite' }} />}
-                {saving ? 'Saving...' : 'Save Section'}
-              </button>
+                <div className="flex items-center gap-2 py-1">
+                  <input type="checkbox" id="isVisible" checked={form.isVisible} onChange={e => setForm(f => ({ ...f, isVisible: e.target.checked }))} className="rounded text-indigo-600 focus:ring-0 cursor-pointer" />
+                  <label htmlFor="isVisible" className="text-xs font-semibold text-slate-600 cursor-pointer">Make visible on public profile</label>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button type="submit" disabled={saving} className="flex-1 bg-indigo-600 text-white rounded-xl py-2.5 text-sm font-bold shadow-sm hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                    {saving && <Loader2 size={16} className="animate-spin" />}
+                    {saving ? 'Saving...' : 'Save Section'}
+                  </button>
+                  <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 text-sm font-bold border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-all">Cancel</button>
+                </div>
+              </form>
             </div>
-            
           </div>
         </div>
       )}
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

@@ -31,7 +31,7 @@ export default function FooterSection() {
     "Portals & Account": [
       { name: "My Profile", path: "/profile" },
       { name: "My Applications", path: "/my-applications" },
-      { name: "Mentor Dashboard", path: "/amdashboard" },
+      { name: "Mentor Dashboard", path: "/mentor-dashboard" },
       { name: "Admin Dashboard", path: "/dashboardAdmin" },
       { name: "University Admin", path: "/uniAdminPortal" },
       { name: "Teacher Dashboard", path: "/teacher/dashboard" },
@@ -112,8 +112,8 @@ export default function FooterSection() {
             © 2025 SkillPilot Platform. Built for the future of talent.
           </div>
           <div className="flex items-center gap-6">
-            <select 
-              value={selectedCurrency} 
+            <select
+              value={selectedCurrency}
               onChange={(e) => setSelectedCurrency(e.target.value)}
               className="bg-transparent border border-[rgba(55,50,47,0.2)] rounded-lg px-3 py-1 text-xs font-semibold text-[#605A57] cursor-pointer hover:border-[rgba(55,50,47,0.4)] focus:outline-none bg-white transition-all duration-200"
             >

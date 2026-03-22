@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SkillPilot Mentor Dashboard - Custom Sections</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-primary": "#b9c7e0",
+                        "primary-fixed-dim": "#b9c7e0",
+                        "on-primary-fixed-variant": "#3a485c",
+                        "inverse-surface": "#342f2d",
+                        "surface": "#fff8f5",
+                        "surface-variant": "#eae1dc",
+                        "secondary-fixed": "#d3e4fe",
+                        "secondary-container": "#d0e1fb",
+                        "secondary": "#505f76",
+                        "primary-fixed": "#d5e3fd",
+                        "outline-variant": "#c5c6cd",
+                        "tertiary-container": "#004944",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f8efeb",
+                        "surface-container-low": "#fbf2ed",
+                        "on-primary": "#ffffff",
+                        "background": "#fff8f5",
+                        "tertiary-fixed-dim": "#80d5cb",
+                        "surface-bright": "#fff8f5",
+                        "primary": "#1d2b3e",
+                        "on-primary-container": "#9eadc5",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-tertiary-fixed": "#00201d",
+                        "on-secondary-container": "#54647a",
+                        "on-primary-fixed": "#0d1c2f",
+                        "surface-tint": "#515f74",
+                        "primary-container": "#334155",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#9cf2e8",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#f0e6e2",
+                        "on-surface": "#1f1b18",
+                        "tertiary": "#00312d",
+                        "surface-container": "#f6ece8",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-background": "#1f1b18",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#e1d8d4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container-highest": "#eae1dc",
+                        "on-tertiary-container": "#65bbb1",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#44474c",
+                        "outline": "#75777d",
+                        "error-container": "#ffdad6"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fff8f5;
+            color: #1f1b18;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-nav {
+            background: rgba(255, 248, 245, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #1d2b3e 0%, #334155 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200/50 dark:border-slate-800/50 py-8 px-4 z-50">
+<div class="mb-10 px-4">
+<span class="font-headline font-bold text-slate-900 dark:text-slate-100 text-xl tracking-tight">SkillPilot</span>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="dashboard">dashboard</span>
+                Overview
+            </a>
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="payments">payments</span>
+                Services
+            </a>
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="forum">forum</span>
+                DM Inbox
+            </a>
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="confirmation_number">confirmation_number</span>
+                Coupons
+            </a>
+<!-- Active Tab -->
+<a class="flex items-center px-4 py-3 text-slate-900 dark:text-white font-bold border-r-2 border-slate-900 dark:border-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="dashboard_customize">dashboard_customize</span>
+                Custom Sections
+            </a>
+<a class="flex items-center px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="event_available">event_available</span>
+                Schedule &amp; Profile
+            </a>
+</nav>
+<div class="mt-auto border-t border-slate-200/50 pt-6 px-4">
+<div class="flex items-center mb-6">
+<img alt="Mentor profile picture" class="w-10 h-10 rounded-full object-cover mr-3" data-alt="Mentor profile avatar male professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnVNfCJzqsdg6uaVnBaY3KWf1s-3-2d0Wpxky7F3u1uFN28qnOyzBcfIGpCGX0ClE45-QVWpraczsGCV8U8nFCpnMWsXuxe50Wa961gaElaYg4TR2gImr06gJv3iAw1f5RK8ezSgN1AZjHVruBkd3qNmy9wNJPxy-0sAXBmiWN2NTCPr-ZSyFQTE45J3rDUYehQDVqBof1Ao5bEKRi9bIDZ8tMW-UGdpMGG8wOtcNv-6_LfoBSHz8f6HOe49GyLtg-8uOsJa5_kW4"/>
+<div>
+<p class="text-sm font-bold text-slate-900 dark:text-slate-100">Mentor Name</p>
+<p class="text-xs text-slate-500">@skillpilot_handle</p>
+</div>
+</div>
+<a class="flex items-center py-2 text-slate-500 hover:text-slate-900 text-sm font-medium transition-colors" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="visibility">visibility</span>
+                View Public Profile
+            </a>
+<a class="flex items-center py-2 text-slate-500 hover:text-slate-900 text-sm font-medium transition-colors" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="settings">settings</span>
+                Edit Profile Setup
+            </a>
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md flex items-center justify-between px-8 w-auto">
+<h1 class="text-xl font-black text-slate-900 dark:text-white tracking-tight font-headline">Custom Sections</h1>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+<span class="material-symbols-outlined text-sm" data-icon="search">search</span>
+</span>
+<input class="bg-surface-container-highest border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 w-64" placeholder="Search sections..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-slate-500">
+<button class="hover:opacity-70 transition-opacity"><span class="material-symbols-outlined" data-icon="notifications">notifications</span></button>
+<button class="hover:opacity-70 transition-opacity"><span class="material-symbols-outlined" data-icon="help_outline">help_outline</span></button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-24 px-12 pb-12 min-h-screen">
+<!-- Dashboard Header Asymmetric -->
+<div class="flex justify-between items-end mb-12">
+<div class="max-w-2xl">
+<h2 class="text-4xl font-headline font-extrabold text-primary mb-4 tracking-tight">Tailor your mentor profile.</h2>
+<p class="text-on-surface-variant text-lg leading-relaxed">Add custom modules like Testimonials, Tech Stack, or Case Studies to showcase your unique career journey and attract the right mentees.</p>
+</div>
+<button class="signature-gradient text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 shadow-lg hover:translate-y-[-2px] transition-all">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                Add New Section
+            </button>
+</div>
+<!-- Sorting Headers -->
+<div class="flex items-center justify-between mb-8 px-4 py-3 bg-surface-container-low rounded-xl">
+<div class="flex gap-8">
+<button class="text-sm font-bold text-primary flex items-center gap-1">
+                    Name <span class="material-symbols-outlined text-xs" data-icon="arrow_downward">arrow_downward</span>
+</button>
+<button class="text-sm font-medium text-on-surface-variant">Last Modified</button>
+<button class="text-sm font-medium text-on-surface-variant">Engagement</button>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs font-label text-outline uppercase tracking-widest">Displaying 4 Sections</span>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer" data-icon="grid_view">grid_view</span>
+<span class="material-symbols-outlined text-slate-300 cursor-not-allowed" data-icon="view_list">view_list</span>
+</div>
+</div>
+<!-- Bento Grid for Sections -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Section Card 1 -->
+<div class="col-span-8 bg-surface-container-lowest rounded-xl p-6 group cursor-pointer border border-transparent hover:border-outline-variant/15 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)]">
+<div class="flex items-start justify-between mb-6">
+<div class="flex gap-4">
+<div class="w-24 h-24 rounded-lg bg-surface-variant overflow-hidden">
+<img alt="Tech Stack Thumbnail" class="w-full h-full object-cover" data-alt="Abstract tech stack visualization icons" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLZB_m-4hdbCIFOeLivjOTVSTJpMYOglklAB0Q2STP4KPc3EGaBR_9detoiOjzfM9DZhs1gIPtlTDnxB0ZBH4gOed6V17yT7zGlzUgKWS-FFEv2qmz7z02_gJhGFE30JdP1f4YugXwyMRK5CC0OG6ReV9fANapKv66WBULq7vXW28Mh_DPeSib5CuK5HYthQZHe5-41tyGqIhEm9iRew45qPNVzkIQyvd5uBHv__IctBaibgaQYq1a854UYuEPR3tQip_t5aiwOaw"/>
+</div>
+<div>
+<h3 class="text-xl font-bold text-primary mb-1">My Core Tech Stack</h3>
+<p class="text-sm text-on-surface-variant line-clamp-2">A deep dive into the architecture and tools I use for enterprise-level React applications...</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors text-primary">
+<span class="material-symbols-outlined" data-icon="visibility" style="font-variation-settings: 'FILL' 1;">visibility</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-4 pt-4 border-t border-outline-variant/10">
+<span class="px-3 py-1 bg-tertiary-container/10 text-on-tertiary-container rounded-full text-xs font-bold">Featured</span>
+<span class="text-xs text-outline font-medium">Modified 2 days ago</span>
+</div>
+</div>
+<!-- Section Card 2 -->
+<div class="col-span-4 bg-surface-container-lowest rounded-xl p-6 group cursor-pointer border border-transparent hover:border-outline-variant/15 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)]">
+<div class="mb-4">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-4xl text-primary-container" data-icon="history_edu">history_edu</span>
+<span class="material-symbols-outlined text-slate-300" data-icon="visibility_off">visibility_off</span>
+</div>
+<h3 class="text-xl font-bold text-primary mb-2">My Design Philosophy</h3>
+<p class="text-sm text-on-surface-variant">Drafting the core principles of the Professional Navigator system.</p>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<span class="text-xs text-outline font-medium">Draft</span>
+</div>
+</div>
+<!-- Section Card 3 -->
+<div class="col-span-4 bg-surface-container-lowest rounded-xl p-6 group cursor-pointer border border-transparent hover:border-outline-variant/15 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)]">
+<div class="mb-4">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-4xl text-tertiary" data-icon="format_quote">format_quote</span>
+<span class="material-symbols-outlined text-primary" data-icon="visibility" style="font-variation-settings: 'FILL' 1;">visibility</span>
+</div>
+<h3 class="text-xl font-bold text-primary mb-2">Mentee Testimonials</h3>
+<p class="text-sm text-on-surface-variant">12 verified success stories from students at Google, Meta, and Stripe.</p>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<span class="text-xs text-outline font-medium">Published</span>
+</div>
+</div>
+<!-- Section Card 4 -->
+<div class="col-span-8 bg-surface-container-lowest rounded-xl p-6 group cursor-pointer border border-transparent hover:border-outline-variant/15 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)]">
+<div class="flex items-center gap-6">
+<div class="flex-1">
+<h3 class="text-xl font-bold text-primary mb-2">Career Roadmap Builder</h3>
+<p class="text-sm text-on-surface-variant mb-4">A visual timeline of how we will approach your first 90 days in a new role.</p>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-tertiary-container" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-xs text-on-surface-variant font-medium">Live Interactive Tool</span>
+</div>
+</div>
+<div class="w-48 h-32 rounded-lg overflow-hidden bg-surface-container">
+<img alt="Roadmap Graphic" class="w-full h-full object-cover opacity-80" data-alt="Data visualization charts showing growth" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbCTM6ArOjQb7NbGufbQHm84eai6L-9IqRs-CzFDFw_nkYGtJe3ZsE4E3NG0K7XPkyML0Vxccb6BZbwM0Yl_Edm0m76bawkXT8BuhI4sZt62Lxd3lM5p_3RLiQvym6Vc846TIFKEQ18VeIXzlwRg1qtPCI8ekb0E8cB53FvivXeOsh0snHD2ccddyTRuQP4x1YBQfgFv_904zIYl6xAcBXuuDKP5-XE80LIsat390qJRgrkUhyFpPUhvm9-whsgVSYCgArQtN5mpE"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Add Section Modal Overlay -->
+<div class="fixed inset-0 bg-primary/20 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+<div class="bg-surface-bright w-full max-w-4xl max-h-[921px] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-outline-variant/20">
+<!-- Modal Header -->
+<div class="px-8 py-6 border-b border-surface-container-high flex justify-between items-center">
+<div>
+<h2 class="text-2xl font-headline font-extrabold text-primary">Create New Custom Section</h2>
+<p class="text-sm text-on-surface-variant">Define content that makes your profile stand out.</p>
+</div>
+<button class="w-10 h-10 rounded-full hover:bg-surface-container-low flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Modal Content Scrollable -->
+<div class="flex-1 overflow-y-auto p-8 space-y-10">
+<!-- Title Input -->
+<div class="space-y-2">
+<label class="text-xs font-label font-bold text-outline uppercase tracking-widest">Section Title</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-6 py-4 text-lg focus:bg-white focus:ring-1 focus:ring-primary/20 transition-all outline-none" placeholder="e.g. My Open Source Contributions" type="text"/>
+</div>
+<!-- Editor Section -->
+<div class="space-y-4">
+<div class="flex justify-between items-end border-b border-surface-container-high pb-2">
+<label class="text-xs font-label font-bold text-outline uppercase tracking-widest">Content Body</label>
+<div class="flex bg-surface-container-low p-1 rounded-lg">
+<button class="px-4 py-1.5 rounded-md text-xs font-bold bg-white shadow-sm text-primary">Write</button>
+<button class="px-4 py-1.5 rounded-md text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">Preview</button>
+</div>
+</div>
+<!-- Rich Text Toolbar -->
+<div class="flex gap-2 text-on-surface-variant">
+<button class="p-2 hover:bg-surface-container-low rounded-md"><span class="material-symbols-outlined text-xl" data-icon="format_bold">format_bold</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded-md"><span class="material-symbols-outlined text-xl" data-icon="format_italic">format_italic</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded-md"><span class="material-symbols-outlined text-xl" data-icon="link">link</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded-md"><span class="material-symbols-outlined text-xl" data-icon="format_list_bulleted">format_list_bulleted</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded-md"><span class="material-symbols-outlined text-xl" data-icon="image">image</span></button>
+<div class="w-px h-6 bg-surface-container-high self-center mx-2"></div>
+<button class="p-2 hover:bg-surface-container-low rounded-md"><span class="material-symbols-outlined text-xl" data-icon="code">code</span></button>
+</div>
+<textarea class="w-full bg-surface-container-highest border-none rounded-xl px-6 py-4 text-base focus:bg-white focus:ring-1 focus:ring-primary/20 transition-all outline-none resize-none" placeholder="Enter your section content here. Supports Markdown formatting..." rows="8"></textarea>
+</div>
+<!-- Image Upload Grid -->
+<div class="space-y-4">
+<label class="text-xs font-label font-bold text-outline uppercase tracking-widest">Gallery &amp; Assets (Optional)</label>
+<div class="grid grid-cols-4 gap-4">
+<!-- Upload Trigger -->
+<div class="aspect-square rounded-xl border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center hover:bg-surface-container-low cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors mb-2" data-icon="cloud_upload">cloud_upload</span>
+<span class="text-xs font-medium text-outline">Upload</span>
+</div>
+<!-- Placeholder Image Item -->
+<div class="aspect-square rounded-xl bg-surface-container overflow-hidden relative group">
+<img alt="Asset Preview" class="w-full h-full object-cover" data-alt="Colleagues working around a table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1nfFwbIpLvqTsnwL3d4lPlwzTmI91CjByPXuwh0HT0ElXJPHtNXYOeAG4njl_NS0Is9k9IXJfCOZtRhZ7mz2Q94qPg-M_O0o3iDrBovN8p5e31hfT3UA_wgO6ciyMt0iCgLS-rWvG2cNCnnT9IVOERLvCYuobTFvMBQd6vQsHkX_RQ4Qg_HivHJkEIDdhPRwAQEf_V9JEDIQpYwxKvBPCsGTUWDrAbFqZGqRK-IL33uSpvyUww5u7x3T8jioqDuPI8ZR4rVsWzWs"/>
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+<button class="bg-white text-error w-8 h-8 rounded-full flex items-center justify-center shadow-lg"><span class="material-symbols-outlined text-sm" data-icon="delete">delete</span></button>
+</div>
+</div>
+<div class="aspect-square rounded-xl bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant" data-icon="image">image</span>
+</div>
+<div class="aspect-square rounded-xl bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant" data-icon="image">image</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer Actions -->
+<div class="px-8 py-6 bg-surface-container-low border-t border-surface-container-high flex justify-between items-center">
+<div class="flex items-center gap-6">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+<span class="ml-3 text-sm font-medium text-primary">Publicly Visible</span>
+</label>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-3 rounded-xl font-bold text-primary hover:bg-white transition-colors">Save as Draft</button>
+<button class="signature-gradient text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition-opacity">Publish Section</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

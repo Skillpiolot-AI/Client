@@ -109,81 +109,94 @@ function ThreadView({ threadId, currentUserId, onClose, onThreadUpdate }) {
   const menteeObj = thread.menteeId;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="flex flex-col h-full bg-slate-50/50">
       {/* Header */}
-      <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: '12px', background: '#fff' }}>
-        <button onClick={onClose} style={{ background: '#F1F5F9', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer' }}><X size={16} /></button>
-        <Avatar user={menteeObj} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: '14px', color: '#1E293B' }}>{menteeObj?.name}</div>
-          <div style={{ fontSize: '12px', color: C.slate }}>{thread.subject}</div>
+      <div className="p-4 bg-white border-b border-slate-200/50 flex items-center justify-between shadow-sm sticky top-0 z-10">
+        <div className="flex items-center gap-3">
+          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all lg:hidden">
+            <X size={18} />
+          </button>
+          <Avatar user={menteeObj} size={40} />
+          <div className="overflow-hidden">
+            <h4 className="font-bold text-slate-800 text-sm truncate">{menteeObj?.name}</h4>
+            <p className="text-xs text-slate-500 truncate leading-tight mt-0.5">{thread.subject}</p>
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ background: statusBg[thread.status], color: statusColors[thread.status], borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>{thread.status}</span>
-          {thread.serviceId && <span style={{ fontSize: '11px', color: C.slate }}>{thread.serviceId.emoji} {thread.serviceId.title}</span>}
+        <div className="flex items-center gap-2">
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase ${
+            thread.status === 'active' ? 'bg-green-100 text-green-800' :
+            thread.status === 'open' ? 'bg-amber-100 text-amber-800' :
+            'bg-slate-100 text-slate-600'
+          }`}>
+            {thread.status}
+          </span>
           {!isClosed && (
-            <button onClick={closeThread} disabled={closing} title="Close thread" style={{ background: '#FEF2F2', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer' }}>
-              <XCircle size={14} color="#DC2626" />
+            <button onClick={closeThread} disabled={closing} title="Close thread" className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+              <XCircle size={16} />
             </button>
           )}
         </div>
       </div>
 
-      {/* Response deadline */}
+      {/* Response Deadline */}
       {thread.responseDeadline && !thread.mentorRepliedAt && (
-        <div style={{ background: '#FEF3C7', padding: '8px 20px', fontSize: '12px', color: '#92400E', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Clock size={12} /> Respond by: <strong>{new Date(thread.responseDeadline).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</strong>
+        <div className="bg-amber-50 px-5 py-2 border-b border-amber-100/50 text-xxs font-bold text-amber-800 flex items-center gap-2">
+          <Clock size={12} className="text-amber-600" /> 
+          <span>Action Required: Reply by {new Date(thread.responseDeadline).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       )}
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '12px', background: '#F8FAFC' }}>
-        
-        {/* Previous History Toggle */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        {/* History Toggle */}
         {history && (
-          <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+          <div className="text-center">
             <button 
               onClick={() => setShowHistory(!showHistory)}
-              style={{ background: '#EFF6FF', border: '1px solid #D6E4FF', padding: '4px 12px', borderRadius: '20px', fontSize: '11px', color: '#1E40AF', cursor: 'pointer', fontWeight: 600 }}
+              className="text-[11px] font-bold text-indigo-600 bg-indigo-50/50 hover:bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100/30 transition-all"
             >
-              {showHistory ? 'Hide Previous History' : 'View 30-Day Previous History'}
+              {showHistory ? 'Hide Archives' : 'View 30-Day History'}
             </button>
           </div>
         )}
 
-        {/* Render History Messages */}
+        {/* History Messages */}
         {showHistory && history && (
-          <div style={{ background: '#FAFBFF', padding: '12px', borderRadius: '12px', border: '1px dashed #E2E8F0', marginBottom: '10px' }}>
-            <p style={{ fontSize: '10px', color: '#94A3B8', textAlign: 'center', marginBottom: '8px', textTransform: 'uppercase' }}>📜 Archived History</p>
+          <div className="bg-slate-100/50 p-4 rounded-xl border border-slate-200/40 space-y-3 mb-2">
+            <p className="text-[9px] font-bold text-slate-400 text-center uppercase tracking-wider">📜 Archived Conversation</p>
             {history.messages?.map((m, i) => {
               const isMyMsg = m.senderRole === 'mentor';
               return (
-                <div key={`hist-${i}`} style={{ display: 'flex', flexDirection: isMyMsg ? 'row-reverse' : 'row', gap: '8px', alignItems: 'flex-end', marginBottom: '8px', opacity: 0.7 }}>
+                <div key={`hist-${i}`} className={`flex ${isMyMsg ? 'justify-end' : 'justify-start'} gap-2 items-end opacity-60`}>
                   {!isMyMsg && <Avatar user={thread.menteeId} size={24} />}
-                  <div style={{ maxWidth: '70%' }}>
-                    <div style={{ background: isMyMsg ? C.indigo : '#fff', color: isMyMsg ? '#fff' : '#1E293B', borderRadius: isMyMsg ? '16px 16px 4px 16px' : '16px 16px 16px 4px', padding: '8px 12px', fontSize: '13px', border: isMyMsg ? 'none' : `1px solid ${C.border}` }}>
-                      {m.content}
-                    </div>
+                  <div className={`max-w-[75%] p-2.5 rounded-xl text-xs ${
+                    isMyMsg ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none shadow-sm'
+                  }`}>
+                    {m.content}
                   </div>
                 </div>
               );
             })}
-            <hr style={{ border: 'none', borderTop: '1px dashed #E2E8F0', margin: '12px 0' }} />
           </div>
         )}
 
+        {/* Live Messages */}
         {thread.messages.map((m, i) => {
           const isMyMsg = m.senderRole === 'mentor';
           return (
-            <div key={i} style={{ display: 'flex', flexDirection: isMyMsg ? 'row-reverse' : 'row', gap: '8px', alignItems: 'flex-end' }}>
-              {!isMyMsg && <Avatar user={menteeObj} size={28} />}
-              <div style={{ maxWidth: '70%' }}>
-                <div style={{ background: isMyMsg ? C.indigo : '#fff', color: isMyMsg ? '#fff' : '#1E293B', borderRadius: isMyMsg ? '16px 16px 4px 16px' : '16px 16px 16px 4px', padding: '10px 14px', fontSize: '14px', lineHeight: 1.5, border: isMyMsg ? 'none' : `1px solid ${C.border}`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <div key={i} className={`flex ${isMyMsg ? 'justify-end' : 'justify-start'} gap-2 items-end`}>
+              {!isMyMsg && <Avatar user={menteeObj} size={30} />}
+              <div className="max-w-[75%]">
+                <div className={`p-3 rounded-2xl text-sm leading-relaxed ${
+                  isMyMsg 
+                    ? 'bg-indigo-600 text-white rounded-br-none shadow-sm shadow-indigo-100' 
+                    : 'bg-white border border-slate-200/50 text-slate-800 rounded-bl-none shadow-sm'
+                }`}>
                   {m.content}
                 </div>
-                <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '3px', textAlign: isMyMsg ? 'right' : 'left', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: isMyMsg ? 'flex-end' : 'flex-start' }}>
+                <div className={`flex items-center gap-1.5 mt-1 text-xxs text-slate-400 ${isMyMsg ? 'justify-end' : 'justify-start'}`}>
                   <TimeAgo date={m.createdAt} />
-                  {isMyMsg && m.isRead && <CheckCheck size={11} color={C.green} />}
+                  {isMyMsg && m.isRead && <CheckCheck size={12} className="text-green-500" />}
                 </div>
               </div>
             </div>
@@ -194,38 +207,38 @@ function ThreadView({ threadId, currentUserId, onClose, onThreadUpdate }) {
 
       {/* Reply box */}
       {!isClosed ? (
-        <div style={{ padding: '12px 16px', background: '#fff', borderTop: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {/* Suggestions roll */}
+        <div className="p-4 bg-white border-t border-slate-200/50 space-y-3 sticky bottom-0 z-10">
           {suggestions.length > 0 && (
-            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '6px' }}>
+            <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
               {suggestions.map((sug, i) => (
                 <button
                   key={i}
+                  type="button"
                   onClick={() => setReply(sug)}
-                  style={{ background: '#EEF2FF', border: '1px solid #E0E7FF', padding: '5px 10px', borderRadius: '14px', fontSize: '11px', color: '#4F46E5', cursor: 'pointer', flexShrink: 0, fontWeight: 500 }}
+                  className="px-2.5 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 rounded-full text-[11px] text-slate-600 font-medium transition-all flex-shrink-0 cursor-pointer"
                 >
                   {sug}
                 </button>
               ))}
             </div>
           )}
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
+          <div className="flex gap-3 items-end">
             <textarea
               value={reply}
               onChange={e => setReply(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-              placeholder="Type your reply… (Enter to send, Shift+Enter for newline)"
-              rows={2}
-              style={{ flex: 1, border: `1.5px solid ${C.border}`, borderRadius: '12px', padding: '10px 14px', fontSize: '14px', outline: 'none', resize: 'none', fontFamily: 'inherit', lineHeight: 1.4 }}
+              placeholder="Type your reply… (Enter to send)"
+              rows={1}
+              className="flex-1 bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/10 outline-none resize-none placeholder:text-slate-400 leading-normal"
             />
-            <button onClick={send} disabled={sending || !reply.trim()} style={{ background: C.indigo, border: 'none', borderRadius: '12px', padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontWeight: 700, fontSize: '13px', opacity: reply.trim() ? 1 : 0.5 }}>
-              {sending ? <Loader2 size={14} style={{ animation: 'spin 0.6s linear infinite' }} /> : <Send size={14} />} Send
+            <button onClick={send} disabled={sending || !reply.trim()} className="h-10 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center justify-center gap-2 text-sm font-bold shadow-sm transition-all disabled:opacity-50">
+              {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={15} />}
             </button>
           </div>
         </div>
       ) : (
-        <div style={{ padding: '12px 20px', background: '#F1F5F9', borderTop: `1px solid ${C.border}`, textAlign: 'center', fontSize: '13px', color: C.slate }}>
-          🔒 This thread is closed
+        <div className="p-4 bg-slate-100/80 border-t border-slate-200/40 text-center text-xs font-bold text-slate-500 flex items-center justify-center gap-1.5">
+          🔒 Thread is closed
         </div>
       )}
     </div>
@@ -260,61 +273,76 @@ export default function DMInbox() {
   const totalUnread = threads.reduce((sum, t) => sum + (t.unreadByMentor || 0), 0);
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 120px)', border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden', background: '#fff' }}>
+    <div className="flex bg-white rounded-3xl border border-slate-200/40 h-[calc(100vh-160px)] overflow-hidden shadow-sm w-full">
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       {/* Thread list */}
-      <div style={{ width: '320px', flexShrink: 0, borderRight: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column' }}>
+      <div className={`w-full md:w-80 border-r border-slate-200/30 flex flex-col bg-slate-50/20 ${selected ? 'hidden md:flex' : 'flex'}`}>
         {/* Header */}
-        <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#1E293B' }}>Priority DM Inbox</h2>
+        <div className="p-5 border-b border-slate-200/30 bg-white">
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-base font-bold text-slate-800">Priority DMs</h2>
             {totalUnread > 0 && (
-              <span style={{ background: '#EF4444', color: '#fff', borderRadius: '20px', padding: '2px 8px', fontSize: '11px', fontWeight: 800 }}>{totalUnread}</span>
+              <span className="bg-red-500 text-white text-xxs font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">{totalUnread}</span>
             )}
           </div>
           {/* Filter pills */}
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
             {['all', 'open', 'active', 'closed'].map(s => (
-              <button key={s} onClick={() => setStatusFilter(s)} style={{ padding: '4px 12px', borderRadius: '20px', border: `1.5px solid ${statusFilter === s ? C.indigo : C.border}`, background: statusFilter === s ? C.bg : 'transparent', color: statusFilter === s ? C.indigo : C.slate, fontSize: '12px', fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize' }}>
-                {s}
+              <button 
+                key={s} 
+                onClick={() => setStatusFilter(s)} 
+                className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all flex-shrink-0 cursor-pointer ${
+                  statusFilter === s 
+                    ? 'bg-indigo-50 border-indigo-200/50 text-indigo-600 border' 
+                    : 'border border-slate-200 text-slate-500 hover:bg-slate-50 bg-white'
+                }`}
+              >
+                {s.charAt(0).toUpperCase() + s.slice(1)}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Thread list */}
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        {/* Thread list body */}
+        <div className="flex-1 overflow-y-auto divide-y divide-slate-100/60 bg-white">
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px' }}><Loader2 size={24} style={{ animation: 'spin 0.8s linear infinite' }} color={C.indigo} /></div>
+            <div className="flex justify-center p-8 text-slate-400"><Loader2 size={24} className="animate-spin" /></div>
           ) : threads.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '48px 20px' }}>
-              <MessageSquare size={32} color="#CBD5E1" style={{ margin: '0 auto 10px' }} />
-              <p style={{ fontSize: '14px', color: C.slate, margin: 0 }}>No messages yet</p>
-              <p style={{ fontSize: '12px', color: '#94A3B8', margin: '4px 0 0' }}>Mentees who buy your Priority DM service will appear here</p>
+            <div className="text-center p-8 text-slate-400">
+              <MessageSquare size={32} className="mx-auto mb-2 text-slate-300" />
+              <p className="text-sm font-bold text-slate-500 mb-1">No messages found</p>
+              <p className="text-xxs text-slate-400">Offer priority DM service to unlock conversations.</p>
             </div>
           ) : (
             threads.map(t => {
               const isActive = selected === t._id;
               const hasUnread = t.unreadByMentor > 0;
               return (
-                <button key={t._id} onClick={() => setSelected(t._id)} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '14px 20px', border: 'none', borderBottom: `1px solid ${C.border}`, background: isActive ? C.bg : hasUnread ? '#FAFBFF' : '#fff', cursor: 'pointer', transition: 'background 0.1s' }}>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                    <div style={{ position: 'relative' }}>
-                      <Avatar user={t.menteeId} size={40} />
-                      {hasUnread && <div style={{ position: 'absolute', top: -2, right: -2, width: '14px', height: '14px', borderRadius: '50%', background: '#EF4444', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', color: '#fff', fontWeight: 800 }}>{t.unreadByMentor}</div>}
+                <button key={t._id} onClick={() => setSelected(t._id)} className={`block w-full text-left p-4 hover:bg-slate-50/60 transition-all border-l-2 ${isActive ? 'bg-indigo-50/40 border-indigo-600' : 'border-transparent bg-white'}`}>
+                  <div className="flex gap-3 items-start">
+                    <div className="relative flex-shrink-0">
+                      <Avatar user={t.menteeId} size={42} />
+                      {hasUnread && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-extrabold flex items-center justify-center border-2 border-white">{t.unreadByMentor}</div>
+                      )}
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13px', fontWeight: hasUnread ? 800 : 600, color: '#1E293B' }}>{t.menteeId?.name}</span>
-                        <span style={{ fontSize: '11px', color: '#94A3B8' }}><TimeAgo date={t.lastMessageAt} /></span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-center mb-0.5">
+                        <span className={`text-xs ${hasUnread ? 'font-bold text-slate-900' : 'font-semibold text-slate-700'}`}>{t.menteeId?.name}</span>
+                        <span className="text-[10px] text-slate-400"><TimeAgo date={t.lastMessageAt} /></span>
                       </div>
-                      <p style={{ margin: '2px 0 0', fontSize: '12px', color: C.slate, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p className={`text-xs truncate ${hasUnread ? 'font-bold text-slate-800' : 'text-slate-500'}`}>
                         {t.lastMessage?.content || t.subject}
                       </p>
-                      <div style={{ marginTop: '4px', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <span style={{ background: statusBg[t.status], color: statusColors[t.status], borderRadius: '20px', padding: '1px 7px', fontSize: '10px', fontWeight: 700 }}>{t.status}</span>
-                        {t.serviceId && <span style={{ fontSize: '10px', color: '#94A3B8' }}>{t.serviceId.emoji}</span>}
+                      <div className="mt-1.5 flex gap-1 items-center">
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                          t.status === 'active' ? 'bg-green-50 text-green-700' :
+                          t.status === 'open' ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-600'
+                        }`}>
+                          {t.status}
+                        </span>
+                        {t.serviceId && <span className="text-[9px] text-slate-400">{t.serviceId.emoji} Priority</span>}
                       </div>
                     </div>
                   </div>
@@ -326,7 +354,7 @@ export default function DMInbox() {
       </div>
 
       {/* Conversation panel */}
-      <div style={{ flex: 1 }}>
+      <div className={`flex-1 flex flex-col bg-white ${!selected ? 'hidden md:flex' : 'flex'}`}>
         {selected ? (
           <ThreadView
             threadId={selected}
@@ -335,10 +363,10 @@ export default function DMInbox() {
             onThreadUpdate={load}
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: C.slate }}>
-            <MessageSquare size={48} color="#CBD5E1" style={{ marginBottom: '12px' }} />
-            <p style={{ fontSize: '16px', fontWeight: 600, color: '#94A3B8', margin: 0 }}>Select a conversation</p>
-            <p style={{ fontSize: '13px', color: '#CBD5E1', margin: '4px 0 0' }}>Click a thread on the left to start responding</p>
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-400 bg-slate-50/10">
+            <MessageSquare size={48} className="text-slate-200 mb-3" />
+            <p className="text-md font-bold text-slate-500 mb-1">Select a Thread</p>
+            <p className="text-xs text-slate-400">Choose a mentee thread on the left to start replying.</p>
           </div>
         )}
       </div>

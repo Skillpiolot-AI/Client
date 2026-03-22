@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SkillPilot Mentor Dashboard - Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-primary": "#b9c7e0",
+              "primary-fixed-dim": "#b9c7e0",
+              "on-primary-fixed-variant": "#3a485c",
+              "inverse-surface": "#342f2d",
+              "surface": "#fff8f5",
+              "surface-variant": "#eae1dc",
+              "secondary-fixed": "#d3e4fe",
+              "secondary-container": "#d0e1fb",
+              "secondary": "#505f76",
+              "primary-fixed": "#d5e3fd",
+              "outline-variant": "#c5c6cd",
+              "tertiary-container": "#004944",
+              "on-error-container": "#93000a",
+              "inverse-on-surface": "#f8efeb",
+              "surface-container-low": "#fbf2ed",
+              "on-primary": "#ffffff",
+              "background": "#fff8f5",
+              "tertiary-fixed-dim": "#80d5cb",
+              "surface-bright": "#fff8f5",
+              "primary": "#1d2b3e",
+              "on-primary-container": "#9eadc5",
+              "on-secondary-fixed": "#0b1c30",
+              "on-tertiary-fixed": "#00201d",
+              "on-secondary-container": "#54647a",
+              "on-primary-fixed": "#0d1c2f",
+              "surface-tint": "#515f74",
+              "primary-container": "#334155",
+              "on-error": "#ffffff",
+              "tertiary-fixed": "#9cf2e8",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#f0e6e2",
+              "on-surface": "#1f1b18",
+              "tertiary": "#00312d",
+              "surface-container": "#f6ece8",
+              "secondary-fixed-dim": "#b7c8e1",
+              "on-secondary": "#ffffff",
+              "on-tertiary-fixed-variant": "#00504a",
+              "on-background": "#1f1b18",
+              "error": "#ba1a1a",
+              "surface-dim": "#e1d8d4",
+              "on-secondary-fixed-variant": "#38485d",
+              "surface-container-highest": "#eae1dc",
+              "on-tertiary-container": "#65bbb1",
+              "on-tertiary": "#ffffff",
+              "on-surface-variant": "#44474c",
+              "outline": "#75777d",
+              "error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #fff8f5;
+        color: #1f1b18;
+      }
+      .font-manrope { font-family: 'Manrope', sans-serif; }
+      .premium-gradient {
+        background: linear-gradient(135deg, #1d2b3e 0%, #334155 100%);
+      }
+      .glass-nav {
+        background: rgba(255, 248, 245, 0.8);
+        backdrop-filter: blur(20px);
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- SideNavBar (Authority Source: JSON) -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-slate-50 dark:bg-slate-900/50 flex flex-col h-full py-8 px-4 border-r border-slate-200/50 dark:border-slate-800/50 z-50">
+<div class="mb-10 px-4">
+<h1 class="font-manrope font-bold text-slate-900 dark:text-slate-100 text-2xl tracking-tighter">SkillPilot</h1>
+</div>
+<div class="flex items-center gap-3 mb-8 px-4">
+<img alt="Mentor profile picture" class="w-10 h-10 rounded-full object-cover" data-alt="Close up portrait of a professional mentor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANYbpaFAinEyM_WOmZ25y0wfJwJZoXBOPDcNyoE14_ckn6hTqYEwlDdmauLJSg2l_IA1IaYhtPi_C6Ro3i3xLRhbtqYD6UFpPbViRXlE0YkQBBcbrHq1mZ_V3WMAiCvBvQ276hcSO53JGCAafZ2z6Zn_ww6EFWEysZhZz8wKU7i7a1K29cBg83rbDiL8kISa1R_q0sJ8pgF4-gWXhv4ShLTummxi3-2ToK_CH2qmBk8mx4-eHfSQFr5DfMb6vxK5CeRK8vIhC6t1o"/>
+<div class="overflow-hidden">
+<p class="font-manrope text-sm font-bold text-slate-900 dark:text-slate-100 truncate">Mentor Name</p>
+<p class="text-xs text-slate-500 truncate">@skillpilot_handle</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active: Overview -->
+<a class="flex items-center gap-3 px-4 py-3 font-manrope text-sm font-medium tracking-tight text-slate-900 dark:text-white font-bold border-r-2 border-slate-900 dark:border-white transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-manrope text-sm font-medium tracking-tight text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="payments">payments</span>
+<span>Services</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-manrope text-sm font-medium tracking-tight text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="forum">forum</span>
+<span>DM Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-manrope text-sm font-medium tracking-tight text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="confirmation_number">confirmation_number</span>
+<span>Coupons</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-manrope text-sm font-medium tracking-tight text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard_customize">dashboard_customize</span>
+<span>Custom Sections</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-manrope text-sm font-medium tracking-tight text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="event_available">event_available</span>
+<span>Schedule &amp; Profile</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-slate-200/50 dark:border-slate-800/50 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 font-manrope text-sm font-medium tracking-tight text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+<span>View Public Profile</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-manrope text-sm font-medium tracking-tight text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+<span>Edit Profile Setup</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar (Authority Source: JSON) -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md flex items-center justify-between px-8 w-full shadow-sm dark:shadow-none">
+<div class="flex items-center gap-4">
+<h2 class="font-manrope text-lg font-bold text-slate-900 dark:text-slate-100">Overview</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<div class="flex items-center bg-surface-container-highest rounded-full px-4 py-2 w-64">
+<span class="material-symbols-outlined text-slate-500 text-[20px]" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full ml-2" placeholder="Search mentees or data..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-slate-500 hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pl-64 pt-16 min-h-screen bg-surface">
+<div class="p-8 max-w-7xl mx-auto space-y-10">
+<!-- Hero Section / Welcome -->
+<section class="mt-4">
+<div class="flex flex-col gap-2">
+<span class="font-label text-xs uppercase tracking-widest text-on-primary-container font-semibold">Navigator Status: Active</span>
+<h2 class="font-manrope text-4xl font-extrabold text-primary tracking-tight leading-tight">Welcome back, <span class="text-primary-container">Strategic Guide.</span></h2>
+<p class="text-on-surface-variant body-md max-w-2xl leading-relaxed">Your mentorship ecosystem is thriving. Here's a snapshot of your professional impact and growth metrics for this month.</p>
+</div>
+</section>
+<!-- Stats Bento Grid (Visual Quality Focus) -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Stat Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] group border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 rounded-lg bg-surface-container-low group-hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="groups">groups</span>
+</div>
+<span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">+12%</span>
+</div>
+<p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">Total Mentees</p>
+<h3 class="font-manrope text-3xl font-bold text-on-surface">1,248</h3>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] group border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 rounded-lg bg-surface-container-low group-hover:bg-tertiary-fixed transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">Top 1%</span>
+</div>
+<p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">Avg Rating</p>
+<h3 class="font-manrope text-3xl font-bold text-on-surface">4.92</h3>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] group border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 rounded-lg bg-surface-container-low group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="payments">payments</span>
+</div>
+</div>
+<p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">Total Earnings (INR)</p>
+<h3 class="font-manrope text-3xl font-bold text-on-surface">₹4,82,500</h3>
+</div>
+<!-- Stat Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] group border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 rounded-lg bg-surface-container-low group-hover:bg-on-tertiary-container transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="work_history">work_history</span>
+</div>
+<span class="text-[10px] font-bold text-primary bg-primary-fixed px-2 py-1 rounded-full">Milestone</span>
+</div>
+<p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">Total Placements</p>
+<h3 class="font-manrope text-3xl font-bold text-on-surface">84</h3>
+</div>
+</section>
+<!-- Public Profile Banner (Call to Action) -->
+<section class="premium-gradient rounded-3xl p-8 text-white relative overflow-hidden">
+<!-- Decorative element -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+<div class="absolute bottom-0 left-0 w-32 h-32 bg-primary-container/20 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+<div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="space-y-4 text-center md:text-left">
+<h4 class="font-manrope text-2xl font-bold">Your Gateway to Mentees</h4>
+<p class="text-on-primary-container max-w-md">Share your unique mentor link on social media to attract new bookings and build your personal brand.</p>
+<div class="flex flex-wrap items-center gap-4 mt-6">
+<div class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 font-body text-sm flex items-center gap-2 group cursor-pointer hover:bg-white/20 transition-all">
+<span class="text-white/60">skillpilot.app/mentor/</span><span class="font-bold text-white">skillpilot_handle</span>
+<span class="material-symbols-outlined text-sm ml-2" data-icon="content_copy">content_copy</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="bg-white text-primary px-8 py-4 rounded-xl font-bold text-sm hover:translate-y-[-2px] transition-all flex items-center justify-center gap-2 shadow-xl">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+                            View Public Profile
+                        </button>
+</div>
+</div>
+</section>
+<!-- Bottom Layout: Quick Tips & Activity -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Quick Tips (Requirement) -->
+<div class="lg:col-span-1 space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="font-manrope text-xl font-bold text-primary">Strategic Tips</h3>
+<span class="material-symbols-outlined text-primary-container" data-icon="lightbulb">lightbulb</span>
+</div>
+<div class="space-y-4">
+<!-- Tip 1 -->
+<div class="bg-surface-container-low p-5 rounded-2xl space-y-2 border-l-4 border-primary">
+<p class="font-bold text-sm text-primary">Boost Conversion</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Mentors who add at least 3 distinct offerings (e.g., Mock Interviews, Resume Review, 1-on-1) see a 40% higher booking rate.</p>
+<a class="inline-block text-[10px] font-bold text-primary uppercase tracking-wider hover:underline mt-1" href="#">Add Offerings →</a>
+</div>
+<!-- Tip 2 -->
+<div class="bg-surface-container-low p-5 rounded-2xl space-y-2 border-l-4 border-on-tertiary-container">
+<p class="font-bold text-sm text-primary">Limited Time Coupons</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Using coupons during festive seasons or weekend sprints can help clear pending inquiries in your DM inbox.</p>
+<a class="inline-block text-[10px] font-bold text-primary uppercase tracking-wider hover:underline mt-1" href="#">Manage Coupons →</a>
+</div>
+</div>
+</div>
+<!-- Recent Mentees / Growth (Visual Depth) -->
+<div class="lg:col-span-2 bg-surface-container-low rounded-3xl p-8">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="font-manrope text-xl font-bold text-primary">Recent Mentees</h3>
+<p class="text-xs text-on-surface-variant">Last 5 interactions across your services</p>
+</div>
+<button class="text-xs font-bold text-primary px-4 py-2 border border-primary/20 rounded-full hover:bg-white transition-colors">View All History</button>
+</div>
+<div class="space-y-0">
+<!-- Mentee Row 1 -->
+<div class="flex items-center justify-between py-4 group hover:px-4 hover:bg-surface-container-lowest hover:rounded-xl transition-all">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-primary text-xs">AK</div>
+<div>
+<p class="font-bold text-sm text-on-surface">Arjun Kapoor</p>
+<p class="text-[10px] text-outline uppercase tracking-wider">Product Strategy Session</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface">₹1,500</p>
+<p class="text-[10px] text-green-600 font-bold">COMPLETED</p>
+</div>
+</div>
+<!-- Mentee Row 2 -->
+<div class="flex items-center justify-between py-4 group hover:px-4 hover:bg-surface-container-lowest hover:rounded-xl transition-all">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-primary text-xs">SM</div>
+<div>
+<p class="font-bold text-sm text-on-surface">Sarah Mehta</p>
+<p class="text-[10px] text-outline uppercase tracking-wider">Mock Interview Sprint</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface">₹2,800</p>
+<p class="text-[10px] text-primary-container font-bold">UPCOMING</p>
+</div>
+</div>
+<!-- Mentee Row 3 -->
+<div class="flex items-center justify-between py-4 group hover:px-4 hover:bg-surface-container-lowest hover:rounded-xl transition-all">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center font-bold text-primary text-xs">RP</div>
+<div>
+<p class="font-bold text-sm text-on-surface">Rohan Prasad</p>
+<p class="text-[10px] text-outline uppercase tracking-wider">Career Roadmap 1:1</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface">₹950</p>
+<p class="text-[10px] text-green-600 font-bold">COMPLETED</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

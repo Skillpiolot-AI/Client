@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../AuthContext';
 import axios from 'axios';
 import config from '../../config';
-import { MessageSquare, Clock, Users, Edit, Plus, Calendar, CheckCircle, TrendingUp, PhoneCall } from "lucide-react";
+import { MessageSquare, Clock, Users, Edit, Plus, Calendar, CheckCircle, TrendingUp, PhoneCall, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -259,7 +259,7 @@ export default function MentorDashboard() {
                               <Calendar className="h-5 w-5 text-indigo-600" />
                             </div>
                             <div>
-                              <h3 className="font-bold text-gray-800">{appointment.userId.name}</h3>
+                              <h3 className="font-bold text-gray-800">{appointment.userId?.name || 'Unknown User'}</h3>
                               <p className="text-sm text-gray-500 font-medium">Scheduled for {new Date(appointment.scheduledDate).toLocaleString()}</p>
                             </div>
                           </div>
@@ -287,11 +287,11 @@ export default function MentorDashboard() {
                         <CardContent className="p-5 flex items-center justify-between">
                           <div className="flex items-center space-x-4">
                             <Avatar className="h-10 w-10">
-                              <AvatarImage src={appointment.userId.profileImage} />
-                              <AvatarFallback>{appointment.userId.name.charAt(0)}</AvatarFallback>
+                              <AvatarImage src={appointment.userId?.profileImage} />
+                              <AvatarFallback>{appointment.userId?.name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
                             <div>
-                              <h3 className="font-bold text-gray-800">{appointment.userId.name}</h3>
+                              <h3 className="font-bold text-gray-800">{appointment.userId?.name || 'Unknown User'}</h3>
                               <p className="text-sm text-gray-500 font-medium">{new Date(appointment.scheduledDate).toLocaleDateString()}</p>
                             </div>
                           </div>

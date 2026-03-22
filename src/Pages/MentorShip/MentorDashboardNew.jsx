@@ -13,7 +13,8 @@ import {
   LayoutDashboard, Star, Tag, Calendar, MessageSquare,
   TrendingUp, Plus, Edit2, Trash2, Power, Eye, ExternalLink,
   ChevronDown, ChevronUp, Copy, Check, Loader2, Settings,
-  DollarSign, Users, Award, X, GripVertical, Inbox, Type
+  DollarSign, Users, Award, X, GripVertical, Inbox, Type,
+  Search, Bell, HelpCircle, Clock, Menu
 } from 'lucide-react';
 import DMInbox from './DMInbox';
 import CustomSectionsTab from './CustomSectionsTab';
@@ -107,119 +108,167 @@ function ServicesTab({ mentorId }) {
   const isAsync = ASYNC_TYPES.includes(form.serviceType);
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#1E293B' }}>My Services</h2>
-          <p style={{ margin: '2px 0 0', fontSize: '13px', color: C.slate }}>{services.length} service{services.length !== 1 ? 's' : ''} created</p>
+          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Manage Offerings</h2>
+          <p className="text-slate-500 text-sm mt-1">{services.length} active service{services.length !== 1 ? 's' : ''} on profile</p>
         </div>
-        <button onClick={openNew} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: C.indigo, color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 18px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
-          <Plus size={15} /> Add Service
+        <button onClick={openNew} className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2.5 flex items-center gap-2 text-sm font-bold shadow-sm transition-all">
+          <Plus size={18} /> Add Service
         </button>
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '48px', color: C.slate }}><Loader2 size={28} style={{ animation: 'spin 0.8s linear infinite' }} /></div>
+        <div className="flex justify-center p-12 text-slate-400"><Loader2 size={32} className="animate-spin" /></div>
       ) : services.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', border: `2px dashed ${C.border}`, borderRadius: '16px' }}>
-          <p style={{ fontSize: '32px', margin: '0 0 8px' }}>🎯</p>
-          <p style={{ fontSize: '15px', fontWeight: 700, color: '#1E293B', margin: '0 0 4px' }}>No services yet</p>
-          <p style={{ fontSize: '13px', color: C.slate, margin: '0 0 16px' }}>Add your first service to start accepting bookings.</p>
-          <button onClick={openNew} style={{ background: C.indigo, color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>+ Add Service</button>
+        <div className="text-center p-12 bg-white border border-dashed border-slate-200 rounded-2xl max-w-lg mx-auto shadow-sm">
+          <p className="text-4xl mb-3">🎯</p>
+          <p className="font-bold text-slate-800 mb-1">No services created yet</p>
+          <p className="text-slate-500 text-xs mb-6">Define your expertise to start hosting bookings with mentees.</p>
+          <button onClick={openNew} className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 shadow-sm">+ Create First Service</button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {services.map(s => (
-            <div key={s._id} style={{ background: '#fff', border: `1px solid ${s.isActive ? C.border : '#F1F5F9'}`, borderRadius: '14px', padding: '16px 18px', display: 'flex', gap: '14px', alignItems: 'center', opacity: s.isActive ? 1 : 0.6 }}>
-              <div style={{ fontSize: '24px', flexShrink: 0 }}>{s.emoji || '🎯'}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '15px', fontWeight: 700, color: '#1E293B' }}>{s.title}</span>
-                  <Pill>{SERVICE_LABELS[s.serviceType] || s.serviceType}</Pill>
-                  {!s.isActive && <Pill color="#94A3B8" bg="#F1F5F9">Inactive</Pill>}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map(s => {
+            const isAsyncSvc = ASYNC_TYPES.includes(s.serviceType);
+            return (
+              <div key={s._id} className={`group relative bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-md border border-slate-200/40 flex flex-col h-full ${!s.isActive ? 'opacity-60 bg-slate-50/50' : 'shadow-sm'}`}>
+                <div className="flex justify-between items-start mb-5">
+                  <div className="w-12 h-12 bg-indigo-50/50 rounded-xl flex items-center justify-center text-2xl shadow-sm border border-indigo-100/20">
+                    {s.emoji || '🎯'}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`h-1.5 w-1.5 rounded-full ${s.isActive ? 'bg-green-500' : 'bg-slate-400'}`}></span>
+                    <span className="text-xxs font-bold uppercase tracking-wider text-slate-400">
+                      {s.isActive ? 'Live' : 'Paused'}
+                    </span>
+                  </div>
                 </div>
-                <p style={{ margin: '3px 0 0', fontSize: '13px', color: C.slate }}>{s.description?.slice(0, 80)}{s.description?.length > 80 ? '…' : ''}</p>
+                
+                <div className="mb-4 flex-1">
+                  <span className="text-xxs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                    {SERVICE_LABELS[s.serviceType] || s.serviceType}
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-800 mt-2 line-clamp-1">{s.title}</h3>
+                  <p className="text-slate-500 text-xs mt-1 line-clamp-2 leading-relaxed h-[36px] overflow-hidden">{s.description}</p>
+                </div>
+
+                <div className="mt-auto pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg text-slate-800 text-xs font-extrabold">
+                      {s.isFree ? <span className="text-green-600">Free</span> : `₹${s.price?.toLocaleString('en-IN')}`}
+                    </div>
+                    {s.duration && !isAsyncSvc && (
+                      <div className="flex items-center gap-1 bg-slate-50 px-2.5 py-1.5 rounded-lg text-slate-500 text-xxs font-medium">
+                        <Calendar size={11} className="text-slate-400" /> {s.duration} min
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between mt-2">
+                    <button onClick={() => openEdit(s)} className="text-slate-400 hover:text-indigo-600 transition-colors p-1 hover:bg-slate-50 rounded-lg">
+                      <Edit2 size={15} />
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => toggle(s._id)} 
+                        title={s.isActive ? 'Deactivate' : 'Activate'}
+                        className={`p-1 rounded-lg transition-colors ${
+                          s.isActive 
+                            ? 'text-amber-500 hover:bg-amber-50' 
+                            : 'text-green-600 hover:bg-green-50'
+                        }`}
+                      >
+                        <Power size={15} />
+                      </button>
+                      <button onClick={() => del(s._id)} className="text-slate-400 hover:text-red-500 transition-colors p-1 hover:bg-slate-50 rounded-lg">
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#1E293B' }}>{s.isFree ? <span style={{ color: C.green }}>Free</span> : `₹${s.price?.toLocaleString('en-IN')}`}</div>
-                {s.duration && !ASYNC_TYPES.includes(s.serviceType) && <div style={{ fontSize: '11px', color: C.slate }}>{s.duration} min</div>}
-              </div>
-              <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
-                <button onClick={() => openEdit(s)} title="Edit" style={{ background: C.bg, border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer' }}><Edit2 size={13} color={C.indigo} /></button>
-                <button onClick={() => toggle(s._id)} title={s.isActive ? 'Deactivate' : 'Activate'} style={{ background: s.isActive ? '#FEF3C7' : '#ECFDF5', border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer' }}><Power size={13} color={s.isActive ? '#D97706' : C.green} /></button>
-                <button onClick={() => del(s._id)} title="Delete" style={{ background: '#FEF2F2', border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer' }}><Trash2 size={13} color={C.red} /></button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {/* Service Form Modal */}
       {showForm && (
-        <div onClick={() => setShowForm(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '16px' }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px', padding: '28px', maxWidth: '520px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontWeight: 800, color: '#1E293B' }}>{editSvc ? 'Edit Service' : 'Add New Service'}</h3>
-              <button onClick={() => setShowForm(false)} style={{ background: '#F1F5F9', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer' }}><X size={16} /></button>
-            </div>
-
-            <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Service Type</label>
-            <select value={form.serviceType} onChange={e => setForm(f => ({ ...f, serviceType: e.target.value }))} style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', marginBottom: '14px', outline: 'none' }}>
-              {Object.entries(SERVICE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </select>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr', gap: '0 10px' }}>
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Emoji</label>
-                <input value={form.emoji} onChange={e => setForm(f => ({ ...f, emoji: e.target.value }))} placeholder="🎯" style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 10px', fontSize: '18px', marginBottom: '14px', outline: 'none', boxSizing: 'border-box', textAlign: 'center' }} />
+        <div onClick={() => setShowForm(false)} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div onClick={e => e.stopPropagation()} className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-slate-800">{editSvc ? 'Edit Service' : 'Create New Service'}</h3>
+                <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-50 transition-all">
+                  <X size={18} />
+                </button>
               </div>
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Title *</label>
-                <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Mock Interview – DSA + System Design" style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', marginBottom: '14px', outline: 'none', boxSizing: 'border-box' }} />
-              </div>
-            </div>
 
-            <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Description</label>
-            <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={3} placeholder="What will mentees get?" style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', marginBottom: '14px', outline: 'none', resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              <form className="space-y-4" onSubmit={e => { e.preventDefault(); save(); }}>
+                <div>
+                  <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Service Type</label>
+                  <select value={form.serviceType} onChange={e => setForm(f => ({ ...f, serviceType: e.target.value }))} className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-slate-800">
+                    {Object.entries(SERVICE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                  </select>
+                </div>
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '12px', fontSize: '13px', fontWeight: 600, color: C.slate }}>
-              <input type="checkbox" checked={form.isFree} onChange={e => setForm(f => ({ ...f, isFree: e.target.checked }))} style={{ accentColor: C.green }} />
-              This service is FREE
-            </label>
+                <div className="grid grid-cols-4 gap-3">
+                  <div className="col-span-1">
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Emoji</label>
+                    <input value={form.emoji} onChange={e => setForm(f => ({ ...f, emoji: e.target.value }))} placeholder="🎯" className="w-full text-center bg-slate-50 border border-slate-200/60 rounded-xl px-2 py-2 text-xl focus:ring-2 focus:ring-indigo-500/10 outline-none" />
+                  </div>
+                  <div className="col-span-3">
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Title *</label>
+                    <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Mock Interview" className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 outline-none" required />
+                  </div>
+                </div>
 
-            {!form.isFree && (
-              <>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Price (₹)</label>
-                <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="999" style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', marginBottom: '14px', outline: 'none', boxSizing: 'border-box' }} />
-              </>
-            )}
+                <div>
+                  <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Description</label>
+                  <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={3} placeholder="Describe what the mentee will get..." className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 outline-none resize-none" />
+                </div>
 
-            {!isAsync ? (
-              <>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Duration</label>
-                <select value={form.duration} onChange={e => setForm(f => ({ ...f, duration: Number(e.target.value) }))} style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', marginBottom: '14px', outline: 'none' }}>
-                  {[15, 30, 45, 60, 75, 90, 120].map(d => <option key={d} value={d}>{d} minutes</option>)}
-                </select>
-              </>
-            ) : (
-              <>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Response Time</label>
-                <select value={form.responseTime} onChange={e => setForm(f => ({ ...f, responseTime: e.target.value }))} style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', marginBottom: '14px', outline: 'none' }}>
-                  {['Within 12 hours', 'Within 24 hours', 'Within 48 hours', 'Within 72 hours', 'Within 1 week'].map(r => <option key={r}>{r}</option>)}
-                </select>
-              </>
-            )}
+                <div className="flex items-center gap-2 py-1">
+                  <input type="checkbox" id="isFree" checked={form.isFree} onChange={e => setForm(f => ({ ...f, isFree: e.target.checked }))} className="rounded text-indigo-600 focus:ring-0 cursor-pointer" />
+                  <label htmlFor="isFree" className="text-xs font-semibold text-slate-600 cursor-pointer">Offer for Free</label>
+                </div>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-              <button onClick={save} disabled={saving} style={{ flex: 1, background: C.indigo, color: '#fff', border: 'none', borderRadius: '12px', padding: '12px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', opacity: saving ? 0.7 : 1 }}>
-                {saving ? 'Saving…' : editSvc ? 'Update Service' : 'Add Service'}
-              </button>
-              <button onClick={() => setShowForm(false)} style={{ background: '#F1F5F9', color: C.slate, border: 'none', borderRadius: '12px', padding: '12px 18px', cursor: 'pointer' }}>Cancel</button>
+                {!form.isFree && (
+                  <div>
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Price (₹)</label>
+                    <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="999" className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 outline-none" />
+                  </div>
+                )}
+
+                {!isAsync ? (
+                  <div>
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Duration</label>
+                    <select value={form.duration} onChange={e => setForm(f => ({ ...f, duration: Number(e.target.value) }))} className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 outline-none">
+                      {[15, 30, 45, 60, 75, 90, 120].map(d => <option key={d} value={d}>{d} minutes</option>)}
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Response Time</label>
+                    <select value={form.responseTime} onChange={e => setForm(f => ({ ...f, responseTime: e.target.value }))} className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/10 outline-none">
+                      {['Within 12 hours', 'Within 24 hours', 'Within 48 hours', 'Within 72 hours', 'Within 1 week'].map(r => <option key={r}>{r}</option>)}
+                    </select>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <button type="submit" disabled={saving} className="flex-1 bg-indigo-600 text-white rounded-xl py-2.5 text-sm font-bold shadow-sm hover:bg-indigo-700 transition-all disabled:opacity-50">
+                    {saving ? 'Saving...' : editSvc ? 'Update Service' : 'Create Service'}
+                  </button>
+                  <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2.5 text-sm font-bold border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-all">Cancel</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
       )}
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
@@ -272,65 +321,95 @@ function CouponsTab() {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#1E293B' }}>Discount Coupons</h2>
-          <p style={{ margin: '2px 0 0', fontSize: '13px', color: C.slate }}>Create coupons mentees can apply at checkout</p>
+          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Discount Coupons</h2>
+          <p className="text-slate-500 text-sm mt-1">{coupons.length} coupon{coupons.length !== 1 ? 's' : ''} offered</p>
         </div>
-        <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: C.indigo, color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 18px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
-          <Plus size={15} /> New Coupon
+        <button onClick={() => setShowForm(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2.5 flex items-center gap-2 text-sm font-bold shadow-sm transition-all">
+          <Plus size={18} /> New Coupon
         </button>
       </div>
 
-      {/* URL auto-apply tip */}
-      <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '12px', padding: '12px 16px', marginBottom: '20px', fontSize: '13px', color: '#1E40AF' }}>
-        💡 <strong>Tip:</strong> Share profile links with auto-applied coupons: <code style={{ background: '#DBEAFE', borderRadius: '4px', padding: '1px 6px' }}>skillpilot.app/mentor/handle?coupon_code=YOURCODE</code>
+      {/* Tip Banner */}
+      <div className="bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-800 flex items-center gap-2 shadow-sm">
+        <span className="text-lg">💡</span>
+        <span>
+          <strong>Pro Tip:</strong> Share profile links with auto-applied coupons: 
+          <code className="bg-blue-100 text-blue-900 px-1.5 py-0.5 rounded ml-1 font-bold">skillpilot.app/mentor/handle?coupon_code=SAVE20</code>
+        </span>
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px' }}><Loader2 size={24} style={{ animation: 'spin 0.8s linear infinite' }} color={C.indigo} /></div>
+        <div className="flex justify-center p-12 text-slate-400"><Loader2 size={32} className="animate-spin" /></div>
       ) : coupons.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', border: `2px dashed ${C.border}`, borderRadius: '16px' }}>
-          <p style={{ fontSize: '32px', margin: '0 0 8px' }}>🎟️</p>
-          <p style={{ fontSize: '15px', fontWeight: 700, color: '#1E293B', margin: '0 0 4px' }}>No coupons yet</p>
-          <p style={{ fontSize: '13px', color: C.slate, margin: '0 0 16px' }}>Create a coupon to offer discounts to your mentees.</p>
-          <button onClick={() => setShowForm(true)} style={{ background: C.indigo, color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>+ Create Coupon</button>
+        <div className="text-center p-12 bg-white border border-dashed border-slate-200 rounded-2xl max-w-lg mx-auto shadow-sm">
+          <p className="text-4xl mb-3">🎟️</p>
+          <p className="font-bold text-slate-800 mb-1">No campaigns created yet</p>
+          <p className="text-slate-500 text-xs mb-6">Drive conversions by offering targeted discount incentives to mentees.</p>
+          <button onClick={() => setShowForm(true)} className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 shadow-sm">+ Create Coupon</button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="space-y-4">
           {coupons.map(c => {
             const used = c.redemptions?.length || 0;
             const isValid = c.isActive && (!c.validUntil || new Date(c.validUntil) > new Date()) && (!c.maxUses || used < c.maxUses);
             return (
-              <div key={c._id} style={{ background: '#fff', border: `1px solid ${isValid ? C.border : '#F1F5F9'}`, borderRadius: '14px', padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', opacity: isValid ? 1 : 0.6 }}>
-                <div style={{ background: isValid ? '#ECFDF5' : '#F1F5F9', borderRadius: '12px', padding: '10px 16px', fontFamily: 'monospace', fontWeight: 800, fontSize: '16px', color: isValid ? '#065F46' : '#94A3B8', letterSpacing: '1px' }}>
-                  {c.code}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, fontSize: '15px', color: '#1E293B' }}>
-                      {c.discountType === 'percentage' ? `${c.discountValue}% off` : `₹${c.discountValue} off`}
-                    </span>
-                    <Pill color={isValid ? C.green : C.slate} bg={isValid ? '#ECFDF5' : '#F1F5F9'}>{isValid ? 'Active' : 'Inactive'}</Pill>
-                    <Pill color="#7C3AED" bg="#F5F3FF">{c.appliesTo === 'all_services' ? 'All Services' : 'Selected'}</Pill>
+              <div key={c._id} className={`group bg-white p-6 rounded-2xl flex items-center justify-between border border-slate-200/40 hover:shadow-md transition-all duration-300 ${!isValid ? 'opacity-60 bg-slate-50/50' : 'shadow-sm'}`}>
+                <div className="flex items-center gap-6">
+                  <div className={`w-16 h-16 rounded-xl flex flex-col items-center justify-center border border-slate-100 font-extrabold shadow-sm ${isValid ? 'bg-indigo-50 text-indigo-600 border-indigo-100/20' : 'bg-slate-100 text-slate-400'}`}>
+                    <span className="text-base">{c.discountType === 'percentage' ? `${c.discountValue}%` : `₹${c.discountValue}`}</span>
+                    <span className="text-[9px] uppercase tracking-wider text-slate-400 mt-0.5">OFF</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '16px', marginTop: '4px', fontSize: '12px', color: C.slate }}>
-                    <span>👥 {used}/{c.maxUses || '∞'} used</span>
-                    <span>👤 {c.perUserLimit}/person</span>
-                    {c.validUntil && <span>⏳ Expires {new Date(c.validUntil).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-bold text-slate-800 tracking-wider font-mono text-sm">{c.code}</span>
+                      <button 
+                        onClick={() => copyCode(c.code)} 
+                        className="text-slate-400 hover:text-indigo-600 p-1 hover:bg-slate-50 rounded transition-all"
+                      >
+                        {copied === c.code ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-500">{c.description || 'Early Bird Campaign offering general savings'}</p>
+                    <div className="flex gap-2 mt-2">
+                      <span className="px-2 py-0.5 bg-slate-100/80 rounded text-[10px] font-bold text-slate-500">
+                        {c.appliesTo === 'all_services' ? 'ALL SERVICES' : 'SELECTED'}
+                      </span>
+                      {c.validUntil && (
+                        <span className="px-2 py-0.5 bg-amber-50 rounded text-[10px] font-bold text-amber-600 flex items-center gap-1">
+                          <Clock size={10} /> Exp: {new Date(c.validUntil).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <button onClick={() => copyCode(c.code)} title="Copy code" style={{ background: C.bg, border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer' }}>
-                    {copied === c.code ? <Check size={13} color={C.green} /> : <Copy size={13} color={C.indigo} />}
-                  </button>
-                  <button onClick={() => toggleCoupon(c._id, c.isActive)} title={c.isActive ? 'Deactivate' : 'Activate'} style={{ background: c.isActive ? '#FEF3C7' : '#ECFDF5', border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer' }}>
-                    <Power size={13} color={c.isActive ? '#D97706' : C.green} />
-                  </button>
-                  <button onClick={() => delCoupon(c._id)} style={{ background: '#FEF2F2', border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer' }}>
-                    <Trash2 size={13} color={C.red} />
-                  </button>
+
+                <div className="flex items-center gap-12">
+                  <div className="text-right flex flex-col items-end">
+                    <p className="text-xs font-bold text-slate-700">{used} / {c.maxUses || '∞'} Uses</p>
+                    {c.maxUses && (
+                      <div className="w-24 h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+                        <div className="bg-indigo-600 h-full rounded-full transition-all" style={{ width: `${Math.min((used / c.maxUses) * 100, 100)}%` }}></div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => toggleCoupon(c._id, c.isActive)} 
+                      title={c.isActive ? 'Deactivate' : 'Activate'}
+                      className={`p-1.5 rounded-lg transition-colors ${c.isActive ? 'text-amber-500 hover:bg-amber-50' : 'text-green-600 hover:bg-green-50'}`}
+                    >
+                      <Power size={15} />
+                    </button>
+                    <button 
+                      onClick={() => delCoupon(c._id)} 
+                      className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -340,54 +419,59 @@ function CouponsTab() {
 
       {/* Coupon Form Modal */}
       {showForm && (
-        <div onClick={() => setShowForm(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '16px' }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px', padding: '28px', maxWidth: '460px', width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontWeight: 800, color: '#1E293B' }}>Create Coupon</h3>
-              <button onClick={() => setShowForm(false)} style={{ background: '#F1F5F9', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer' }}><X size={16} /></button>
-            </div>
+        <div onClick={() => setShowForm(false)} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div onClick={e => e.stopPropagation()} className="bg-white rounded-2xl shadow-xl w-full max-w-sm max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold text-slate-800">Create New Coupon</h3>
+                <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-50 transition-all">
+                  <X size={18} />
+                </button>
+              </div>
 
-            {[
-              { label: 'Coupon Code *', key: 'code', placeholder: 'e.g. SAVE20', onChange: v => v.toUpperCase().replace(/\s/g, '') },
-            ].map(({ label, key, placeholder, onChange }) => (
-              <div key={key} style={{ marginBottom: '14px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>{label}</label>
-                <input value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: onChange ? onChange(e.target.value) : e.target.value }))} placeholder={placeholder} style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'monospace', fontWeight: 700, letterSpacing: '1px' }} />
-              </div>
-            ))}
+              <form className="space-y-4" onSubmit={e => { e.preventDefault(); save(); }}>
+                <div>
+                  <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Coupon Code *</label>
+                  <input value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase().replace(/\s/g, '') }))} placeholder="e.g. SAVE20" className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm font-bold tracking-widest focus:ring-2 focus:ring-indigo-500/10 outline-none uppercase placeholder:font-normal placeholder:tracking-normal" required />
+                </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 12px' }}>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Discount Type</label>
-                <select value={form.discountType} onChange={e => setForm(f => ({ ...f, discountType: e.target.value }))} style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', outline: 'none' }}>
-                  <option value="percentage">% Percentage</option>
-                  <option value="flat">₹ Flat Amount</option>
-                </select>
-              </div>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Discount Value *</label>
-                <input type="number" value={form.discountValue} onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))} placeholder={form.discountType === 'percentage' ? '10' : '100'} style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
-              </div>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Max Uses (blank = unlimited)</label>
-                <input type="number" value={form.maxUses} onChange={e => setForm(f => ({ ...f, maxUses: e.target.value }))} placeholder="100" style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
-              </div>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Per User Limit</label>
-                <input type="number" value={form.perUserLimit} onChange={e => setForm(f => ({ ...f, perUserLimit: e.target.value }))} placeholder="1" min="1" style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
-              </div>
-            </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Type</label>
+                    <select value={form.discountType} onChange={e => setForm(f => ({ ...f, discountType: e.target.value }))} className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500/10 outline-none">
+                      <option value="percentage">% Percentage</option>
+                      <option value="flat">₹ Flat Price</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Value *</label>
+                    <input type="number" value={form.discountValue} onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))} placeholder="20" className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500/10 outline-none" required />
+                  </div>
+                </div>
 
-            <div style={{ marginBottom: '14px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 600, color: C.slate, display: 'block', marginBottom: '6px' }}>Expires On (leave blank = no expiry)</label>
-              <input type="date" value={form.validUntil} onChange={e => setForm(f => ({ ...f, validUntil: e.target.value }))} style={{ width: '100%', border: `1.5px solid ${C.border}`, borderRadius: '10px', padding: '9px 12px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
-            </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Max Uses</label>
+                    <input type="number" value={form.maxUses} onChange={e => setForm(f => ({ ...f, maxUses: e.target.value }))} placeholder="100" className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500/10 outline-none" />
+                  </div>
+                  <div>
+                    <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Per User</label>
+                    <input type="number" value={form.perUserLimit} onChange={e => setForm(f => ({ ...f, perUserLimit: e.target.value }))} placeholder="1" className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500/10 outline-none" />
+                  </div>
+                </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={save} disabled={saving || !form.code || !form.discountValue} style={{ flex: 1, background: C.indigo, color: '#fff', border: 'none', borderRadius: '12px', padding: '12px', fontWeight: 700, cursor: 'pointer', opacity: saving || !form.code ? 0.7 : 1 }}>
-                {saving ? 'Creating…' : '🎟️ Create Coupon'}
-              </button>
-              <button onClick={() => setShowForm(false)} style={{ background: '#F1F5F9', color: C.slate, border: 'none', borderRadius: '12px', padding: '12px 18px', cursor: 'pointer' }}>Cancel</button>
+                <div>
+                  <label className="text-xxs uppercase tracking-wider font-bold text-slate-400 block mb-1">Expiry Date</label>
+                  <input type="date" value={form.validUntil} onChange={e => setForm(f => ({ ...f, validUntil: e.target.value }))} className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2 text-xs focus:ring-2 focus:ring-indigo-500/10 outline-none" />
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button type="submit" disabled={saving || !form.code || !form.discountValue} className="flex-1 bg-indigo-600 text-white rounded-xl py-2.5 text-sm font-bold shadow-sm hover:bg-indigo-700 transition-all disabled:opacity-50">
+                    {saving ? 'Creating...' : ' Create Coupon'}
+                  </button>
+                  <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2.5 text-sm font-bold border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-all">Cancel</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -399,53 +483,120 @@ function CouponsTab() {
 // ─── Overview Tab ─────────────────────────────────────────────────────────────
 function OverviewTab({ profile, handle }) {
   const navigate = useNavigate();
-  const totalServices = profile?.totalServices || 0;
   const totalMentees = profile?.totalMentees || 0;
   const rating = profile?.averageRating || 0;
   const earnings = profile?.totalEarnings || 0;
+  const placements = profile?.totalPlacements || 0;
 
   return (
-    <div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-        <StatCard icon={<Users size={18} color={C.indigo} />} label="Total Mentees" value={totalMentees} sub="all time" />
-        <StatCard icon={<Star size={18} color="#F59E0B" />} label="Avg Rating" value={rating > 0 ? rating.toFixed(1) : '—'} sub={`${profile?.totalReviews || 0} reviews`} color="#F59E0B" />
-        <StatCard icon={<DollarSign size={18} color={C.green} />} label="Total Earnings" value={`₹${earnings.toLocaleString('en-IN')}`} sub="all time" color={C.green} />
-        <StatCard icon={<Award size={18} color="#7C3AED" />} label="Total Placements" value={profile?.totalPlacements || 0} sub="mentees placed" color="#7C3AED" />
-      </div>
-
-      {/* Profile link */}
-      {handle && (
-        <div style={{ background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', borderRadius: '16px', padding: '20px 24px', marginBottom: '20px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <p style={{ margin: '0 0 2px', fontSize: '12px', fontWeight: 600, opacity: 0.8 }}>YOUR PUBLIC PROFILE</p>
-            <p style={{ margin: 0, fontSize: '16px', fontWeight: 800 }}>skillpilot.app/mentor/{handle}</p>
-          </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/mentor/${handle}`); }} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '10px', padding: '8px 14px', color: '#fff', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
-              📋 Copy
-            </button>
-            <button onClick={() => navigate(`/mentor/${handle}`)} style={{ background: '#fff', border: 'none', borderRadius: '10px', padding: '8px 14px', color: C.indigo, cursor: 'pointer', fontSize: '13px', fontWeight: 700 }}>
-              <ExternalLink size={13} style={{ verticalAlign: 'middle', marginRight: '4px' }} />View
-            </button>
-          </div>
+    <div className="space-y-10">
+      
+      {/* Hero Welcome Section */}
+      <section className="mt-2">
+        <div className="flex flex-col gap-2">
+          <span className="text-xs uppercase tracking-widest text-indigo-500 font-semibold">Navigator Status: Active</span>
+          <h2 className="font-bold text-4xl text-slate-800 tracking-tight leading-tight">
+            Welcome back, <span className="text-indigo-600">Strategic Guide.</span>
+          </h2>
+          <p className="text-slate-500 max-w-2xl leading-relaxed text-sm">Your mentorship ecosystem is thriving. Here's a snapshot of your professional impact and growth metrics.</p>
         </div>
+      </section>
+
+      {/* Stats Bento Grid */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stat Card 1 */}
+        <div className="bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-md border border-slate-200/40 group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2.5 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 transition-colors">
+              <Users size={20} className="text-indigo-600" />
+            </div>
+          </div>
+          <p className="text-xxs uppercase tracking-wider text-slate-400 mb-1 font-bold">Total Mentees</p>
+          <h3 className="text-3xl font-extrabold text-slate-800">{totalMentees}</h3>
+        </div>
+
+        {/* Stat Card 2 */}
+        <div className="bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-md border border-slate-200/40 group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2.5 rounded-xl bg-amber-50 group-hover:bg-amber-100 transition-colors">
+              <Star size={20} className="text-amber-500" />
+            </div>
+          </div>
+          <p className="text-xxs uppercase tracking-wider text-slate-400 mb-1 font-bold">Avg Rating</p>
+          <h3 className="text-3xl font-extrabold text-slate-800">{rating > 0 ? rating.toFixed(1) : '—'}</h3>
+        </div>
+
+        {/* Stat Card 3 */}
+        <div className="bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-md border border-slate-200/40 group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2.5 rounded-xl bg-green-50 group-hover:bg-green-100 transition-colors">
+              <DollarSign size={20} className="text-green-600" />
+            </div>
+          </div>
+          <p className="text-xxs uppercase tracking-wider text-slate-400 mb-1 font-bold">Total Earnings</p>
+          <h3 className="text-3xl font-extrabold text-slate-800">₹{earnings.toLocaleString('en-IN')}</h3>
+        </div>
+
+        {/* Stat Card 4 */}
+        <div className="bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-md border border-slate-200/40 group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2.5 rounded-xl bg-purple-50 group-hover:bg-purple-100 transition-colors">
+              <Award size={20} className="text-purple-600" />
+            </div>
+          </div>
+          <p className="text-xxs uppercase tracking-wider text-slate-400 mb-1 font-bold">Total Placements</p>
+          <h3 className="text-3xl font-extrabold text-slate-800">{placements}</h3>
+        </div>
+      </section>
+
+      {/* Public Profile Banner */}
+      {handle && (
+        <section className="bg-gradient-to-br from-indigo-900 via-slate-800 to-indigo-950 rounded-3xl p-8 text-white relative overflow-hidden shadow-sm">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="space-y-4">
+              <h4 className="text-2xl font-bold">Your Gateway to Mentees</h4>
+              <p className="text-indigo-200 max-w-md text-sm leading-relaxed">Share your unique mentor link on social media to attract new bookings and build your personal brand.</p>
+              <div className="flex flex-wrap items-center gap-4 mt-6">
+                <div 
+                  onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/mentor/${handle}`); alert('Link copied!'); }}
+                  className="bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/20 text-xs flex items-center gap-2 cursor-pointer hover:bg-white/20 transition-all shadow-sm"
+                >
+                  <span className="text-white/60">skillpilot.app/mentor/</span><span className="font-bold text-white">{handle}</span>
+                  <Copy size={13} className="ml-1 opacity-70" />
+                </div>
+              </div>
+            </div>
+            <div>
+              <button onClick={() => navigate(`/mentor/${handle}`)} className="bg-white text-slate-900 px-6 py-3.5 rounded-xl font-bold text-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 shadow-lg">
+                <Eye size={18} /> View Public Profile
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
-      {/* Quick tips */}
-      <div style={{ background: '#FAFBFF', border: `1px solid ${C.border}`, borderRadius: '16px', padding: '20px' }}>
-        <h3 style={{ margin: '0 0 14px', fontSize: '15px', fontWeight: 700, color: '#1E293B' }}>💡 Quick Tips</h3>
-        {[
-          ['Services', 'Add diverse services (1:1, async, group) to attract more mentees'],
-          ['Coupons', 'Create a giveaway coupon and share it on LinkedIn for free leads'],
-          ['Profile URL', 'Add ?coupon_code=YOURCODE to auto-apply discounts from any link'],
-          ['Custom Sections', 'Add a "Success Stories" section to build trust with mentees'],
-        ].map(([title, tip]) => (
-          <div key={title} style={{ display: 'flex', gap: '10px', marginBottom: '10px', padding: '10px 12px', background: '#fff', borderRadius: '10px', border: `1px solid ${C.border}` }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: C.indigo, background: C.bg, borderRadius: '6px', padding: '2px 8px', height: 'fit-content', whiteSpace: 'nowrap' }}>{title}</span>
-            <span style={{ fontSize: '13px', color: C.slate }}>{tip}</span>
+      {/* Strategic Tips & Activity grid */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-slate-800">Strategic Tips</h3>
           </div>
-        ))}
-      </div>
+          <div className="space-y-4">
+            {[
+              { type: 'Services', title: 'Boost Conversion', tip: 'Mentors who add at least 3 distinct offerings see a 40% higher booking rate.', act: 'Add Offerings' },
+              { type: 'Coupons', title: 'Limited Time Coupons', tip: 'Using coupons during festive seasons helps clear pending inquiries triggers alerts.', act: 'Manage Coupons' },
+            ].map(item => (
+              <div key={item.title} className="bg-white p-5 rounded-2xl space-y-2 border-l-4 border-indigo-600 shadow-sm border border-slate-200/30">
+                <p className="font-bold text-sm text-slate-800">{item.title}</p>
+                <p className="text-xs text-slate-500 leading-relaxed">{item.tip}</p>
+                <button className="inline-block text-xxs font-bold text-indigo-600 uppercase tracking-wider hover:underline mt-1">{item.act} →</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
@@ -494,6 +645,8 @@ export default function MentorDashboardNew() {
 
   const handle = profile?.handle || user?.username?.toLowerCase().replace(/[^a-z0-9_]/g, '_');
 
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+
   if (loading) return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
       <Loader2 size={32} style={{ animation: 'spin 0.8s linear infinite' }} color={C.indigo} />
@@ -502,76 +655,119 @@ export default function MentorDashboardNew() {
   );
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#F8FAFC', fontFamily: 'Inter, sans-serif' }}>
-
-      {/* Sidebar */}
-      <div style={{ width: '220px', background: '#fff', borderRight: `1px solid ${C.border}`, padding: '24px 16px', flexShrink: 0, position: 'sticky', top: 0, height: '100vh', overflowY: 'auto' }}>
-        {/* Mentor avatar */}
-        <div style={{ textAlign: 'center', marginBottom: '24px', padding: '16px 0', borderBottom: `1px solid ${C.border}` }}>
-          <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '20px', fontWeight: 800, overflow: 'hidden' }}>
-            {profile?.profileImage || user?.imageUrl ? <img src={profile?.profileImage || user?.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : user?.name?.[0]?.toUpperCase()}
+    <div className="flex min-h-[calc(100vh-64px)] bg-slate-50/50 font-sans">
+      
+      {/* Sidebar Navigation */}
+      <aside className={`sticky top-16 h-[calc(100vh-64px)] bg-slate-50 border-r border-slate-200/50 z-30 flex flex-col transition-all duration-300 ${
+        sidebarExpanded ? 'w-64 flex' : 'w-0 overflow-hidden md:w-16 flex'
+      }`}>
+        <div className="flex flex-col h-full py-8 px-4">
+          <div className="mb-10 px-4">
+            <h1 className="font-bold text-slate-900 text-2xl tracking-tighter">SkillPilot</h1>
           </div>
-          <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: 700, color: '#1E293B' }}>{profile?.displayName || user?.name}</p>
-          {handle && <p style={{ margin: 0, fontSize: '11px', color: C.slate }}>@{handle}</p>}
-        </div>
-
-        {/* Nav tabs */}
-        {TABS.map(t => {
-          const Icon = t.icon;
-          const active = tab === t.key;
-          return (
-            <button key={t.key} onClick={() => setTab(t.key)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '10px 12px', borderRadius: '10px', border: 'none', cursor: 'pointer', marginBottom: '4px', background: active ? C.bg : 'transparent', color: active ? C.indigo : '#475569', fontWeight: active ? 700 : 500, fontSize: '14px', transition: 'all 0.15s' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Icon size={16} /> {t.label}
-              </div>
-              {t.key === 'inbox' && unreadCount > 0 && (
-                <span style={{ background: '#EF4444', color: '#fff', borderRadius: '20px', padding: '2px 6px', fontSize: '10px', fontWeight: 800 }}>{unreadCount}</span>
+          
+          <div className="flex items-center gap-3 mb-8 px-4">
+            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold overflow-hidden shadow-sm">
+              {profile?.profileImage || user?.imageUrl ? (
+                <img src={profile?.profileImage || user?.imageUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                user?.name?.[0]?.toUpperCase()
               )}
+            </div>
+            <div className="overflow-hidden">
+              <p className="font-bold text-sm text-slate-900 truncate">{profile?.displayName || user?.name}</p>
+              {handle && <p className="text-xs text-slate-500 truncate">@{handle}</p>}
+            </div>
+          </div>
+
+          <nav className="flex-1 space-y-1">
+            {TABS.map(t => {
+              const Icon = t.icon;
+              const active = tab === t.key;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  className={`flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all duration-200 font-medium text-sm ${
+                    active 
+                      ? 'bg-white shadow-sm border border-slate-200/40 text-indigo-600 font-bold' 
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon size={18} className={active ? 'text-indigo-600' : 'text-slate-500'} />
+                    <span>{t.label}</span>
+                  </div>
+                  {t.key === 'inbox' && unreadCount > 0 && (
+                    <span className="bg-red-500 text-white text-xxs font-extrabold px-2 py-0.5 rounded-full min-w-[20px] text-center">{unreadCount}</span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="mt-auto pt-6 border-t border-slate-200/60 space-y-1">
+            <button onClick={() => navigate(`/mentor/${handle}`)} className="flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 transition-all font-medium text-sm">
+              <Eye size={18} className="text-slate-400" /> View Public Profile
             </button>
-          );
-        })}
-
-
-        <div style={{ borderTop: `1px solid ${C.border}`, marginTop: '16px', paddingTop: '16px' }}>
-          <button onClick={() => navigate(`/mentor/${handle}`)} style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '10px 12px', borderRadius: '10px', border: 'none', cursor: 'pointer', background: 'transparent', color: C.slate, fontSize: '13px', fontWeight: 500 }}>
-            <Eye size={15} /> View Public Profile
-          </button>
-          <button onClick={() => navigate('/become-a-mentor')} style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '10px 12px', borderRadius: '10px', border: 'none', cursor: 'pointer', background: 'transparent', color: C.slate, fontSize: '13px', fontWeight: 500 }}>
-            <Settings size={15} /> Edit Profile Setup
-          </button>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div style={{ flex: 1, padding: '32px', maxWidth: '900px' }}>
-        <div style={{ marginBottom: '28px' }}>
-          <h1 style={{ margin: '0 0 4px', fontSize: '22px', fontWeight: 800, color: '#1E293B' }}>
-            {TABS.find(t => t.key === tab)?.label}
-          </h1>
-          <p style={{ margin: 0, fontSize: '13px', color: C.slate }}>
-            {tab === 'overview' && 'Your mentor dashboard at a glance'}
-            {tab === 'services' && 'Manage what you offer to mentees'}
-            {tab === 'coupons' && 'Create and track discount coupons'}
-            {tab === 'schedule' && 'Update your profile and availability'}
-          </p>
-        </div>
-
-        {tab === 'overview' && <OverviewTab profile={profile} handle={handle} />}
-        {tab === 'services' && <ServicesTab mentorId={user?._id || user?.id} />}
-        {tab === 'inbox' && <DMInbox />}
-        {tab === 'coupons' && <CouponsTab />}
-        {tab === 'custom_sections' && <CustomSectionsTab />}
-
-        {tab === 'schedule' && (
-          <div style={{ background: '#fff', borderRadius: '16px', border: `1px solid ${C.border}`, padding: '24px' }}>
-            <p style={{ color: C.slate, fontSize: '14px' }}>
-              Use the full profile editor to update your bio, schedule, and social links.
-            </p>
-            <button onClick={() => navigate('/mentor-profile')} style={{ marginTop: '12px', background: C.indigo, color: '#fff', border: 'none', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
-              Open Full Profile Editor →
+            <button onClick={() => navigate('/become-a-mentor')} className="flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 transition-all font-medium text-sm">
+              <Settings size={18} className="text-slate-400" /> Edit Profile Setup
             </button>
           </div>
-        )}
+        </div>
+      </aside>
+
+      {/* Main Content & Top Bar Area */}
+      <div className="flex-1 flex flex-col min-h-full overflow-hidden">
+        
+        {/* Top App Bar Header */}
+        <header className="sticky top-16 right-0 h-16 z-20 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 w-full border-b border-slate-200/20 shadow-sm flex-shrink-0">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSidebarExpanded(!sidebarExpanded)} className="p-2 hover:bg-slate-100 rounded-xl text-slate-500 transition-all flex items-center justify-center border border-slate-200/50 shadow-sm bg-white cursor-pointer" title="Toggle Sidebar">
+              <Menu size={18} className="text-slate-600" />
+            </button>
+            <h2 className="text-md font-bold text-slate-800">
+              {TABS.find(t => t.key === tab)?.label}
+            </h2>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="relative hidden lg:block">
+              <div className="flex items-center bg-slate-100 rounded-full px-4 py-1.5 w-64 border border-slate-200/30">
+                <Search size={16} className="text-slate-400" />
+                <input className="bg-transparent border-none focus:ring-0 text-sm w-full ml-2 text-slate-800 placeholder-slate-400" placeholder="Search..." type="text"/>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-slate-400">
+              <button className="hover:text-slate-600 transition-colors">
+                <Bell size={20} />
+              </button>
+              <button className="hover:text-slate-600 transition-colors">
+                <HelpCircle size={20} />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Scrollable Main Workspace */}
+        <main className="flex-1 p-8 max-w-7xl w-full">
+          {tab === 'overview' && <OverviewTab profile={profile} handle={handle} />}
+          {tab === 'services' && <ServicesTab mentorId={user?._id || user?.id} />}
+          {tab === 'inbox' && <DMInbox />}
+          {tab === 'coupons' && <CouponsTab />}
+          {tab === 'custom_sections' && <CustomSectionsTab />}
+
+          {tab === 'schedule' && (
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm max-w-xl">
+              <p className="text-slate-600 text-sm">
+                Use the full profile editor to update your bio, schedule, and social links.
+              </p>
+              <button onClick={() => navigate('/mentor-profile')} className="mt-4 bg-indigo-600 text-white rounded-xl px-5 py-2.5 text-sm font-bold hover:bg-indigo-700 shadow-sm hover:shadow transition-all">
+                Open Full Profile Editor →
+              </button>
+            </div>
+          )}
+        </main>
+
       </div>
     </div>
   );
