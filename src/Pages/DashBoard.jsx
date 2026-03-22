@@ -1,30 +1,46 @@
 import React, { useState } from 'react';
 
-const DashboardCard = ({ title, path, description, badge }) => (
-  <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden transform hover:scale-105">
-    {badge && (
-      <span className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-semibold ${badge === 'Public' ? 'bg-blue-100 text-blue-700' :
-          badge === 'User' ? 'bg-green-100 text-green-700' :
-            badge === 'Mentor' ? 'bg-purple-100 text-purple-700' :
-              badge === 'Admin' ? 'bg-red-100 text-red-700' :
-                'bg-yellow-100 text-yellow-700'
-        }`}>
-        {badge}
-      </span>
-    )}
-    <h3 className="text-xl font-semibold mb-2 text-gray-800 pr-16">{title}</h3>
-    <p className="text-gray-600 mb-4 text-sm">{description}</p>
-    <a
-      href={path}
-      className="text-blue-500 hover:text-blue-700 font-medium inline-flex items-center group"
-    >
-      Go to {title}
-      <svg className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
-    </a>
-  </div>
-);
+const DashboardCard = ({ title, path, description, badge, iconColor, bgColor }) => {
+  const badgeStyles = {
+    Public: 'bg-surface-container-highest text-on-surface',
+    User: 'bg-primary-container text-white',
+    Mentor: 'bg-tertiary-container text-white',
+    Admin: 'bg-secondary-container text-on-secondary-container',
+    University: 'bg-surface-container-highest text-primary',
+    UniAdmin: 'bg-surface-container-highest text-primary',
+    UniTeach: 'bg-surface-container-highest text-primary',
+  };
+
+  const badgeText = badge === 'UniAdmin' || badge === 'UniTeach' ? 'University' : badge;
+
+  return (
+    <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col justify-between">
+      <div>
+        <div className="flex justify-between items-start mb-4">
+          <span className={`material-symbols-outlined ${iconColor || 'text-primary'} p-2 ${bgColor || 'bg-surface-container-low'} rounded-lg`}>
+            {description.includes('Auth') || description.includes('Log') || description.includes('Sign') ? 'lock' : 
+             description.includes('Analytics') ? 'analytics' :
+             description.includes('User') || description.includes('Profile') ? 'person' :
+             description.includes('Career') || description.includes('Job') ? 'work' :
+             description.includes('Mentor') ? 'groups' :
+             description.includes('University') || description.includes('Teacher') ? 'school' : 'dashboard'}
+          </span>
+          <span className={`px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded ${badgeStyles[badge] || 'bg-surface-container-highest'}`}>
+            {badgeText}
+          </span>
+        </div>
+        <h3 className="font-headline font-bold text-lg text-primary mb-1">{title}</h3>
+        <code className="text-xs text-secondary bg-surface-container-low px-2 py-1 rounded truncate block">
+          {path}
+        </code>
+      </div>
+      <a href={path} className="mt-4 text-xs font-bold text-primary hover:underline inline-flex items-center gap-1">
+        Go to Page
+        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+      </a>
+    </div>
+  );
+};
 
 const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,7 +52,6 @@ const Dashboard = () => {
       { title: 'Assessment Info', path: '/Assesmentinfo', description: 'AI-powered career assessment information', badge: 'Public' },
       { title: 'Assessment', path: '/assessment', description: 'Take career assessment test', badge: 'Public' },
       { title: 'Profile', path: '/profile', description: 'View and edit your profile', badge: 'User' },
-      { title: 'Dashboard', path: '/dashboard', description: 'User dashboard overview', badge: 'User' },
     ],
 
     auth: [
@@ -57,7 +72,6 @@ const Dashboard = () => {
       { title: 'Career Paths', path: '/careerPaths', description: 'Explore tech career paths', badge: 'Public' },
       { title: 'All Job Titles', path: '/jobtitleall', description: 'Search all job titles', badge: 'Public' },
       { title: 'Job Info', path: '/job-info', description: 'View job information', badge: 'Public' },
-      { title: 'Dummy Job Info', path: '/dummyinfo', description: 'Sample job information', badge: 'Public' },
     ],
 
     mentorship: [
@@ -71,9 +85,7 @@ const Dashboard = () => {
       { title: 'My Appointments', path: '/my-applications', description: 'View scheduled appointments', badge: 'User' },
       { title: 'My Bookings', path: '/my-bookings', description: 'View your booking history', badge: 'User' },
       { title: 'Mentor Sessions', path: '/mentor-sessions', description: 'Manage your mentoring sessions', badge: 'Mentor' },
-      { title: 'My Sessions (Old)', path: '/my-sessions', description: 'Legacy session view', badge: 'Mentor' },
       { title: 'Book Session', path: '/schedulementor', description: 'Schedule a mentoring session', badge: 'Public' },
-      { title: 'Rate Session', path: '/rate-session/:bookingId', description: 'Rate your completed session', badge: 'User' },
       { title: 'User Feedback', path: '/userFeedback', description: 'View all user feedback', badge: 'Admin' },
     ],
 
@@ -90,21 +102,19 @@ const Dashboard = () => {
       { title: 'Career Roadmaps', path: '/roadmap', description: 'Explore career paths', badge: 'Public' },
       { title: 'Software Engineer', path: '/softwareengineer', description: 'Frontend developer roadmap', badge: 'Public' },
       { title: 'Data Scientist', path: '/datascientist', description: 'Data science career path', badge: 'Public' },
-      { title: 'All Career Paths', path: '/careerPaths', description: 'Browse all tech career paths', badge: 'Public' },
     ],
 
     admin: [
-      { title: 'Admin Dashboard', path: '/dashboardAdmin', description: 'Main admin control panel', badge: 'Admin' },
-      { title: 'Analytics', path: '/analytics', description: 'System analytics and metrics', badge: 'Admin' },
-      { title: 'Announcements', path: '/admin/announcements', description: 'Send notifications to users', badge: 'Admin' },
-      { title: 'User Management', path: '/admin/user-management', description: 'Manage all users', badge: 'Admin' },
-      { title: 'User Data', path: '/admin/userData', description: 'Detailed user analytics', badge: 'Admin' },
-      { title: 'Mentor Applications', path: '/mentoapplication', description: 'Review mentor applications', badge: 'Admin' },
-      { title: 'Add Mentor', path: '/addmentor', description: 'Register new mentors', badge: 'Admin' },
-      { title: 'Admin Updates', path: '/admin/updates', description: 'Manage platform updates', badge: 'Admin' },
-      { title: 'System Settings', path: '/admin/system-settings', description: 'Configure system settings', badge: 'Admin' },
-      { title: 'Server Logs', path: '/admin/server-logs', description: 'View server activity logs', badge: 'Admin' },
-      { title: 'Mentor Dashboard', path: '/amdashboard', description: 'Mentor management view', badge: 'Mentor' },
+      { title: 'Admin Dashboard', path: '/dashboardAdmin', description: 'Main admin control panel', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
+      { title: 'Analytics', path: '/analytics', description: 'System analytics and metrics', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
+      { title: 'User Management', path: '/admin/user-management', description: 'Manage all users', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
+      { title: 'User Data', path: '/admin/userData', description: 'Detailed user analytics', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
+      { title: 'Session Bookings', path: '/admin/bookings', description: 'Monitor and coordinate all mentor sessions', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
+      { title: 'Mentor Applications', path: '/mentoapplication', description: 'Review mentor applications', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
+      { title: 'Add Mentor', path: '/addmentor', description: 'Register new mentors', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
+      { title: 'Admin Updates', path: '/admin/updates', description: 'Manage platform updates', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
+      { title: 'System Settings', path: '/admin/system-settings', description: 'Configure system settings', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
+      { title: 'Server Logs', path: '/admin/server-logs', description: 'View server activity logs', badge: 'Admin', iconColor: 'text-error', bgColor: 'bg-error-container' },
     ],
 
     management: [
@@ -131,26 +141,28 @@ const Dashboard = () => {
   };
 
   const sectionTitles = {
-    core: '🏠 Core Pages',
-    auth: '🔐 Authentication',
-    career: '💼 Career & Jobs',
-    mentorship: '🎓 Mentorship',
-    learning: '📚 Learning Resources',
-    roadmaps: '🗺️ Career Roadmaps',
-    admin: '⚙️ Admin Panel',
-    management: '📋 Management',
-    university: '🏫 University',
-    community: '👥 Community',
+    core: 'Core Pages',
+    auth: 'Authentication',
+    career: 'Career & Jobs',
+    mentorship: 'Mentorship',
+    learning: 'Learning Resources',
+    roadmaps: 'Career Roadmaps',
+    admin: 'Admin & Management',
+    management: 'Management',
+    university: 'University Partners',
+    community: 'Community',
   };
 
-  const badges = ['All', 'Public', 'User', 'Mentor', 'Admin', 'UniAdmin', 'UniTeach'];
+  const badges = ['All', 'Public', 'User', 'Mentor', 'Admin', 'University'];
 
   const filteredSections = {};
   Object.entries(sections).forEach(([key, cards]) => {
     const filtered = cards.filter(card => {
       const matchesSearch = card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         card.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesBadge = selectedBadge === 'All' || card.badge === selectedBadge;
+      
+      const badgeText = card.badge === 'UniAdmin' || card.badge === 'UniTeach' ? 'University' : card.badge;
+      const matchesBadge = selectedBadge === 'All' || badgeText === selectedBadge;
       return matchesSearch && matchesBadge;
     });
     if (filtered.length > 0) {
@@ -162,114 +174,72 @@ const Dashboard = () => {
   const filteredPages = Object.values(filteredSections).flat().length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 px-4 py-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12 animate-fadeIn">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Application Dashboard
-          </h1>
-          <p className="text-gray-600 text-lg mb-8">
-            Navigate through all available pages and features
+    <div className="bg-surface font-body text-on-surface min-h-screen">
+      <main class="pt-24 pb-20 px-8 max-w-[1440px] mx-auto">
+        {/* Hero Section */}
+        <section class="mb-16 mt-8">
+          <h1 class="font-headline font-extrabold text-5xl md:text-6xl text-primary tracking-tight mb-6">Master Directory</h1>
+          <p class="text-secondary max-w-2xl text-lg leading-relaxed">
+            A unified roadmap of the SkillPilot ecosystem. Navigate through core services, administrative controls, and community resources from a single strategic view.
           </p>
+        </section>
 
-          {/* Search and Filter */}
-          <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-6">
-            <div className="relative w-full md:w-96">
-              <input
-                type="text"
-                placeholder="Search pages..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-3 pl-10 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
-              />
-              <svg className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-
-            <div className="flex flex-wrap gap-2 justify-center">
+        {/* Search & Filter Bar */}
+        <div class="sticky top-[72px] z-40 py-6 mb-12 bg-surface/90 backdrop-blur-md">
+          <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
+            <div class="flex flex-wrap gap-2">
               {badges.map(badge => (
                 <button
                   key={badge}
                   onClick={() => setSelectedBadge(badge)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${selectedBadge === badge
-                      ? 'bg-blue-500 text-white shadow-lg scale-105'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
-                    }`}
+                  className={`px-4 py-1.5 rounded-full font-label text-xs tracking-wider uppercase transition-colors ${
+                    selectedBadge === badge
+                      ? 'bg-primary text-white'
+                      : 'bg-surface-container-highest text-on-surface hover:bg-surface-container-high'
+                  }`}
                 >
-                  {badge}
+                  {badge === 'All' ? 'All Roles' : badge}
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="text-sm text-gray-500">
-            Showing {filteredPages} of {totalPages} pages
-          </div>
-        </div>
-
-        {/* Sections */}
-        {Object.entries(filteredSections).map(([key, cards]) => (
-          <div key={key} className="mb-12 animate-fadeIn">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800 border-b-4 border-blue-500 pb-3 inline-block">
-              {sectionTitles[key]}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
-              {cards.map((card, index) => (
-                <DashboardCard key={index} {...card} />
-              ))}
+            <div class="w-full md:w-96 relative">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">search</span>
+              <input
+                type="text"
+                placeholder="Find a specific page or path..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/10 font-body text-sm"
+              />
             </div>
           </div>
-        ))}
-
-        {filteredPages === 0 && (
-          <div className="text-center py-12">
-            <svg className="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="text-2xl font-semibold text-gray-600 mb-2">No pages found</h3>
-            <p className="text-gray-500">Try adjusting your search or filter</p>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-16 text-center text-gray-500 text-sm border-t-2 border-gray-200 pt-8">
-          <p className="mb-4 text-lg font-semibold">Total Pages: {totalPages}</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <span className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg font-medium">
-              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-              Public
-            </span>
-            <span className="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-700 rounded-lg font-medium">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-              User
-            </span>
-            <span className="inline-flex items-center px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg font-medium">
-              <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-              Mentor
-            </span>
-            <span className="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 rounded-lg font-medium">
-              <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-              Admin
-            </span>
-            <span className="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-700 rounded-lg font-medium">
-              <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
-              University
-            </span>
-          </div>
         </div>
-      </div>
 
-      <style>{`
-            @keyframes fadeIn {
-              from { opacity: 0; transform: translateY(20px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
-            .animate-fadeIn {
-              animation: fadeIn 0.6s ease-out;
-            }
-          `}</style>
+        {/* Directory Grid */}
+        <div class="space-y-16">
+          {Object.entries(filteredSections).map(([key, cards]) => (
+            <div key={key} className={key === 'admin' ? 'bg-surface-container-low p-8 rounded-3xl' : ''}>
+              <div class="flex items-center gap-4 mb-8">
+                <h2 class="font-headline font-bold text-2xl text-primary tracking-tight">{sectionTitles[key]}</h2>
+                <div class={`h-[1px] flex-grow ${key === 'admin' ? 'bg-outline-variant/40' : 'bg-outline-variant/20'}`}></div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {cards.map((card, index) => (
+                  <DashboardCard key={index} {...card} />
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {filteredPages === 0 && (
+            <div className="text-center py-12">
+              <span className="material-symbols-outlined text-6xl text-slate-300 mb-4 block">sentiment_dissatisfied</span>
+              <h3 className="text-2xl font-semibold text-gray-600 mb-2">No pages found</h3>
+              <p className="text-gray-500">Try adjusting your search or filter</p>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 };

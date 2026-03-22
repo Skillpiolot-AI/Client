@@ -2,27 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { 
-  Users, 
-  Activity, 
-  Calendar, 
-  TrendingUp,
-  Eye,
-  Clock,
-  UserPlus,
-  LogIn,
-  BarChart3,
-  PieChart,
-  Download,
-  RefreshCw
-} from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from 'react-hot-toast';
 import config from '../../../config';
+
+// Sub-components (Reusing existing components but wrapping in modern Bento Layout)
 import OverviewCards from './components/OverviewCards';
-import UserAnalytics from './components/UserAnalytics';
 import ActivityStats from './components/ActivityStats';
 import LoginPatterns from './components/LoginPatterns';
 import DetailedUserList from './components/DetailedUserList';
@@ -35,17 +19,16 @@ export default function AnalyticsDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
 
   const timeframeOptions = [
-    { value: '24h', label: '24 Hours' },
-    { value: 'week', label: '1 Week' },
-    { value: 'month', label: '1 Month' },
-    { value: 'year', label: '1 Year' },
+    { value: '24h', label: 'Last 24 Hours' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last Year' },
   ];
 
   const tabOptions = [
-    { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'activity', label: 'Activity', icon: Activity },
-    { id: 'patterns', label: 'Login Patterns', icon: TrendingUp },
+    { id: 'overview', label: 'Analytics', icon: 'analytics' },
+    { id: 'users', label: 'User Directory', icon: 'group' },
+    { id: 'activity', label: 'Activity Logs', icon: 'list_alt' },
   ];
 
   useEffect(() => {
@@ -75,139 +58,118 @@ export default function AnalyticsDashboard() {
     setRefreshing(true);
     await fetchAnalyticsData();
     setRefreshing(false);
-    toast.success('Data refreshed successfully');
-  };
-
-  const exportData = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${config.API_BASE_URL}/analytics/export`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { timeframe },
-        responseType: 'blob'
-      });
-      
-      const blob = new Blob([response.data], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `analytics-${timeframe}-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast.success('Analytics data exported successfully');
-    } catch (error) {
-      console.error('Export error:', error);
-      toast.error('Failed to export data');
-    }
+    toast.success('Metrics synchronized');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-container-lowest flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin text-indigo-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading analytics...</p>
+          <span className="material-symbols-outlined text-4xl animate-spin text-primary mb-2">sync</span>
+          <p className="text-secondary font-body">Loading environment analytics...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-              <p className="text-gray-600 mt-1">Monitor user engagement and platform performance</p>
-            </div>
-            <div className="flex space-x-3">
-              <Select value={timeframe} onValueChange={setTimeframe}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeframeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={handleRefresh}
-                disabled={refreshing}
-                variant="outline"
-                className="flex items-center"
+    <div className="bg-surface font-body text-on-surface min-h-screen">
+      <main className="pt-24 pb-20 px-8 max-w-[1440px] mx-auto">
+        {/* Header Section */}
+        <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 mt-8">
+          <div>
+            <h1 className="font-headline font-extrabold text-4xl text-primary tracking-tight mb-2">Systems Intelligence</h1>
+            <p className="text-secondary">Comprehensive diagnostics of node growth, authentications, and traffic indexing.</p>
+          </div>
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="relative flex-grow md:flex-grow-0">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary text-lg">calendar_today</span>
+              <select 
+                value={timeframe} 
+                onChange={(e) => setTimeframe(e.target.value)}
+                className="bg-surface-container-high border-none rounded-xl py-3 pl-10 pr-10 appearance-none font-label text-xs font-bold tracking-wider uppercase text-primary focus:ring-2 focus:ring-primary/10 w-full"
               >
-                <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-              <Button onClick={exportData} className="flex items-center">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
+                {timeframeOptions.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none">arrow_drop_down</span>
             </div>
+            
+            <button 
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="p-3 rounded-xl bg-surface-container-high hover:bg-surface-container-highest transition-colors flex items-center justify-center"
+            >
+              <span className={`material-symbols-outlined text-primary ${refreshing ? 'animate-spin' : ''}`}>sync</span>
+            </button>
           </div>
+        </section>
 
-          {/* Navigation Tabs */}
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
-              {tabOptions.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${
-                      activeTab === tab.id
-                        ? 'border-indigo-500 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4 mr-2" />
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+        {/* Navigation Tabs (Sub-Navigation) */}
+        <div className="flex gap-2 mb-8 bg-surface-container-low p-1.5 rounded-2xl w-fit">
+          {tabOptions.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-label text-xs font-bold tracking-wider uppercase transition-all ${
+                activeTab === tab.id
+                  ? 'bg-surface-container-lowest text-primary shadow-sm border border-outline-variant/10'
+                  : 'text-secondary hover:text-primary'
+              }`}
+            >
+              <span className="material-symbols-outlined text-lg">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Content based on active tab */}
+        {/* Workspace Bento Grid */}
         <motion.div
           key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="min-h-[600px]"
         >
           {activeTab === 'overview' && (
-            <div className="space-y-6">
+            <div className="flex flex-col gap-8">
+              {/* Stat Bento (Calculated locally if API relies on sub-components) */}
               <OverviewCards overview={overview} timeframe={timeframe} />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ActivityStats timeframe={timeframe} />
-                <LoginPatterns timeframe={timeframe} />
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/5">
+                  <h3 className="font-headline font-bold text-lg text-primary mb-6 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-tertiary">bubble_chart</span>
+                    Access Metrics
+                  </h3>
+                  <ActivityStats timeframe={timeframe} />
+                </div>
+                
+                <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/5">
+                  <h3 className="font-headline font-bold text-lg text-primary mb-6 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-secondary">insights</span>
+                    Authentication Trails
+                  </h3>
+                  <LoginPatterns timeframe={timeframe} />
+                </div>
               </div>
             </div>
           )}
 
           {activeTab === 'users' && (
-            <DetailedUserList timeframe={timeframe} />
+            <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/10">
+              <DetailedUserList timeframe={timeframe} />
+            </div>
           )}
 
           {activeTab === 'activity' && (
-            <ActivityStats timeframe={timeframe} detailed={true} />
-          )}
-
-          {activeTab === 'patterns' && (
-            <LoginPatterns timeframe={timeframe} detailed={true} />
+            <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/10">
+              <ActivityStats timeframe={timeframe} detailed={true} />
+            </div>
           )}
         </motion.div>
-      </div>
+      </main>
     </div>
   );
 }
