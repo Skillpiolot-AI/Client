@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline": "#75777d",
+              "on-error": "#ffffff",
+              "inverse-primary": "#b9c7e0",
+              "on-secondary-fixed-variant": "#38485d",
+              "on-primary": "#ffffff",
+              "tertiary": "#00312d",
+              "tertiary-fixed-dim": "#80d5cb",
+              "on-tertiary-fixed": "#00201d",
+              "surface-bright": "#fff8f5",
+              "secondary": "#505f76",
+              "on-error-container": "#93000a",
+              "tertiary-fixed": "#9cf2e8",
+              "surface-container-highest": "#eae1dc",
+              "on-primary-container": "#9eadc5",
+              "inverse-on-surface": "#f8efeb",
+              "surface-container-low": "#fbf2ed",
+              "surface-container": "#f6ece8",
+              "secondary-container": "#d0e1fb",
+              "primary": "#1d2b3e",
+              "on-secondary": "#ffffff",
+              "on-secondary-fixed": "#0b1c30",
+              "surface-variant": "#eae1dc",
+              "primary-fixed-dim": "#b9c7e0",
+              "on-primary-fixed-variant": "#3a485c",
+              "primary-fixed": "#d5e3fd",
+              "on-tertiary-fixed-variant": "#00504a",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#65bbb1",
+              "on-surface-variant": "#44474c",
+              "error-container": "#ffdad6",
+              "outline-variant": "#c5c6cd",
+              "on-primary-fixed": "#0d1c2f",
+              "surface-tint": "#515f74",
+              "tertiary-container": "#004944",
+              "error": "#ba1a1a",
+              "on-surface": "#1f1b18",
+              "on-secondary-container": "#54647a",
+              "surface-dim": "#e1d8d4",
+              "secondary-fixed": "#d3e4fe",
+              "on-background": "#1f1b18",
+              "surface": "#fff8f5",
+              "primary-container": "#334155",
+              "background": "#fff8f5",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed-dim": "#b7c8e1",
+              "surface-container-high": "#f0e6e2",
+              "inverse-surface": "#342f2d"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #fff8f5; color: #1f1b18; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .glass-panel { background: rgba(255, 248, 245, 0.8); backdrop-filter: blur(20px); }
+        .hero-gradient { background: linear-gradient(135deg, #1d2b3e 0%, #334155 100%); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<main class="min-h-screen pb-24">
+<!-- Hero Banner Section -->
+<section class="relative h-[460px] w-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Modern high-end architectural interior with clean lines, soft natural lighting and sophisticated professional atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG2QkZoyb5Aid36KdClUQiQKNhI_sgaHoKkgb3NO3Oki0F16o01OKGVpc5YXgJmWXgkoYnNS1C-9PVBKDKLFI0uMyQ0EPgmus_3YWdHHMWnh5wATRewWjIThIx68Vm2S7JJqMvNA3F5yQWceHQ-nOfUbFDhhrUnOsir-N4NI6ibJVmnRTXIfODhVuz451CXzGpJSYhzTqd064n2tPN_hAt72G1yAg1EI0gXqeyGA_wRjxsQV7WEw1CBvFz5prstkXvUUaDLtfc-js"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full p-12 flex justify-between items-end">
+<div class="max-w-2xl">
+<div class="flex items-center gap-4 mb-4">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[0.65rem] font-bold tracking-widest uppercase font-label">Strategy Hub</span>
+<span class="text-white/70 text-sm font-label uppercase tracking-wider">Public Community</span>
+</div>
+<h1 class="text-5xl md:text-6xl font-headline font-extrabold text-white tracking-tighter mb-4">Aeronaut Strategic</h1>
+<p class="text-white/80 text-lg font-body leading-relaxed max-w-xl">Curating the future of career trajectories through intentional mentorship and high-impact professional networking.</p>
+</div>
+<div class="flex flex-col items-end gap-6">
+<div class="flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-primary object-cover" data-alt="Close-up portrait of a professional man in a suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC52S2rjWgeCWddQit5jXSgg6VVmhSVRY7tW2ITcZoDyccvttw-hw7_cjQIl6EMYaZRFYqhUK1Ur6ifW7I23cg8GtHRqMvod71eDhqLgTkuI8y_y8xLrWjhNDiaSoInIDhmpjKAach3-Dw9N5js_PIit771pmnJO69b4-GVVHoRuLkCO-DFcouGZTvObiNTWMFQjOlxamevV48OgWl3WqFmenMxTteBvCj3TP1oMseAc8pexfztTrSQECaBW-IEFJinn9buHrPF4nA"/>
+<img class="w-10 h-10 rounded-full border-2 border-primary object-cover" data-alt="Close-up portrait of a professional woman smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5jRvC_P0WDLvi1JwjbQAa7656ZeY0cQnleajYnNvUnfYcIkmu84scRhsRjZHfJjq9yWh7ldrjJza1nAgNO-VbJ5ihTF7ld0vTXZ8Zq9jpHrYUTWTvz40HOa9GploeKbhvpcFQkVC5xcQPCqo8EOArFwCBUY-wAxfE9ZZm9KsN_0huSsyZQg3YNP2R6odp1uC3-9nUvDBnh8doCdHX_62PN8_ZJOwC_3r2xRwEyghLZJtjKQFSC4GiTwr9xaX_YTW1hbyfhx0ZrwE"/>
+<img class="w-10 h-10 rounded-full border-2 border-primary object-cover" data-alt="Close-up portrait of a professional man with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzi1Hkl7X9MTXhpgiPw5luYK0Ef4VBpJ95pCnfHfi3WdQSpx1qmEJP4Qm90h1yQFpU-q1grL696VFN8McHIjIvUCOcNVMiy5rEqFMwMsJqAhbXI14KsVfm1WOs6fcAyzxpNupLafmYLQ7wa8y2YzdyZVbR-Hp0mT7rJ_oScrDBRmym3jNLa1x30NVPrta3u36ZXL28-4eG1eb5r3ToRKDStZSsJ0t4wmaPWglbzTz4RrKdga8HWYvWMQKL97Fft0Ef3aFktMQDDxQ"/>
+<div class="w-10 h-10 rounded-full border-2 border-primary bg-primary-container flex items-center justify-center text-[10px] text-white font-bold">+2.4k</div>
+</div>
+<button class="hero-gradient px-8 py-4 rounded-xl text-white font-headline font-bold text-sm uppercase tracking-widest flex items-center gap-3 shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined text-sm" data-icon="group_add">group_add</span>
+                        Join Group
+                    </button>
+</div>
+</div>
+</section>
+<!-- Bento Layout Content -->
+<div class="max-w-[1400px] mx-auto px-12 -mt-16 relative z-10">
+<div class="grid grid-cols-12 gap-8">
+<!-- About Card (Large Bento) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-10 rounded-xl shadow-[0px_20px_40px_rgba(31,27,24,0.06)] group hover:translate-y-[-4px] transition-all duration-300">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+</div>
+<h2 class="text-2xl font-headline font-bold tracking-tight">About</h2>
+</div>
+<div class="space-y-6">
+<p class="text-on-surface-variant font-body text-lg leading-relaxed">
+                            Welcome to the Aeronaut Strategic collective. This group serves as a high-fidelity workspace for mid-to-senior level professionals navigating complex career shifts. We prioritize intellectual rigor over casual networking, focusing on structured mentorship frameworks and strategic market positioning.
+                        </p>
+<p class="text-on-surface-variant font-body text-lg leading-relaxed">
+                            Our members have successfully transitioned into executive roles across Tier 1 tech firms and venture-backed startups. By joining, you gain access to an exclusive repository of career roadmaps, peer-reviewed resume audits, and direct lines to industry captains.
+                        </p>
+<div class="grid grid-cols-3 gap-6 pt-6">
+<div class="p-6 bg-surface-container-low rounded-xl">
+<span class="block text-primary font-headline font-extrabold text-3xl mb-1">142</span>
+<span class="text-on-surface-variant font-label text-[0.65rem] uppercase tracking-widest font-bold">Successful Pilots</span>
+</div>
+<div class="p-6 bg-surface-container-low rounded-xl">
+<span class="block text-primary font-headline font-extrabold text-3xl mb-1">28</span>
+<span class="text-on-surface-variant font-label text-[0.65rem] uppercase tracking-widest font-bold">Mentorship Pods</span>
+</div>
+<div class="p-6 bg-surface-container-low rounded-xl">
+<span class="block text-primary font-headline font-extrabold text-3xl mb-1">94%</span>
+<span class="text-on-surface-variant font-label text-[0.65rem] uppercase tracking-widest font-bold">Retention Rate</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Insights (Tall Bento) -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest p-10 rounded-xl shadow-[0px_20px_40px_rgba(31,27,24,0.06)] hover:translate-y-[-4px] transition-all duration-300">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="analytics">analytics</span>
+</div>
+<h2 class="text-2xl font-headline font-bold tracking-tight">Activity Insights</h2>
+</div>
+<div class="space-y-10">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary-container mt-1" data-icon="calendar_today">calendar_today</span>
+<div>
+<h4 class="font-headline font-bold text-sm uppercase tracking-wider text-on-surface">Created</h4>
+<p class="text-on-surface-variant font-body mt-1">October 14, 2023</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary-container mt-1" data-icon="bolt">bolt</span>
+<div class="w-full">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline font-bold text-sm uppercase tracking-wider text-on-surface">Response Rate</h4>
+<span class="text-primary font-bold">98%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[98%]"></div>
+</div>
+<p class="text-on-surface-variant font-body text-xs mt-3 leading-relaxed">Top 1% of communities for active engagement and peer-to-peer support.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary-container mt-1" data-icon="forum">forum</span>
+<div>
+<h4 class="font-headline font-bold text-sm uppercase tracking-wider text-on-surface">Weekly Discussions</h4>
+<p class="text-on-surface-variant font-body mt-1">420+ active threads</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Community Rules (Wide/Complex Bento) -->
+<div class="col-span-12 lg:col-span-7 bg-surface-container-low p-10 rounded-xl hover:translate-y-[-4px] transition-all duration-300">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-12 h-12 rounded-xl bg-surface-container-lowest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="gavel">gavel</span>
+</div>
+<h2 class="text-2xl font-headline font-bold tracking-tight">Community Rules</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+<div class="group/rule">
+<div class="flex items-center gap-4 mb-2">
+<span class="font-headline font-black text-primary/20 text-4xl">01</span>
+<h4 class="font-headline font-bold text-lg">Radical Candor</h4>
+</div>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed">Provide direct, actionable feedback. We value growth over politeness.</p>
+</div>
+<div class="group/rule">
+<div class="flex items-center gap-4 mb-2">
+<span class="font-headline font-black text-primary/20 text-4xl">02</span>
+<h4 class="font-headline font-bold text-lg">Zero Solicitation</h4>
+</div>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed">Promotional posts are strictly prohibited unless explicitly vetted by Lead.</p>
+</div>
+<div class="group/rule">
+<div class="flex items-center gap-4 mb-2">
+<span class="font-headline font-black text-primary/20 text-4xl">03</span>
+<h4 class="font-headline font-bold text-lg">Data Privacy</h4>
+</div>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed">Internal roadmaps and discussions are non-disclosure mandated.</p>
+</div>
+<div class="group/rule">
+<div class="flex items-center gap-4 mb-2">
+<span class="font-headline font-black text-primary/20 text-4xl">04</span>
+<h4 class="font-headline font-bold text-lg">Active Presence</h4>
+</div>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed">Dormant accounts are audited quarterly to ensure high ecosystem health.</p>
+</div>
+</div>
+</div>
+<!-- Moderators (Small Bento) -->
+<div class="col-span-12 lg:col-span-5 bg-surface-container-lowest p-10 rounded-xl shadow-[0px_20px_40px_rgba(31,27,24,0.06)] hover:translate-y-[-4px] transition-all duration-300">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+</div>
+<h2 class="text-2xl font-headline font-bold tracking-tight">Moderators</h2>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group/mod transition-colors hover:bg-white">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="Portrait of an elegant executive woman with focused expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQG7pwRTzO-dDuJu6U_fCYkEXTvptyGkEAcbPnssVP6t-cQ-YUmiTZHipqVApl6D7xjXhOQNctKgKCHH3w4ch_Eh5-Sfo4qw6vX8GnzY40adiv_7qAG7I-tTcVk_eQFM7y3EiwEEvG93gIGdT45m5VAnnCTKKLvhVE8ZqWLa56SqI3H3T5v4P-D6Lb0XIF4dXM0MmA38OiM6c5-w-oXkPTHG3ayse38hdGwa0yn8NfS9d9XZ19mdOjI4Vd_a6spjJiotRc05LX2f4"/>
+<div>
+<h4 class="font-headline font-bold text-on-surface">Elena Vane</h4>
+<p class="text-xs font-label uppercase tracking-widest text-primary font-bold">Community Lead</p>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group/mod transition-colors hover:bg-white">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="Portrait of a young professional man in a minimalist office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDi_JkVGluuYkzMg0WoPzvnDlLLULDObjfJXDF7DeqyJlHzo2mlpzyyMlbgkfN2U--rjeksQtPvdoZH1fWX00_eFtVOBfRv9c8-b6DOD3jBlZAvMvWnZ6KTk9IJKjZq8cC1nrZoi8lN-F_P-9nOuXtQnJBfe_JxxcwAXqNuVTlduxxFKMevquVPWDCoTvFIUR8GRbBFaLCwrHdus-SnHgIf_eZO7_ODY7XJFnx_l_u6EZMq74Jjo1-3b06vfmO-oPZ3uQ3UNsk_gfg"/>
+<div>
+<h4 class="font-headline font-bold text-on-surface">Marcus Thorne</h4>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant font-bold">Strategy Advisor</p>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group/mod transition-colors hover:bg-white">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="Portrait of a creative professional woman with warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALhKscEZXpE1Rbefll1xyShdC7sfKx_mMkS3X_0EmfVzNVVcIr8Z4i_q8b49OGy2tLKgrCjdhjwH72D1_vtvYMHmUWvW1SsEYTbHBY8LFUUgnm8v38ojyCwSeD6Eg_M7COFwTiJlTK6c62GE7Svw4cp65hXng1fxNGfXC2BJ7ftqKppeI5anpZVcJMR8Qs5vlqit7-acg8njVICMe9fFWoAh8TxoWB1j0FSHyN_l2leoUJAWtxwrseVjjuN3ZrEEVNYhRw0JCRB_M"/>
+<div>
+<h4 class="font-headline font-bold text-on-surface">Sarah Jenkins</h4>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant font-bold">Member Experience</p>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Action Section (Visual anchor) -->
+<div class="fixed bottom-12 left-1/2 -translate-x-1/2 glass-panel p-4 rounded-full border border-outline-variant/10 shadow-2xl flex items-center gap-8 px-10">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-xs font-headline font-bold uppercase tracking-widest text-on-surface/60">Live Now</span>
+</div>
+<div class="h-6 w-[1px] bg-outline-variant/20"></div>
+<p class="text-sm font-body text-on-surface font-medium italic">"The Future of AI in Strategic Management" discussion started 12m ago.</p>
+<button class="text-primary font-headline font-bold text-xs uppercase tracking-widest hover:underline flex items-center gap-2">
+                View Thread
+                <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</main>
+</body></html>

@@ -1,162 +1,324 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useGroupContext } from '../../contexts/GroupContext';
-import './styles/GroupDetailPage.css';
+import { useAuth } from '../../AuthContext';
 
 export default function GroupDetailPage() {
-  const { id } = useParams();
-  const { fetchGroupById, currentGroup, joinGroup, loading, error } = useGroupContext();
+  const params = useParams();
+  const id = params.groupId || params.id;
+  const { fetchGroupById, currentGroup, joinGroup, leaveGroup, loading, error } = useGroupContext();
+  const { user, isAuthenticated } = useAuth();
   const [isMember, setIsMember] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [joinLoading, setJoinLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
+      setIsInitialLoad(true);
       fetchGroupById(id).then((group) => {
-        // Indicative membership check
-        if (group && group.members) {
-          setIsMember(true); // fallback or wire to auth
+        if (group) {
+          // Check ownership
+          const ownerId = group.owner?._id || group.owner;
+          const userId = user?._id || user?.id;
+          if (userId && ownerId && String(ownerId) === String(userId)) {
+            setIsOwner(true);
+            setIsMember(true);
+          }
+          // Check membership (member list presence or owner)
+          if (group.members && Array.isArray(group.members)) {
+            const memberIds = group.members.map(m => String(m._id || m));
+            if (userId && memberIds.includes(String(userId))) {
+              setIsMember(true);
+            }
+          }
         }
+        setIsInitialLoad(false);
+      }).catch(() => {
+        setIsInitialLoad(false);
       });
     }
-  }, [id, fetchGroupById]);
+  }, [id, fetchGroupById, user]);
 
-  const handleJoinGroup = async () => {
+  const handleJoin = async () => {
+    if (!isAuthenticated()) {
+      navigate('/login');
+      return;
+    }
     try {
+      setJoinLoading(true);
       await joinGroup(id);
       setIsMember(true);
     } catch (err) {
       console.error('Failed to join group:', err);
+    } finally {
+      setJoinLoading(false);
     }
   };
 
-  if (loading) return <div className="p-12 text-center text-secondary">Loading group details...</div>;
-  if (error || !currentGroup) return <div className="p-12 text-center text-error bg-error-container rounded-xl">{error || 'Group not found'}</div>;
+  const handleLeave = async () => {
+    if (isOwner) {
+      alert('As the group owner, you cannot leave. Transfer ownership or delete the group first.');
+      return;
+    }
+    try {
+      setJoinLoading(true);
+      await leaveGroup(id);
+      setIsMember(false);
+    } catch (err) {
+      console.error('Failed to leave group:', err);
+    } finally {
+      setJoinLoading(false);
+    }
+  };
+
+  if (loading || isInitialLoad) return (
+    <div className="flex items-center justify-center min-h-screen bg-surface">
+      <div className="text-center">
+        <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-on-surface-variant font-medium">Loading community...</p>
+      </div>
+    </div>
+  );
+  if (error) return <div className="p-12 text-center text-error bg-error-container rounded-xl mt-24">Error: {error}</div>;
+  if (!currentGroup) return <div className="p-12 text-center text-on-surface-variant bg-surface-container-low rounded-xl mt-24">This community could not be found.</div>;
+
+  const ownerName = currentGroup.owner?.name || 'Unknown';
+  const ownerInitial = ownerName.charAt(0).toUpperCase();
 
   return (
-    <div className="bg-surface text-on-surface antialiased">
-      {/* Hero Section: Group Header */}
-      <section className="relative rounded-3xl overflow-hidden mb-12">
-        <div className="h-64 md:h-80 w-full relative">
-          <img 
-            alt="Group Banner" 
-            className="w-full h-full object-cover" 
-            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2000&q=80" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent"></div>
-        </div>
-        
-        <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] uppercase font-bold tracking-widest rounded-full">
-                {currentGroup.type || 'Public'}
-              </span>
-              <span className="flex items-center gap-1 text-white/90 text-sm font-medium">
-                <span className="material-symbols-outlined text-sm">group</span> 
-                {currentGroup.memberCount || 0} Members
-              </span>
+    <main className="min-h-screen pb-24 bg-surface text-on-surface antialiased font-body">
+      {/* Hero Banner */}
+      <section className="relative h-[420px] w-full overflow-hidden">
+        <img
+          alt="Group Cover"
+          className="w-full h-full object-cover"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG2QkZoyb5Aid36KdClUQiQKNhI_sgaHoKkgb3NO3Oki0F16o01OKGVpc5YXgJmWXgkoYnNS1C-9PVBKDKLFI0uMyQ0EPgmus_3YWdHHMWnh5wATRewWjIThIx68Vm2S7JJqMvNA3F5yQWceHQ-nOfUbFDhhrUnOsir-N4NI6ibJVmnRTXIfODhVuz451CXzGpJSYhzTqd064n2tPN_hAt72G1yAg1EI0gXqeyGA_wRjxsQV7WEw1CBvFz5prstkXvUUaDLtfc-js"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full p-10 flex flex-col md:flex-row justify-between md:items-end gap-6">
+          <div className="max-w-2xl">
+            {/* Breadcrumb */}
+            <nav className="flex items-center space-x-2 text-white/60 mb-4">
+              <Link to="/groups" className="text-xs font-label uppercase tracking-widest hover:text-white transition-colors">Groups</Link>
+              <span className="material-symbols-outlined text-sm">chevron_right</span>
+              <span className="text-xs font-label uppercase tracking-widest font-bold text-white truncate max-w-xs">{currentGroup.name || 'Community'}</span>
+            </nav>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="bg-white/20 text-white px-3 py-1 rounded-full text-[0.65rem] font-bold tracking-widest uppercase font-label backdrop-blur-sm">{currentGroup.type || 'Public'}</span>
+              {currentGroup.category && (
+                <span className="bg-primary/80 text-white px-3 py-1 rounded-full text-[0.65rem] font-bold tracking-widest uppercase font-label">{currentGroup.category}</span>
+              )}
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-2">{currentGroup.name}</h1>
-            <p className="text-white/80 max-w-xl font-medium">{currentGroup.description}</p>
+            <h1 className="text-4xl md:text-5xl font-headline font-extrabold text-white tracking-tight mb-3">{currentGroup.name}</h1>
+            <p className="text-white/75 text-base font-body leading-relaxed max-w-xl line-clamp-2">{currentGroup.description}</p>
           </div>
 
-          <div className="flex items-center gap-4">
-            {isMember ? (
-              <Link to={`/groups/${id}/chat`} className="px-8 py-4 bg-gradient-to-r from-primary to-primary-container text-white rounded-xl font-bold shadow-lg hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
-                Enter Chat
-                <span className="material-symbols-outlined">arrow_forward</span>
-              </Link>
-            ) : (
-              <button 
-                onClick={handleJoinGroup}
-                className="px-8 py-4 bg-gradient-to-r from-primary to-primary-container text-white rounded-xl font-bold shadow-lg hover:-translate-y-1 transition-all duration-300 flex items-center gap-2"
-              >
-                Join Group
-              </button>
-            )}
-            <button className="p-4 bg-white/10 backdrop-blur-md text-white rounded-xl border border-white/20 hover:bg-white/20 transition-all">
-              <span className="material-symbols-outlined">share</span>
-            </button>
+          {/* Action Buttons */}
+          <div className="flex flex-col items-start md:items-end gap-3">
+            <div className="flex items-center gap-2 text-white/80 text-sm font-semibold">
+              <span className="material-symbols-outlined text-lg">group</span>
+              <span>{currentGroup.membersCount || currentGroup.memberCount || 0} Members</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Owner: Settings button */}
+              {isOwner && (
+                <Link
+                  to={`/groups/${id}/admin`}
+                  className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/20 backdrop-blur-sm !text-white border border-white/30 hover:bg-white/30 transition-all font-bold text-sm"
+                >
+                  <span className="material-symbols-outlined text-sm">settings</span>
+                  Settings
+                </Link>
+              )}
+
+              {/* Member actions */}
+              {isMember ? (
+                <>
+                  <Link
+                    to={`/groups/${id}/chat`}
+                    className="premium-gradient px-7 py-3 rounded-xl !text-black font-headline font-bold text-sm uppercase tracking-widest flex items-center gap-2 shadow-xl hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <span className="material-symbols-outlined text-sm">chat</span>
+                    Enter Chat
+                  </Link>
+                  {!isOwner && (
+                    <button
+                      onClick={handleLeave}
+                      disabled={joinLoading}
+                      className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/20 backdrop-blur-sm !text-white border border-white/30 hover:bg-red-500/80 hover:border-red-400 transition-all font-bold text-sm"
+                    >
+                      <span className="material-symbols-outlined text-sm">exit_to_app</span>
+                      Leave
+                    </button>
+                  )}
+                </>
+              ) : (
+                <button
+                  onClick={handleJoin}
+                  disabled={joinLoading}
+                  className="premium-gradient px-7 py-3 rounded-xl !text-black font-headline font-bold text-sm uppercase tracking-widest flex items-center gap-2 shadow-xl hover:-translate-y-1 transition-all duration-300 disabled:opacity-60"
+                >
+                  <span className="material-symbols-outlined text-sm">group_add</span>
+                  {joinLoading ? 'Joining...' : isAuthenticated() ? 'Join Group' : 'Login to Join'}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Bento Layout: Content Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Main Content Area */}
-        <div className="lg:col-span-8 space-y-8">
-          {/* Description Card */}
-          <div className="bg-surface-container-lowest rounded-3xl p-8 transition-all duration-300 border border-outline-variant/10">
-            <h2 className="text-2xl font-bold mb-6 text-primary">About this Community</h2>
-            <div className="space-y-4 text-on-surface-variant leading-relaxed font-body">
-              <p>{currentGroup.description}</p>
-              <p>Welcome to our professional ecosystem. This space is dedicated to continuous learning, core development, and organization strategy queries mapping target loops efficiently.</p>
-            </div>
-          </div>
+      {/* Main Content */}
+      <div className="max-w-[1300px] mx-auto px-8 md:px-12 -mt-8 relative z-10">
+        <div className="grid grid-cols-12 gap-8">
 
-          {/* Rules Accordion */}
-          {currentGroup.rules && currentGroup.rules.length > 0 && (
-            <div className="bg-surface-container-low rounded-3xl p-8">
-              <h2 className="text-2xl font-bold mb-8 text-primary">Community Rules</h2>
-              <div className="space-y-4">
-                {currentGroup.rules.map((rule, index) => (
-                  <div key={index} className="group bg-surface-container-lowest rounded-2xl overflow-hidden transition-all duration-300 border border-outline-variant/10">
-                    <div className="w-full flex items-center justify-between p-6">
-                      <span className="font-bold text-primary flex items-center gap-4">
-                        <span className="text-primary/30 font-black">{(index + 1).toString().padStart(2, '0')}</span>
-                        {rule}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+          {/* Left: About + Rules */}
+          <div className="col-span-12 lg:col-span-8 space-y-8">
 
-        {/* Sidebar */}
-        <aside className="lg:col-span-4 space-y-8">
-          {/* Group Stats Card */}
-          <div className="bg-primary text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
-            <div className="absolute -right-4 -top-4 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
-            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined">insights</span>
-              Activity Insights
-            </h3>
-            <div className="space-y-6">
-              <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                <span className="text-white/60 text-sm">Created</span>
-                <span className="font-bold">{new Date(currentGroup.createdAt).toLocaleDateString()}</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                <span className="text-white/60 text-sm">Response Rate</span>
-                <span className="font-bold">98%</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Moderators */}
-          <div className="bg-surface-container-lowest rounded-3xl p-8 border border-outline-variant/10">
-            <h3 className="text-lg font-bold mb-6 text-primary">Moderators</h3>
-            <div className="space-y-5">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center font-bold text-primary">
-                  M
+            {/* About Card */}
+            <div className="bg-surface-container-lowest p-8 rounded-2xl shadow-[0px_4px_24px_rgba(31,27,24,0.06)]">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center">
+                  <span className="material-symbols-outlined text-primary">info</span>
                 </div>
+                <h2 className="text-xl font-headline font-bold tracking-tight">About this Community</h2>
+              </div>
+              <p className="text-on-surface-variant font-body leading-relaxed whitespace-pre-line">{currentGroup.description}</p>
+
+              <div className="mt-6 flex items-center gap-4 pt-6 border-t border-outline-variant/10 text-sm text-on-surface-variant">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base text-primary">calendar_today</span>
+                  <span>Created {currentGroup.createdAt ? new Date(currentGroup.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Recently'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base text-primary">lock{currentGroup.type === 'Private' ? '' : '_open'}</span>
+                  <span>{currentGroup.type || 'Public'} Group</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Restrictions Banner — non-members */}
+            {!isMember && (
+              <div className="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-6 flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary text-3xl">lock_open</span>
                 <div>
-                  <span className="block font-bold text-primary text-sm">Owner</span>
-                  <span className="text-xs text-on-surface-variant">Community Lead</span>
+                  <h3 className="font-headline font-bold text-on-surface mb-1">
+                    {isAuthenticated() ? 'Join to access the chat and all content' : 'Log in to participate'}
+                  </h3>
+                  <p className="text-sm text-on-surface-variant">
+                    {isAuthenticated()
+                      ? 'You are viewing this community as a guest. Join to send messages, access exclusive resources, and connect with members.'
+                      : 'Create an account or log in to join this community and interact with members.'}
+                  </p>
+                </div>
+                {!isAuthenticated() && (
+                  <Link to="/login" className="ml-auto flex-shrink-0 bg-primary !text-black font-bold px-5 py-2 rounded-xl text-sm hover:opacity-90 transition">Log In</Link>
+                )}
+              </div>
+            )}
+
+            {/* Community Rules */}
+            {currentGroup.rules && currentGroup.rules.length > 0 && (
+              <div className="bg-surface-container-lowest p-8 rounded-2xl shadow-[0px_4px_24px_rgba(31,27,24,0.06)]">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center">
+                    <span className="material-symbols-outlined text-primary">gavel</span>
+                  </div>
+                  <h2 className="text-xl font-headline font-bold tracking-tight">Community Rules</h2>
+                </div>
+                <div className="space-y-4">
+                  {currentGroup.rules.map((rule, index) => (
+                    <div key={rule._id || index} className="flex gap-4 p-4 bg-surface-container-low rounded-xl">
+                      <span className="font-headline font-black text-primary/30 text-2xl w-8 flex-shrink-0">{index + 1}</span>
+                      <div>
+                        <h4 className="font-headline font-bold text-sm mb-1">{rule.title || `Rule ${index + 1}`}</h4>
+                        <p className="text-on-surface-variant text-sm leading-relaxed">{rule.description}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-            {isMember && (
-              <Link to={`/groups/${id}/settings`} className="w-full mt-8 flex justify-center py-3 rounded-xl border border-outline-variant/30 text-primary text-sm font-bold hover:bg-surface-container-low transition-colors">
-                Group Settings
-              </Link>
             )}
           </div>
-        </aside>
+
+          {/* Right: Creator, Stats, Members */}
+          <div className="col-span-12 lg:col-span-4 space-y-6">
+
+            {/* Creator Card */}
+            <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-[0px_4px_24px_rgba(31,27,24,0.06)]">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="material-symbols-outlined text-primary">manage_accounts</span>
+                <h3 className="font-headline font-bold text-sm uppercase tracking-widest">Community Creator</h3>
+              </div>
+              <div className="flex items-center gap-4 p-4 bg-surface-container-low rounded-xl">
+                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center font-bold text-white text-xl flex-shrink-0">
+                  {ownerInitial}
+                </div>
+                <div>
+                  <h4 className="font-headline font-bold text-on-surface">{ownerName}</h4>
+                  <p className="text-xs font-label uppercase tracking-widest text-primary font-bold">Founder · Community Lead</p>
+                </div>
+                {isOwner && (
+                  <span className="ml-auto text-[10px] font-bold text-primary bg-primary/10 px-2 py-1 rounded-full uppercase tracking-wider">You</span>
+                )}
+              </div>
+            </div>
+
+            {/* Members Count Card */}
+            <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-[0px_4px_24px_rgba(31,27,24,0.06)]">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="material-symbols-outlined text-primary">group</span>
+                <h3 className="font-headline font-bold text-sm uppercase tracking-widest">Members</h3>
+              </div>
+              <p className="text-4xl font-headline font-extrabold text-primary">
+                {currentGroup.membersCount || currentGroup.memberCount || 0}
+              </p>
+              <p className="text-on-surface-variant text-sm mt-1">Active community members</p>
+              {isMember && (
+                <div className="mt-4 flex items-center gap-2 text-xs font-bold text-green-600 bg-green-50 rounded-lg px-3 py-2">
+                  <span className="material-symbols-outlined text-sm">check_circle</span>
+                  You are a member
+                </div>
+              )}
+            </div>
+
+            {/* Owner Settings Panel */}
+            {isOwner && (
+              <div className="bg-primary/5 border border-primary/20 p-6 rounded-2xl">
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="material-symbols-outlined text-primary">admin_panel_settings</span>
+                  <h3 className="font-headline font-bold text-sm uppercase tracking-widest text-primary">Owner Controls</h3>
+                </div>
+                <div className="space-y-3">
+                  <Link
+                    to={`/groups/${id}/admin`}
+                    className="flex items-center gap-3 w-full p-3 rounded-xl bg-white hover:bg-surface-container-low transition-colors text-on-surface font-semibold text-sm"
+                  >
+                    <span className="material-symbols-outlined text-primary text-lg">settings</span>
+                    Group Settings
+                  </Link>
+                  <Link
+                    to={`/groups/${id}/admin`}
+                    className="flex items-center gap-3 w-full p-3 rounded-xl bg-white hover:bg-surface-container-low transition-colors text-on-surface font-semibold text-sm"
+                  >
+                    <span className="material-symbols-outlined text-primary text-lg">edit</span>
+                    Edit Group Details
+                  </Link>
+                  <Link
+                    to={`/groups/${id}/admin`}
+                    className="flex items-center gap-3 w-full p-3 rounded-xl bg-white hover:bg-surface-container-low transition-colors text-on-surface font-semibold text-sm"
+                  >
+                    <span className="material-symbols-outlined text-primary text-lg">people</span>
+                    Manage Members
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

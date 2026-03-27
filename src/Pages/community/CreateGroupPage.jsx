@@ -96,7 +96,7 @@ export default function CreateGroupPage() {
                       />
                       <div className="flex items-center gap-3 mb-2">
                         <span className="material-symbols-outlined text-primary">public</span>
-                        <span className="font-bold text-primary">Public Group</span>
+                        <span className={`font-bold ${formData.type === 'Public' ? '!text-primary' : 'text-on-surface'}`}>Public Group</span>
                       </div>
                       <p className="text-xs text-on-surface-variant">Anyone can find and join this group without approval.</p>
                     </label>
@@ -112,7 +112,7 @@ export default function CreateGroupPage() {
                       />
                       <div className="flex items-center gap-3 mb-2">
                         <span className="material-symbols-outlined text-primary">lock</span>
-                        <span className="font-bold text-primary">Private Vault</span>
+                        <span className={`font-bold ${formData.type === 'Private' ? '!text-primary' : 'text-on-surface'}`}>Private Vault</span>
                       </div>
                       <p className="text-xs text-on-surface-variant">Invisible to outsiders. Members must be invited or approved.</p>
                     </label>
@@ -126,7 +126,7 @@ export default function CreateGroupPage() {
                 <button 
                   type="submit" 
                   disabled={loading}
-                  className="bg-gradient-to-br from-primary to-primary-container text-white font-headline font-bold py-4 px-10 rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
+                  className="bg-gradient-to-br from-primary to-primary-container !text-black font-headline font-bold py-4 px-10 rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
                 >
                   {loading ? 'Launching...' : 'Launch Group'}
                   <span className="material-symbols-outlined">arrow_forward</span>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Groups | Navigator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#75777d",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b9c7e0",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#00312d",
+                        "tertiary-fixed-dim": "#80d5cb",
+                        "on-tertiary-fixed": "#00201d",
+                        "surface-bright": "#fff8f5",
+                        "secondary": "#505f76",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#9cf2e8",
+                        "surface-container-highest": "#eae1dc",
+                        "on-primary-container": "#9eadc5",
+                        "inverse-on-surface": "#f8efeb",
+                        "surface-container-low": "#fbf2ed",
+                        "surface-container": "#f6ece8",
+                        "secondary-container": "#d0e1fb",
+                        "primary": "#1d2b3e",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-variant": "#eae1dc",
+                        "primary-fixed-dim": "#b9c7e0",
+                        "on-primary-fixed-variant": "#3a485c",
+                        "primary-fixed": "#d5e3fd",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#65bbb1",
+                        "on-surface-variant": "#44474c",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c5c6cd",
+                        "on-primary-fixed": "#0d1c2f",
+                        "surface-tint": "#515f74",
+                        "tertiary-container": "#004944",
+                        "error": "#ba1a1a",
+                        "on-surface": "#1f1b18",
+                        "on-secondary-container": "#54647a",
+                        "surface-dim": "#e1d8d4",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-background": "#1f1b18",
+                        "surface": "#fff8f5",
+                        "primary-container": "#334155",
+                        "background": "#fff8f5",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "surface-container-high": "#f0e6e2",
+                        "inverse-surface": "#342f2d"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-glass {
+            background: rgba(255, 248, 245, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #1d2b3e 0%, #334155 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-secondary-container">
+<main class="min-h-screen pt-20 pb-24 px-6 md:px-12 lg:px-24">
+<header class="max-w-7xl mx-auto mb-16 space-y-4">
+<div class="flex items-center justify-between">
+<nav class="flex items-center space-x-2 text-on-surface-variant">
+<span class="text-xs font-label uppercase tracking-widest">Navigator</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-xs font-label uppercase tracking-widest font-bold text-primary">Workspace</span>
+</nav>
+<div class="flex items-center space-x-4">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-300">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors duration-300">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<h1 class="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary">
+                My Groups
+            </h1>
+<p class="text-on-surface-variant max-w-lg text-lg leading-relaxed">
+                Strategic overview of your active professional communities and specialized mentorship circles.
+            </p>
+</header>
+<section class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+<div class="group relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] hover:-translate-y-1">
+<div class="flex justify-between items-start mb-12">
+<div class="w-14 h-14 rounded-full flex items-center justify-center bg-primary text-white">
+<span class="material-symbols-outlined text-2xl" data-icon="architecture">architecture</span>
+</div>
+<div class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">
+                            Active
+                        </div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">Systems Design Pilot</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed">Deep dive into scalable enterprise architecture and cloud patterns.</p>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex -space-x-2">
+<img alt="" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="close-up portrait of professional man in workspace with soft window light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5lB5NjnSowpziLKYR5-_tlfutG_SA8NXeB2MHCsq0pGDs9jzWxPwum_ksGwoW0Tem-pijQN-HwwxdK6oDSZS7GVfH7IC7YIG7x4Nf0sAb9belAfMgQ1fFWhGjwDKvyXbBk-heAKfCNfhbXTjELYIoJ3irYrZagYIvhMvG4PY3lNhi0WhtYPCulTllHjCHHaMrmz6CNwVQiLmNlarYX1YTNLky9i2u1d6XyAbq8dXaMqIt82r7iwobuMqD6bczdP_kUWDiPm3HqlA"/>
+<img alt="" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="smiling woman in modern office setting with warm professional lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH4HJORXAgnm6IvD5b6c805pvOxInRdqE-ARL2j-gFPPMBf30ZJGSW2N-EJ9OZ9vSnBxWqKeCYPPmnhedUcgBTzfEh1Zny3iIelFqJHDTYx_QLgaXS3ffSvylK8jAkdHPiRHjQwvGrpYw6D-rJFg6f3k3QrwYV8TgKE_kvcxNPIIq71mIAmjqUXOSMYjhyo09AMKs_AG5PqLoCE0LYroa3R0LnxzkPcLiyosSbgJB9jc_6BCJAvztDNpFu6gSYSKN1fQ6Dn_OWdKQ"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-primary">+12</div>
+</div>
+<div class="flex items-center text-primary font-bold text-xs uppercase tracking-tighter">
+<span>24 New Activities</span>
+<span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] hover:-translate-y-1">
+<div class="flex justify-between items-start mb-12">
+<div class="w-14 h-14 rounded-full flex items-center justify-center bg-secondary-container text-on-secondary-container">
+<span class="material-symbols-outlined text-2xl" data-icon="leaderboard">leaderboard</span>
+</div>
+<div class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">
+                            8 Unread
+                        </div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">Executive Leadership</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed">Strategic mentorship for high-impact decision making and culture.</p>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex -space-x-2">
+<img alt="" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="professional woman leading a meeting in a bright glass-walled conference room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG0GRT9hOJbckdnFEjSw8MVfRnriTXuTmUwfPj4QUCUayYojKTnpRf4tohsDWrgKV134ZzlEtUTxJucHriUNNiR39nbUCzYHa9h1qkTYIyld0vGNhvxj6hfI8QAIPOObRxThV_ZqCpcGWTfRIGy1-t0resTWp3-Bu6LwvX9e_MisZ1soe2eKujjoGsZCTHTgWZGyfX0YvdkPEEPl6EvIQ287iM3aVzsY8ZVMNqgFncKtp8027GuZcw1-Q94ggxRffibjSODJaxwWs"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-primary">+4</div>
+</div>
+<div class="flex items-center text-primary font-bold text-xs uppercase tracking-tighter">
+<span>View Updates</span>
+<span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] hover:-translate-y-1">
+<div class="flex justify-between items-start mb-12">
+<div class="w-14 h-14 rounded-full flex items-center justify-center bg-tertiary-container text-on-tertiary-container">
+<span class="material-symbols-outlined text-2xl" data-icon="psychology">psychology</span>
+</div>
+<div class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">
+                            Silent
+                        </div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">AI Ethics Board</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed">Discussing the social implications and governance of emerging tech.</p>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex -space-x-2">
+<img alt="" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="man in business attire working on a tablet in a modern library" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLitc4ZpyPYc4DAeZm7awlrWUVqd2H5Lv2wLdzZEKc4jvbTpg5ewjVnDNko2gm19ZZD20qj5aX_MIk5IC5PujSDGIALkDbqgNlgNC9MHWDEsb-G96yBRwTkzokC9N4rWBOIPn-fTRNOLG9fXaR1h5ddi5bQM1x7ZD58TVFqeoUsX71clKQEeNhvQ7bQIq1xX7hbKRE0iapmpXlCN1Zr36OpWrZsGNmc0Lo9Yyw8rUnqxUHNlvFXPsT1fJ6Z5c2vD7znv_Kukl1u8E"/>
+<img alt="" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="professional male portrait with urban skyscraper background in soft focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDev4fnWQ2WQ4x025T_9hbx6XDHxIud1IMlgMtSBN_rSrOWkxD3SiM4kwv9YpPbvGF9WVu7Nyfn2rANxTme-4mIqJ3WBzhnnV33Hri3C4BiPlOKCrvD8Hh7eJvP-PRIkFkaBjO03ouwEABckTL3_xZBFG5RNopvIenhwYbCie5pCkGRLE09x3blMbgtsfYAn4Eq4k_IPtG0j6SVXF7-FKb1xtVNU1MOjFiJaEwSP1FlLVl5DAijBnfYrG5n1jlFv5AK9fMMK_yT6k"/>
+</div>
+<div class="flex items-center text-primary font-bold text-xs uppercase tracking-tighter">
+<span>Enter Room</span>
+<span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] hover:-translate-y-1">
+<div class="flex justify-between items-start mb-12">
+<div class="w-14 h-14 rounded-full flex items-center justify-center bg-primary-container text-on-primary-container">
+<span class="material-symbols-outlined text-2xl" data-icon="diversity_3">diversity_3</span>
+</div>
+<div class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">
+                            Mentorship
+                        </div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">Product Vanguard</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed">Collaborative strategy for product managers in high-growth startups.</p>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex -space-x-2">
+<img alt="" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="portrait of a focused female executive in a minimalist studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeQoZAaYA_oIw4NIzhr05UQvRKhB5v7HvWg2RJ_8sFZaTvU_LfSNVUUXdd0PyvbaVa47Zk7c5z4ItKLpIsoDWBbca13Uu9zfkjGdv7dCva1u9eTDrJFk6Yu4tzYFrZPAlQ0MnzUxx-PsKoRxkU8jQljFxULid0rtkxgVxvisXADgwnbNmH-O_lzZlhtKYVVsBxEVtdbpfyJ3G0vP0rTShyxvVSAYBtJ--ttnnntSvTQi6D2jpKXdNn0pTCh86XeOgvK8wW2n-514g"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-primary">+21</div>
+</div>
+<div class="flex items-center text-primary font-bold text-xs uppercase tracking-tighter">
+<span>15 Unread</span>
+<span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 transition-all duration-300 hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] hover:-translate-y-1">
+<div class="flex justify-between items-start mb-12">
+<div class="w-14 h-14 rounded-full flex items-center justify-center bg-tertiary text-on-tertiary">
+<span class="material-symbols-outlined text-2xl" data-icon="terminal">terminal</span>
+</div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">DevOps Sync</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed">Daily coordination for infrastructure stability and CI/CD automation.</p>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-primary">DS</div>
+</div>
+<div class="flex items-center text-primary font-bold text-xs uppercase tracking-tighter">
+<span>No New Activity</span>
+<span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center justify-center rounded-xl bg-surface-container-low border-2 border-dashed border-outline-variant/30 p-8 group cursor-pointer hover:bg-surface-container transition-all duration-300">
+<div class="w-12 h-12 rounded-full border-2 border-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="add">add</span>
+</div>
+<p class="font-headline font-bold text-primary uppercase text-xs tracking-widest">Join New Community</p>
+</div>
+</div>
+</section>
+<section class="max-w-7xl mx-auto mt-24">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 rounded-2xl hero-gradient p-12 relative overflow-hidden shadow-2xl">
+<div class="relative z-10 space-y-6">
+<span class="bg-white/10 text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase backdrop-blur-md">Featured Program</span>
+<h2 class="font-headline text-4xl font-extrabold text-white leading-tight max-w-md">Quantum Computing Foundations</h2>
+<p class="text-white/70 max-w-sm leading-relaxed">Join the next cohort of pilots exploring the frontier of high-performance computation and cryptographic shifts.</p>
+<button class="bg-white text-primary px-8 py-3 rounded-xl font-bold text-sm uppercase tracking-tighter hover:bg-surface-bright transition-colors duration-300 flex items-center">
+                            Request Invitation
+                            <span class="material-symbols-outlined ml-2 text-sm">north_east</span>
+</button>
+</div>
+<div class="absolute right-0 top-0 w-1/2 h-full opacity-20 bg-cover bg-center mix-blend-overlay" data-alt="abstract visualization of neural networks and complex mathematical data flowing in dark blue space" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDB4VxHF8NxkzjjFajBj5tnBr_lJVfkH28gJXW8WtTxbYhfYkCLvMzTJv6H8f-QyhlwpX2J1boX1Zne4o7IZK6CPwOaQNhqknkyKA40qYbANnh2a9voHCu8fPMGqGzCoGdmRSKmdlGp7ssjc0_EkTyTLdpmdtufdZH1oYP6yfnn9cYisgmZ_M684N0Dnvle4vjxJgMDvSl3ohPi2_qZ0RWM2tYoKt8FQHUDB5GADoQINg1ydIxBB2RqEbnlZ31XQmHf-EyUC1gbA84')"></div>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-10 flex flex-col justify-between">
+<div>
+<div class="flex items-center space-x-2 text-primary mb-6">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label text-xs font-bold uppercase tracking-widest">Network Pulse</span>
+</div>
+<div class="space-y-6">
+<div class="flex justify-between items-end border-b border-outline-variant/20 pb-4">
+<span class="text-on-surface-variant text-sm">Direct Mentorships</span>
+<span class="font-headline text-3xl font-bold text-primary">12</span>
+</div>
+<div class="flex justify-between items-end border-b border-outline-variant/20 pb-4">
+<span class="text-on-surface-variant text-sm">Active Discussions</span>
+<span class="font-headline text-3xl font-bold text-primary">84</span>
+</div>
+<div class="flex justify-between items-end border-b border-outline-variant/20 pb-4">
+<span class="text-on-surface-variant text-sm">Weekly Growth</span>
+<span class="font-headline text-3xl font-bold text-tertiary-container">+14%</span>
+</div>
+</div>
+</div>
+<button class="w-full text-center py-4 text-xs font-bold uppercase tracking-widest text-primary hover:text-secondary transition-colors duration-300">
+                        View Full Report
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<footer class="max-w-7xl mx-auto pb-12 px-6 md:px-12 lg:px-24 flex flex-col md:flex-row justify-between items-center text-on-surface-variant/40 text-[10px] font-label uppercase tracking-[0.2em]">
+<div class="flex items-center space-x-8 mb-6 md:mb-0">
+<a class="hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary transition-colors" href="#">Guidelines</a>
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+</div>
+<div>
+            © 2024 Navigator Strategic Ecosystem
+        </div>
+</footer>
+</body></html>

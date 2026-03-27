@@ -111,6 +111,8 @@ const CommunityLayout = lazy(() => import('./Pages/community/CommunityLayout'));
 const CommunityHomePage = lazy(() => import('./Pages/community/CommunityHomePage'));
 const CreateGroupPage = lazy(() => import('./Pages/community/CreateGroupPage'));
 const GroupDetailPage = lazy(() => import('./Pages/community/GroupDetailPage'));
+const GroupHomePage = lazy(() => import('./Pages/community/GroupHomePage'));
+const PostDetailPage = lazy(() => import('./Pages/community/PostDetailPage'));
 const GroupChatPage = lazy(() => import('./Pages/community/GroupChatPage'));
 const GroupSettingsPage = lazy(() => import('./Pages/community/GroupSettingsPage'));
 const MyGroupsPage = lazy(() => import('./Pages/community/MyGroupsPage'));
@@ -182,12 +184,16 @@ function App() {
           
           {/* 👥 Group & Community Routes */}
           <Route path="/groups" element={<CommunityLayout />}>
-            <Route index element={<CommunityHomePage />} />
+            <Route index element={<GroupDiscoveryPage />} />
             <Route path="discover" element={<GroupDiscoveryPage />} />
             <Route path="create" element={<CreateGroupPage />} />
             <Route path="my-groups" element={<MyGroupsPage />} />
-            <Route path="groups/:groupId" element={<GroupDetailPage />} />
-            <Route path=":groupId" element={<GroupDetailPage />} /> 
+            {/* Group Home — Reddit-style feed */}
+            <Route path=":groupId" element={<GroupHomePage />} />
+            {/* Individual post + nested comments */}
+            <Route path=":groupId/post/:postId" element={<PostDetailPage />} />
+            {/* About / old detail page */}
+            <Route path=":groupId/about" element={<GroupDetailPage />} />
             <Route path=":groupId/chat" element={<GroupChatPage />} />
             <Route path=":groupId/settings" element={<GroupSettingsPage />} />
             <Route path=":groupId/admin" element={<GroupAdminPage />} />

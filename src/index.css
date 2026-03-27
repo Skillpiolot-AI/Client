@@ -5,3 +5,12 @@
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
+
+.premium-gradient {
+    background: linear-gradient(135deg, #1d2b3e 0%, #334155 100%);
+}
+
+.glass-panel {
+    background: rgba(255, 248, 245, 0.8);
+    backdrop-filter: blur(20px);
+}

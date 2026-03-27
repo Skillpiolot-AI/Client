@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SkillPilot | Group Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline": "#75777d",
+              "on-error": "#ffffff",
+              "inverse-primary": "#b9c7e0",
+              "on-secondary-fixed-variant": "#38485d",
+              "on-primary": "#ffffff",
+              "tertiary": "#00312d",
+              "tertiary-fixed-dim": "#80d5cb",
+              "on-tertiary-fixed": "#00201d",
+              "surface-bright": "#fff8f5",
+              "secondary": "#505f76",
+              "on-error-container": "#93000a",
+              "tertiary-fixed": "#9cf2e8",
+              "surface-container-highest": "#eae1dc",
+              "on-primary-container": "#9eadc5",
+              "inverse-on-surface": "#f8efeb",
+              "surface-container-low": "#fbf2ed",
+              "surface-container": "#f6ece8",
+              "secondary-container": "#d0e1fb",
+              "primary": "#1d2b3e",
+              "on-secondary": "#ffffff",
+              "on-secondary-fixed": "#0b1c30",
+              "surface-variant": "#eae1dc",
+              "primary-fixed-dim": "#b9c7e0",
+              "on-primary-fixed-variant": "#3a485c",
+              "primary-fixed": "#d5e3fd",
+              "on-tertiary-fixed-variant": "#00504a",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#65bbb1",
+              "on-surface-variant": "#44474c",
+              "error-container": "#ffdad6",
+              "outline-variant": "#c5c6cd",
+              "on-primary-fixed": "#0d1c2f",
+              "surface-tint": "#515f74",
+              "tertiary-container": "#004944",
+              "error": "#ba1a1a",
+              "on-surface": "#1f1b18",
+              "on-secondary-container": "#54647a",
+              "surface-dim": "#e1d8d4",
+              "secondary-fixed": "#d3e4fe",
+              "on-background": "#1f1b18",
+              "surface": "#fff8f5",
+              "primary-container": "#334155",
+              "background": "#fff8f5",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed-dim": "#b7c8e1",
+              "surface-container-high": "#f0e6e2",
+              "inverse-surface": "#342f2d"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .premium-gradient {
+            background: linear-gradient(135deg, #1d2b3e 0%, #334155 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 248, 245, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased selection:bg-tertiary-fixed selection:text-on-tertiary-fixed">
+<main class="min-h-screen flex flex-col">
+<!-- Featured Hero Section -->
+<section class="relative w-full h-[614px] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Collaborative workspace" class="w-full h-full object-cover" data-alt="Modern high-end shared workspace with professionals collaborating around a large table, soft morning light hitting architectural details, professional atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBoUfAkvr5xOt2K7w5MsvKtk3cMC01rnAZNZHI56piDXut1Guuj6IDeejxp_vJlBZgwUJg9O-peffg_1hd_bcL5zEn-6W5UjdW-jLciuL3jo6AqPT8Udc5JgEB6dkT_I0O4TdFQxkKxYDJBF4zpsFFLwdEi60gvLV17y7hGQIEKDWZxv3HRuahvKTCZIgFawv1KCLAAdob2k1JHjUxuc-zBqJnSYS4CxEyDvMb3B0cOz1vHn4WG4YZ-8MlC35LlRsghVq6RbAC0YU"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/60 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-[1920px] w-full px-12 md:px-24">
+<div class="max-w-3xl">
+<span class="font-label text-tertiary-fixed tracking-[0.2em] uppercase text-xs mb-6 block font-bold">Featured Communities</span>
+<h1 class="font-headline text-5xl md:text-7xl font-extrabold text-white leading-[1.1] mb-8 tracking-tighter">
+                        Find your next <br/><span class="text-on-tertiary-container">Strategic Alliance.</span>
+</h1>
+<p class="text-surface-container-highest text-lg md:text-xl leading-relaxed mb-10 max-w-xl">
+                        Connect with industry-leading mentors and peers in curated environments designed for professional acceleration.
+                    </p>
+<div class="flex gap-4">
+<button class="premium-gradient text-white px-8 py-4 rounded-xl font-bold hover:shadow-[0px_20px_40px_rgba(31,27,24,0.15)] transition-all duration-300 active:scale-95 flex items-center gap-2">
+<span>Join the Pilot</span>
+<span class="material-symbols-outlined text-sm">north_east</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Search & Filter Bar -->
+<section class="sticky top-0 z-40 px-12 py-8 bg-surface/90 backdrop-blur-xl">
+<div class="max-w-[1920px] mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="relative w-full md:w-[400px]">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all text-on-surface" placeholder="Search skills, industries, or keywords..." type="text"/>
+</div>
+<div class="flex items-center gap-3 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+<button class="px-6 py-2.5 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap">All Groups</button>
+<button class="px-6 py-2.5 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-surface-container-highest transition-colors whitespace-nowrap">Code</button>
+<button class="px-6 py-2.5 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-surface-container-highest transition-colors whitespace-nowrap">Design</button>
+<button class="px-6 py-2.5 rounded-full bg-surface-container-low text-on-surface-variant font-medium text-sm hover:bg-surface-container-highest transition-colors whitespace-nowrap">Marketing</button>
+<div class="w-px h-6 bg-outline-variant/30 mx-2"></div>
+<button class="flex items-center gap-2 text-primary font-bold text-sm">
+<span class="material-symbols-outlined text-lg">tune</span>
+<span>Filters</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Discovery Grid -->
+<section class="px-12 pb-24 flex-grow bg-surface">
+<div class="max-w-[1920px] mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+<!-- Card 1 -->
+<div class="group relative flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] transition-all duration-500 transform hover:-translate-y-1">
+<div class="h-48 overflow-hidden relative">
+<img alt="Marketing Strategy Group" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Close-up of professional workshop notes and coffee on a white desk, bright natural lighting, minimalist aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5KC0dUs5i3tJk2shLxcZs5tPXAcKMUcgy4GiPVYjhCxcgfnnblKbGZvn274Qq9qJKuKCvWiP18tGb0L4JmtP3orPbSBSFrzQhRbtm5liuWmS_mnK7tR-4QSR_yNtLAnvEUnq7PsEHsyAbA5XP5hyPmjbxG7JRjSiNNmMkHrFEBTWdU6XntSHaCP4l7GQyCVWaZYEEVz8n2o2D4XdC9fuuc6D88pB72Ab1lhCTKZHUpApcATKjh-svwzNgFjmxSHCO8f4PrGQ_3bU"/>
+<div class="absolute top-4 left-4">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Marketing</span>
+</div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline text-xl font-bold text-primary group-hover:text-tertiary-container transition-colors">Growth Architects</h3>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">groups</span>
+<span class="text-xs font-semibold">1.2k</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">
+                                Advanced strategies for scaling B2B SaaS through intent-based marketing and technical SEO.
+                            </p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex -space-x-2">
+<img alt="member" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="portrait of professional woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKG8SN1AAi2q9m1pc9pVmP-9wLCA-NlqKi-RWpS8zPII_HMz_o8oNNKVleN7fz5UbtYhoPlWHHx9tfjWbRLAzWL7Hz9JPa_MqoI2EzGHdPhp2VkEhUA9CHUmpVv_VBDurtcpsyhNqOlF7QdH2Pf_vVvpyXDSNWY9U2djOj4BftjOSAr4fTz6UrjSvAVcpxfa2anz2NAxuzq9oa63hw5JDM3hOMoAoAYHM9t_hQSWhK8lxzu_wsCCe00fBmlD9pD-hz3LhN1-5LHdM"/>
+<img alt="member" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="portrait of professional man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuGcHgMMNt775gI-42K3rK9vutc8xGtMEbi37g8GPvc72m26pjNW0XSPY6B32GVEkHZFvpr2a3mHLgg8jPQ5YL1Px1PPa9Lm5T3m23V74-paZkzWdxfopDO6HgPuM6NNYd_c5vaN-JLuFL1lbSmpSbX40hh3mbNnSP6SzfYQd22TgTTvjpIWK2UleJ383BvtsBJgLPy6gANUcVX3X0hkyNVIKmjU_I9yxb4k7VYwDXryb9PM0el6ZQVik0kWHicDrRDOaMU9pzuZc"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center text-[10px] font-bold">+18</div>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group/btn">
+                                    View <span class="material-symbols-outlined text-lg transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] transition-all duration-500 transform hover:-translate-y-1">
+<div class="h-48 overflow-hidden relative">
+<img alt="Full Stack Development" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Abstract code on a screen with blue and purple light reflections, dark professional tech aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhliaPq87ZyhwVBHJ4sl1da_P8MG37TTQYw2vIcZF9ptd0RemzokCAEjWszdyw051t65IICNcyYz9eVJkk1UtZwf0km-_OoXu4ynYDtuI7xFMOML1TKeFH6fMtx23BylovA_31g5h8V70u0ZTOt85lPyKl316d9xiL5hIqxDtq0nF1JG48WCK6D944ToZASd3kp9Vm1taGgdC-SxeVkXSnZH-P9JV8zqRYy2WsojWfImHXrdTN_54JoC1MJ32dfHJ-__ALwY6RFdY"/>
+<div class="absolute top-4 left-4">
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Code</span>
+</div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline text-xl font-bold text-primary group-hover:text-tertiary-container transition-colors">Vector Engines</h3>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">groups</span>
+<span class="text-xs font-semibold">840</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">
+                                Deep dives into Rust, WebAssembly, and high-performance computing for next-gen web apps.
+                            </p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex -space-x-2">
+<img alt="member" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="portrait of creative woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnk9zhAwcqNrZVS1vNS-5cmWwHW_YLBYwVcpSFP47G0QpbIrrIsf2qllT7ENHTStjCOYc-CH1IY3VcGtQuV_mBXdF8ox3kC8pdcV3eQOwk9_OkwyRtjp83fKKyz0Tuauii6MwN6S6XFF0wdKGvb4GjDxWhLZ4k2A9RVnP5eixy92im0kElZ6-SdZSVSGp93jVccvlRnxndpQx_AgQ-J-OrXWJ6_1I_ZmjVKXp6mDbqIq-mYfg3QJ8FtoIClNBez41VcrL-DLVBLEk"/>
+<img alt="member" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="portrait of creative man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBemuokyOWFdgAbiN5_E4tJeVtH3S9pZdoCx_y4x_FApHiFkN1ODvkwzUilSVrmW6FON4D7LEVqe07QN_ZDG_xukqUgIPEwBPO9CLgRkF2WLnvSOocUMBDTEgbGaQUGj3F_9LA5a6MSuYUNfSlfJ5tYg0tqJoz97YqaIJiLYBEyYG-rOxqtoJrdXJUXqfn2_Ft5xWlZsXpCYeKNTL-L6v_XUmf0pSzg1Pvx4PQOxUmkMuIn2OQQXmap1iK-UnkLA3JeTd8WXOHooc0"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center text-[10px] font-bold">+52</div>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group/btn">
+                                    View <span class="material-symbols-outlined text-lg transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] transition-all duration-500 transform hover:-translate-y-1">
+<div class="h-48 overflow-hidden relative">
+<img alt="UX Design Collective" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Design sketches and prototypes spread on a desk with iPhone and laptop, creative workspace, soft focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjSgAkA8dKDDbP2JJXumd5IF_CKAmkNywZaaqAnIvPwq_pmL6TF4H2t-Ckl3tJz-G6fxQJ_7yna2CmpNkSkSKTp6hEeD1wxXVwojOWjdbNcdi2wCUs_kUERO3gFzJOgmvlpwp6PN_7wKaRh47bySvIDI0CRNJNKi80KHI5I0cUxTQCAkyZM3hiZuhpSiwA_PNseZHSk7rgAE5mJKLjvix-Q6T_HkbpGEcM2TdvdIpEiIPpTukYziJMxQjY0bkk9A2_CzY8rsBjcQs"/>
+<div class="absolute top-4 left-4">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Design</span>
+</div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline text-xl font-bold text-primary group-hover:text-tertiary-container transition-colors">Pixel Prophets</h3>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">groups</span>
+<span class="text-xs font-semibold">2.4k</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">
+                                Critiquing the future of human-computer interaction and sensory UI systems.
+                            </p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex -space-x-2">
+<img alt="member" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="portrait of designer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADijJGtF4lfprHWPcrFg-trJdhWq_7PT6Xkosv8f8MkZMDaL0P27jmYidADDH9FI5KkZtUKax5eO1U2kKbAWEDFPNgboHbyafJbeDx-Yvmtw4v0koGHX02vdf0YFAn3NEOFfVY8HomtUb76Q_b3AlNQ0dRruOYXPpLqrJF9i_JXM3UgIb1KTVeX9o5M8hsKX8_9n49018dvDGWPLZBt05Zhm3WnfKFx0_gdINZ5UclTm3mMKLsG0rw3XVSRGE3KTHwoyZsBauKK4c"/>
+<img alt="member" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="portrait of developer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCQwQVYlPrxckc53fIWIUJ9sK6lgaeOdLsAO057920Q-r-7PsI2yfJCBw4MKOvCSH5h6vPUWeO4CRdiSoqjQyIZ8Q5XUK2G9HdDbFCi-IxbcMOP5W7VHRsUVpuyE_id5IVTpo5hYMRbG9whchfknyEFq14JLdUEyxrRozAkJNTchFCVQLSUZrYUFrYUX6x6m0B32hg4wdPCwvcxP-8H3DmgSxYTaRfi685yieaZowlxHSog8NMzTWz60Rlvdsv-3IkJEAT6itA1N4"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center text-[10px] font-bold">+110</div>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group/btn">
+                                    View <span class="material-symbols-outlined text-lg transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group relative flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] transition-all duration-500 transform hover:-translate-y-1">
+<div class="h-48 overflow-hidden relative">
+<img alt="Data Science Hub" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Complex charts and analytics displayed on a high-resolution monitor in a darkened office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuHonVp-CfEVuopgZ-JUCIR0ixvyRJTMflZ5GiR9xjz3o5X0HpiPr5fY_h_w3U5zJp90dnYzJCshKQNby9raD8G0AHqlgrd1lgxwH3Z6oVBDKh9UH2aXIf4yk__okslhz50EIAAvEZkBAs9pei-nA99iejSWBXY7wSXy4_PCyzhIWr3mq41nKr7lBritBEXXJwnDQOqgtkRURLPyoOulEIuGPbHFtEycLi2NZO7XYv7mzT32GC33xAwACv26csrhKJ2oK6tkAYI5Q"/>
+<div class="absolute top-4 left-4">
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Marketing</span>
+</div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline text-xl font-bold text-primary group-hover:text-tertiary-container transition-colors">Analytic Minds</h3>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">groups</span>
+<span class="text-xs font-semibold">410</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">
+                                Bridging the gap between raw data and creative storytelling for global brand campaigns.
+                            </p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex -space-x-2">
+<img alt="member" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="portrait of scientist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-pDXmSjFvJQAU_bvwaqK7E0ml5LUpMz2e4cvuv4wTKGVOCPklJFWWSni87d_DbSD5RBMfqIWL4Yvxpsygx3SgCYK0wHpKpuI4jkyK7QcA81RFuufd5H294k8ABYOJLk26tRxUPqXhZQ09HBa-fdHvWaqCby_pyUemTlpmO14KzVvQIhGz7-e36wcPL9x8ZsWGFkkn2ssaC3TbNjaxJBv4P34QRVQAywDCZYmKguKk6bXD1JItsljFMDZyJyEvEftIQFL2ia4xR4Y"/>
+<img alt="member" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="portrait of analyst" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL7m3hH1aLtzukatKnvwg-4TD8NRXk5-C1oLg5h9Jpz5vHJsmSKrwZ9lIsZe2ZhzOZVf-xTcmbtF1ivflVsub-dXN6-KRceTAfIOZdBSMz8hGYal6LXH_fiSotfmhuAV_nD46UW9sLFRyRJ-bEcKaxQL5l2fPNOXkQBPz_rVYfnZoz6iMr9w-2sjaDaNxLGHUpxTf2lTj3MomB4S8cRPwK8J-mdh7gqnQ_QKA81vG8dbykWA8nPDjGC5WuJMjoq_Hfd2PyHAyQFzE"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center text-[10px] font-bold">+5</div>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group/btn">
+                                    View <span class="material-symbols-outlined text-lg transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination/Load More -->
+<div class="mt-20 flex flex-col items-center">
+<div class="w-full h-px bg-outline-variant/20 mb-12"></div>
+<button class="px-12 py-5 rounded-xl font-bold border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300">
+                        Explore More Communities
+                    </button>
+<p class="mt-6 text-on-surface-variant text-xs font-medium uppercase tracking-widest">Showing 4 of 128 verified groups</p>
+</div>
+</div>
+</section>
+<!-- Footer Accent -->
+<footer class="bg-surface-container-low py-12 px-12">
+<div class="max-w-[1920px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-2">
+<span class="font-headline font-black text-2xl tracking-tighter text-primary">SkillPilot.</span>
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest bg-white px-2 py-0.5 rounded">Navigator</span>
+</div>
+<div class="flex gap-8">
+<a class="text-xs font-bold text-on-surface-variant uppercase hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="text-xs font-bold text-on-surface-variant uppercase hover:text-primary transition-colors" href="#">Guidelines</a>
+<a class="text-xs font-bold text-on-surface-variant uppercase hover:text-primary transition-colors" href="#">Support</a>
+</div>
+<p class="text-xs text-on-surface-variant/60 font-medium">© 2024 Strategic Career Ecosystems Inc.</p>
+</div>
+</footer>
+</main>
+</body></html>

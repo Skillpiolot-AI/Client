@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline": "#75777d",
+              "on-error": "#ffffff",
+              "inverse-primary": "#b9c7e0",
+              "on-secondary-fixed-variant": "#38485d",
+              "on-primary": "#ffffff",
+              "tertiary": "#00312d",
+              "tertiary-fixed-dim": "#80d5cb",
+              "on-tertiary-fixed": "#00201d",
+              "surface-bright": "#fff8f5",
+              "secondary": "#505f76",
+              "on-error-container": "#93000a",
+              "tertiary-fixed": "#9cf2e8",
+              "surface-container-highest": "#eae1dc",
+              "on-primary-container": "#9eadc5",
+              "inverse-on-surface": "#f8efeb",
+              "surface-container-low": "#fbf2ed",
+              "surface-container": "#f6ece8",
+              "secondary-container": "#d0e1fb",
+              "primary": "#1d2b3e",
+              "on-secondary": "#ffffff",
+              "on-secondary-fixed": "#0b1c30",
+              "surface-variant": "#eae1dc",
+              "primary-fixed-dim": "#b9c7e0",
+              "on-primary-fixed-variant": "#3a485c",
+              "primary-fixed": "#d5e3fd",
+              "on-tertiary-fixed-variant": "#00504a",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#65bbb1",
+              "on-surface-variant": "#44474c",
+              "error-container": "#ffdad6",
+              "outline-variant": "#c5c6cd",
+              "on-primary-fixed": "#0d1c2f",
+              "surface-tint": "#515f74",
+              "tertiary-container": "#004944",
+              "error": "#ba1a1a",
+              "on-surface": "#1f1b18",
+              "on-secondary-container": "#54647a",
+              "surface-dim": "#e1d8d4",
+              "secondary-fixed": "#d3e4fe",
+              "on-background": "#1f1b18",
+              "surface": "#fff8f5",
+              "primary-container": "#334155",
+              "background": "#fff8f5",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed-dim": "#b7c8e1",
+              "surface-container-high": "#f0e6e2",
+              "inverse-surface": "#342f2d"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .message-thread-line {
+            width: 2px;
+            background: linear-gradient(to bottom, #eae1dc 0%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden h-screen flex flex-col">
+<!-- Immersive Header -->
+<header class="h-20 flex items-center justify-between px-8 bg-surface/80 backdrop-blur-xl z-50">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">hub</span>
+</div>
+<div>
+<h1 class="font-headline font-extrabold text-xl tracking-tighter text-primary">KNOWLEDGE CIRCLE</h1>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
+<span class="text-[10px] font-label font-bold uppercase tracking-widest text-outline">12 Active Navigators</span>
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-1 ml-4 px-4 py-2 bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-outline text-sm">push_pin</span>
+<span class="text-xs font-semibold text-primary/80">Q4 Strategic Roadmap Draft</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex -space-x-2 mr-4">
+<img class="w-8 h-8 rounded-full ring-2 ring-surface" data-alt="close-up portrait of a professional man in a tailored blazer with neutral background and soft daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsWvZc61WhmddEa7_aGNmHkMSGJvXuCC9zN0jHN359SXBslFyCJkbu0expqtgVNfnYUgiCgHEzE5QHqNDq80RhhKaAu2ovcJOOgzT0-tQY-zXnTpR6WjPNrPxqMR4YTx1o4pH9Y_dVq85sO7cXKFDbX4AC_kyw_zAOuM-iA-0KpwInoE8sFGs_zufx9Zow8ILZr6oiq9O6ma4sHei0pSKJYGB3-yY3uU6bOyHqn9nH9VvJpxFx49F6BBMb14UoIHkDbmk0Y3AAvqs"/>
+<img class="w-8 h-8 rounded-full ring-2 ring-surface" data-alt="professional headshot of a smiling woman with glasses in a modern office setting with warm indoor lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl91zymw-wChVJaKoWdRogoyX0PkbGzOmYbvwJwjfhxWQqcFIWkbtMR6uShE3AK4r2i_-d4tCNJJDHy_Q24zYXqj7qLhWzNQ3WK17sz_UZF5VladiSmdYj_nT4B4UqVIF3vHjq27xyHpfz-qdANi1vum5vYu8CCtFmKBxATcYN_gy8bAcAKH54eMqnj5rDUaeahlhjXbYahHKOn8FAd60zbXMNSb4uYEVGsjfL_NbciNMk0AhPNFt5I9B6vjwYBIHud6VNJ3ljk4Q"/>
+<img class="w-8 h-8 rounded-full ring-2 ring-surface" data-alt="studio portrait of a man in casual business attire looking confidently into the camera with soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCWnO2hHopM99nr6kf8TImFefSB6d6d89ZXuS5YC6_znfrvUeJVl3y-eEVnrbu6Dund8KMAgFvr7yMiAx6QmxaFClfnzEqpirziHO_cqT6ttqaATpKkztpGI1yBbHwRskopukMVmi9tlRAO4NPxrso6jCuv_uzQuX0XGYV0kqmHklHIZSyzuNakh10Bd8fvWic1s2i5lYIgatSVmED8lyqTDRdwcZwdjBSm1eP3-XM0X63lJ6fiIfhvxZ2INOvkr-JwYYV0-edZG8"/>
+<div class="w-8 h-8 rounded-full ring-2 ring-surface bg-primary-container text-white flex items-center justify-center text-[10px] font-bold">+9</div>
+</div>
+<button class="p-2 hover:bg-surface-container transition-colors rounded-xl text-outline">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="p-2 hover:bg-surface-container transition-colors rounded-xl text-outline">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Workspace -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Message Wall -->
+<section class="flex-1 flex flex-col relative bg-surface-container-low">
+<div class="flex-1 overflow-y-auto px-8 py-12 space-y-12">
+<!-- Date Separator -->
+<div class="flex items-center justify-center gap-4">
+<div class="h-[1px] flex-1 bg-outline-variant/30"></div>
+<span class="text-[10px] font-label font-bold uppercase tracking-widest text-outline">Tuesday, October 24</span>
+<div class="h-[1px] flex-1 bg-outline-variant/30"></div>
+</div>
+<!-- Message Group 1 (Threaded) -->
+<div class="flex gap-6 items-start">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="professional male headshot with natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwPnB4y1oBokrmGxdE3wDa_6H4nTdHXy5_MGvjV271VacvF9DQsLK4M0AdpDkadjoVegE1YpvROn57DEtf9zfdzBhxDrxTDtB3gOuHw7_vrKxoxnAb7VZSKx2zbHqktT3zCg23NY04Gj4PM-ZMpj8fokBvSU8VlcMYaCp_tPiYd3prK-LRH-TzeZjJkoi0CGVAR1s4aphswlSbD-tZY-2BY6FYx9YD4MrQGTYbwhtbEAh7HUbZFAvfUUUmqsNmrGQLUWirAGpoxgQ"/>
+<div class="flex-1 space-y-4">
+<div class="flex items-baseline gap-3">
+<span class="font-headline font-bold text-primary">Marcus Thorne</span>
+<span class="text-[10px] font-label text-outline uppercase font-semibold">10:42 AM</span>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl rounded-tl-none shadow-[0px_10px_30px_rgba(31,27,24,0.03)] max-w-2xl">
+<p class="text-on-surface leading-relaxed">The competitive landscape analysis for the aeronautics sector is complete. We're seeing a significant pivot toward sustainable propulsion systems in the mid-market. I've uploaded the preliminary findings below.</p>
+</div>
+<!-- Attachments Bento -->
+<div class="grid grid-cols-2 gap-3 max-w-xl">
+<div class="p-4 bg-primary text-on-primary rounded-xl flex items-center gap-4 group cursor-pointer hover:shadow-xl transition-all duration-300">
+<span class="material-symbols-outlined text-3xl">description</span>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold truncate">Q4_Market_Pivot.pdf</p>
+<p class="text-[10px] opacity-60">4.2 MB • PDF Document</p>
+</div>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity">download</span>
+</div>
+<div class="p-4 bg-surface-container-highest rounded-xl flex items-center gap-4 hover:bg-outline-variant/20 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-3xl text-primary">bar_chart</span>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold truncate text-primary">Propulsion_Data.xlsx</p>
+<p class="text-[10px] text-outline">1.8 MB • Spreadsheet</p>
+</div>
+</div>
+</div>
+<!-- Thread Visualization -->
+<div class="relative pl-8 pt-2">
+<div class="absolute left-0 top-0 bottom-0 message-thread-line"></div>
+<div class="flex gap-4 items-start">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="female professional portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMP8PPuOSyuGXUt1z6BKvQ4pFbXThOd4mEzV8xcC79od9-E4xGX9NyipJ8-lz0VspzoVejvXNl9bVdfcgbkU1LPZT6cBauY-zo2njd8ZCxTuZLQFTC8cfpBN6Mvnc9uZAmFL1LW-VEX-YQkj2-f1o2E_JeVD4n6PrGRl4HmtZqsG7HaXaRh0z325Bbh2gtHdDRv6utfVvc9OlTe2t9mMXQhfOUci1g_6LBYTy-FeLPewerkYwpkpJSZe7wsZkCglkvnQXBsMBQYHU"/>
+<div class="flex-1">
+<div class="flex items-baseline gap-3 mb-1">
+<span class="text-sm font-bold text-primary">Sarah Chen</span>
+<span class="text-[9px] font-label text-outline uppercase font-semibold">10:45 AM</span>
+</div>
+<div class="text-sm text-on-surface-variant leading-relaxed">
+                                        Does this include the data from the Munich consortium? Their last paper mentioned a breakthrough in high-density energy storage that might disrupt these findings.
+                                    </div>
+<div class="flex gap-2 mt-3">
+<button class="px-3 py-1.5 rounded-full bg-surface-container-highest text-[10px] font-bold text-primary flex items-center gap-1.5 hover:bg-outline-variant/30 transition-colors">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">thumb_up</span> 2
+                                        </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-highest text-[10px] font-bold text-primary flex items-center gap-1.5">
+                                            Reply
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Message Group 2 (Direct) -->
+<div class="flex gap-6 items-start">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="male user profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6LlIOeIcOCmj1KCRmhEXL4PA6i1VLNC-Xa-T9qEbaPPxj-4RU4g6RwHUs7QfHUegy1QjUxtL5OLyZ_DMpGP553qMDQn6nlcRscvFa0rcz0GTXj4M3sCbOthlgIE2CCkdSu3Yk0an7QBorjNQiXsuxJ9p-W476ZvXAzPD3fs-coepoZaRZFx_NaUvcHNevbOV0WBOcvViaPSX7-upYyvoCrFXQ_L6-UMBLw4v2ESIBxCIOFCCiRtGyJY8LbgucPhSR9lj913Q94Ss"/>
+<div class="flex-1 space-y-4">
+<div class="flex items-baseline gap-3">
+<span class="font-headline font-bold text-primary">Julian Vane</span>
+<span class="text-[10px] font-label text-outline uppercase font-semibold">11:02 AM</span>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl rounded-tl-none shadow-[0px_10px_30px_rgba(31,27,24,0.03)] max-w-2xl border-l-4 border-tertiary-fixed-variant">
+<p class="text-on-surface leading-relaxed">Agreed, Sarah. I’ve reached out to the Munich team. We should have their raw data by EOD tomorrow. In the meantime, Marcus, please focus on the supply chain implications of the energy storage shift.</p>
+</div>
+</div>
+</div>
+<!-- Shared Link Component -->
+<div class="flex gap-6 items-start">
+<div class="w-10 h-10 flex items-center justify-center">
+<span class="material-symbols-outlined text-outline">link</span>
+</div>
+<div class="flex-1">
+<div class="max-w-xl bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0px_10px_30px_rgba(31,27,24,0.03)] hover:shadow-xl transition-all duration-500 cursor-pointer">
+<div class="h-40 bg-cover bg-center" data-alt="modern architecture with glass and steel reflecting a clear blue sky, symbolizing high-tech innovation" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAycOXTiFsvJ74ExIKJanMurqwQzmyN5KbNz3dVC8tqAQPMfvXeMWjwJX3WFcp7qM8xcuKv7W7DvVv8MBZw8oFbdyXznx91YgLbVMdak6J7fQwsUbPw3lY-UrKq0McEj1yXkzObBLxDnMnAT1RfzVYcsKaKEz7LbV1Jd15wgoi98bj1mvrkswxnI-sphu45waRrix_ylFO-qRtwMkLIITs0HXQJP3VHEXHH__awzmGi25vK_gw9ssgVe_n_GCcSjqFL8q3DkDHwZEM')"></div>
+<div class="p-5">
+<p class="text-[10px] font-bold text-on-tertiary-container uppercase tracking-widest mb-2">Strategy Brief</p>
+<h3 class="font-headline font-bold text-lg text-primary mb-2 leading-tight">Navigating the Stratosphere: 2024 Market Forecast</h3>
+<p class="text-xs text-outline line-clamp-2">An in-depth look at how regional flight networks are adopting electric-hybrid propulsion models faster than anticipated...</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Composer Area -->
+<div class="p-8 bg-surface/40 backdrop-blur-md">
+<div class="max-w-4xl mx-auto">
+<div class="bg-surface-container-lowest rounded-2xl p-4 shadow-[0px_20px_40px_rgba(31,27,24,0.08)]">
+<div class="flex items-end gap-4">
+<button class="p-2 text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<div class="flex-1 min-h-[44px] max-h-48 py-2 overflow-y-auto outline-none text-primary placeholder:text-outline/50" contenteditable="true" data-placeholder="Message Knowledge Circle..."></div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">mood</span>
+</button>
+<button class="p-2 text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">alternate_email</span>
+</button>
+<button class="w-10 h-10 bg-primary text-on-primary rounded-xl flex items-center justify-center hover:bg-primary-container transition-all active:scale-95">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</div>
+<div class="mt-4 flex justify-between px-2">
+<div class="flex gap-4">
+<button class="flex items-center gap-1.5 text-[10px] font-bold text-outline uppercase tracking-wider hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">schedule</span> Set Reminder
+                            </button>
+<button class="flex items-center gap-1.5 text-[10px] font-bold text-outline uppercase tracking-wider hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">video_call</span> Start Huddle
+                            </button>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider">Markdown Supported</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Sidebar - Pinned & Intel (Strategic Aeronautics aesthetic) -->
+<aside class="hidden lg:flex w-80 bg-surface border-l border-outline-variant/10 flex-col overflow-y-auto">
+<div class="p-8">
+<h2 class="font-headline font-extrabold text-sm uppercase tracking-widest text-primary mb-8">Strategic Intel</h2>
+<div class="space-y-10">
+<!-- Pinned Section -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest">Pinned Content</span>
+<span class="text-[10px] font-bold text-primary">View All</span>
+</div>
+<div class="space-y-3">
+<div class="p-4 bg-surface-container-low rounded-xl group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl mt-0.5">map</span>
+<div>
+<p class="text-xs font-bold text-primary">Global Logistics Map 2024</p>
+<p class="text-[10px] text-outline mt-1">Updated 2 days ago</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low rounded-xl group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl mt-0.5">history_edu</span>
+<div>
+<p class="text-xs font-bold text-primary">Core Mission Protocol</p>
+<p class="text-[10px] text-outline mt-1">Read by 12 members</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Active Streams (Miniature Chart Concept) -->
+<section>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest mb-4 block">Market Pulse</span>
+<div class="bg-primary-container p-5 rounded-2xl relative overflow-hidden">
+<div class="relative z-10">
+<p class="text-[10px] font-bold text-on-primary/60 uppercase tracking-widest mb-1">Sector Growth</p>
+<h4 class="text-on-primary font-headline font-bold text-xl">+12.4%</h4>
+<div class="mt-4 flex items-end gap-1 h-12">
+<div class="w-2 bg-on-primary/20 h-[30%] rounded-full"></div>
+<div class="w-2 bg-on-primary/20 h-[45%] rounded-full"></div>
+<div class="w-2 bg-on-primary/20 h-[60%] rounded-full"></div>
+<div class="w-2 bg-on-primary/50 h-[80%] rounded-full"></div>
+<div class="w-2 bg-on-primary h-[100%] rounded-full"></div>
+<div class="w-2 bg-on-primary/50 h-[70%] rounded-full"></div>
+</div>
+</div>
+<!-- Background Decoration -->
+<div class="absolute -right-4 -bottom-4 w-24 h-24 bg-on-primary/5 rounded-full blur-xl"></div>
+</div>
+</section>
+<!-- Navigators Status -->
+<section>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest mb-4 block">Navigators</span>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXS3hlLaTJoGutAcQk3jXKvBc_0JYc2KPYTZ1o0HoS_MA6tbUCTSkIeEsEO70N7UK2R5OlX3IhcXSqXg7oF5zAWOpV-V3h1UdtTtXTqQF5wOqTn2p79GalcAxCMuMGp1MVa-0WgW_FdMZmNcc6TkAy7SBhPHYavNBT-rf74WbduSwal3Q2CmLYLIq9CFymhww6M-MmbOQp38fa_KYYpFS9_EMK7k4U5_iF62pP68jjaYYXinM5Dr_WRTSD4yHnw4GSu3ChB4Cb8LU"/>
+<div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-surface"></div>
+</div>
+<span class="text-xs font-bold text-primary">Marcus Thorne</span>
+</div>
+<span class="text-[9px] font-label text-outline uppercase">Active</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-8 h-8 rounded-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClnZET_-eZ0jnqIXJ5wwVV-_sBTBksbepEkv4KQznRPLx5MJyyN2PaEGIFFoGQJ25tvdpXHIblkx3Bj7XHhrDtp8fuyM0HTcRRPUe27lg3-HNqZv_m-_Cs1NaGsOt6VCP04Vk-kxA7UcVYGDPIu9ZG7bf9dRJutOjsexN2ucJvkibHXckJwTXQ5z6_lfxRpzX3m9KVVTTuf4wUmNTCeYTJdCYTJQSWp4eQJDYIeLtZdI1OnIh9mpfPHgOh5rK-xk4Y6wogRyIohto"/>
+<div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-outline-variant rounded-full border-2 border-surface"></div>
+</div>
+<span class="text-xs font-bold text-primary/60">Sarah Chen</span>
+</div>
+<span class="text-[9px] font-label text-outline uppercase">12m</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+</aside>
+</main>
+</body></html>

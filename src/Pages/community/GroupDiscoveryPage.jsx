@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGroupContext } from '../../contexts/GroupContext';
-import './styles/GroupDiscoveryPage.css';
 
 export default function GroupDiscoveryPage() {
   const { fetchGroups, groups, loading, error } = useGroupContext();
@@ -30,112 +29,160 @@ export default function GroupDiscoveryPage() {
   const categories = [...new Set(groups.map((g) => g.category).filter(Boolean))];
 
   return (
-    <div className="bg-surface text-on-surface">
-      {/* Brand & Header */}
-      <header className="mb-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
-          <div className="max-w-2xl">
-            <h1 className="font-headline text-4xl md:text-6xl font-extrabold text-primary mb-6 tracking-tight leading-[1.1]">
-              Discover Your <br/><span className="text-tertiary-container">Knowledge Circle</span>
+    <main className="min-h-screen flex flex-col bg-surface font-body text-on-surface antialiased selection:bg-tertiary-fixed selection:text-on-tertiary-fixed">
+      {/* Featured Hero Section */}
+      <section className="relative w-full h-[614px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img alt="Collaborative workspace" className="w-full h-full object-cover" data-alt="Modern high-end shared workspace with professionals collaborating around a large table, soft morning light hitting architectural details, professional atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBoUfAkvr5xOt2K7w5MsvKtk3cMC01rnAZNZHI56piDXut1Guuj6IDeejxp_vJlBZgwUJg9O-peffg_1hd_bcL5zEn-6W5UjdW-jLciuL3jo6AqPT8Udc5JgEB6dkT_I0O4TdFQxkKxYDJBF4zpsFFLwdEi60gvLV17y7hGQIEKDWZxv3HRuahvKTCZIgFawv1KCLAAdob2k1JHjUxuc-zBqJnSYS4CxEyDvMb3B0cOz1vHn4WG4YZ-8MlC35LlRsghVq6RbAC0YU"/>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/60 to-transparent"></div>
+        </div>
+        <div className="relative z-10 max-w-[1920px] w-full px-12 md:px-24">
+          <div className="max-w-3xl">
+            <nav className="flex items-center space-x-2 text-white/70 mb-8">
+              <Link to="/groups" className="text-xs font-label uppercase tracking-widest hover:text-white transition-colors">Groups</Link>
+              <span className="material-symbols-outlined text-sm">chevron_right</span>
+              <span className="text-xs font-label uppercase tracking-widest font-bold text-white">Discovery</span>
+            </nav>
+            <span className="font-label text-tertiary-fixed tracking-[0.2em] uppercase text-xs mb-6 block font-bold">Featured Communities</span>
+            <h1 className="font-headline text-5xl md:text-7xl font-extrabold text-white leading-[1.1] mb-8 tracking-tighter">
+              Find your next <br/><span className="text-on-tertiary-container">Strategic Alliance.</span>
             </h1>
-            <p className="text-secondary font-body text-lg leading-relaxed max-w-xl">
-              Join specialized communities of professionals navigating the same career waters as you. Exchange insights, mentorship, and opportunities.
+            <p className="text-surface-container-highest text-lg md:text-xl leading-relaxed mb-10 max-w-xl">
+              Connect with industry-leading mentors and peers in curated environments designed for professional acceleration.
             </p>
+            <div className="flex gap-4">
+              <Link to="/groups/create" className="premium-gradient !text-black px-8 py-4 rounded-xl font-bold hover:shadow-[0px_20px_40px_rgba(31,27,24,0.15)] transition-all duration-300 active:scale-95 flex items-center gap-2">
+                <span>Start a Community</span>
+                <span className="material-symbols-outlined text-sm">north_east</span>
+              </Link>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Search Bar */}
-        <div className="relative group">
-          <div className="absolute inset-y-0 left-8 flex items-center pointer-events-none">
-            <span className="material-symbols-outlined text-outline">search</span>
+      {/* Search & Filter Bar */}
+      <section className="sticky top-0 z-40 px-12 py-8 bg-surface/90 backdrop-blur-xl">
+        <div className="max-w-[1920px] mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="relative w-full md:w-[400px]">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <span className="material-symbols-outlined text-outline">search</span>
+            </div>
+            <input 
+              className="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all text-on-surface" 
+              placeholder="Search skills, industries, or keywords..." 
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <input 
-            className="w-full h-20 pl-20 pr-8 bg-surface-container-highest border-none rounded-2xl text-on-surface placeholder:text-outline focus:ring-4 focus:ring-primary/5 focus:bg-surface-container-lowest transition-all duration-300 font-body text-xl shadow-sm" 
-            placeholder="Search for groups, skills, or topics..." 
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          <div className="flex items-center gap-3 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
+            <button 
+              onClick={() => setSelectedCategory('')}
+              className={`px-6 py-2.5 rounded-full font-bold text-sm whitespace-nowrap transition-colors ${!selectedCategory ? 'bg-primary !text-white' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container-highest'}`}
+            >
+              All Groups
+            </button>
+            {categories.map((cat) => (
+              <button 
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-6 py-2.5 rounded-full font-bold text-sm whitespace-nowrap transition-colors ${selectedCategory === cat ? 'bg-primary !text-white' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container-highest'}`}
+              >
+                {cat}
+              </button>
+            ))}
+            <div className="w-px h-6 bg-outline-variant/30 mx-2"></div>
+            <button className="flex items-center gap-2 text-primary font-bold text-sm">
+              <span className="material-symbols-outlined text-lg">tune</span>
+              <span>Filters</span>
+            </button>
+          </div>
         </div>
-      </header>
+      </section>
 
-      {/* Category Filters */}
-      <div className="flex gap-3 overflow-x-auto pb-8 no-scrollbar mb-12">
-        <button 
-          onClick={() => setSelectedCategory('')}
-          className={`px-8 py-3 font-label text-xs font-bold uppercase tracking-widest rounded-full shadow-lg transition-all whitespace-nowrap ${!selectedCategory ? 'bg-primary text-white' : 'bg-surface-container-highest text-secondary hover:bg-surface-container-high'}`}
-        >
-          All Groups
-        </button>
-        {categories.map((cat) => (
-          <button 
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-8 py-3 font-label text-xs font-bold uppercase tracking-widest rounded-full transition-all whitespace-nowrap ${selectedCategory === cat ? 'bg-primary text-white' : 'bg-surface-container-highest text-secondary hover:bg-surface-container-high'}`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {error && <div className="p-4 mb-4 text-error bg-error-container rounded-xl">{error}</div>}
-
-      {loading ? (
-        <div className="text-center p-12">Loading groups...</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredGroups.length > 0 ? (
-            filteredGroups.map((group, index) => {
-              const isFeatured = index % 3 === 2; // alternates featured design style
-              
-              if (isFeatured) {
-                return (
-                  <Link key={group._id} to={`/groups/${group._id}`} className="group relative overflow-hidden bg-primary p-10 rounded-2xl flex flex-col h-full transition-all duration-300 hover:shadow-[0px_24px_48px_rgba(31,27,24,0.12)] hover:-translate-y-1">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-tertiary-container/30 rounded-bl-[100%] blur-3xl -mr-16 -mt-16"></div>
-                    <div className="flex justify-between items-start mb-8 relative z-10">
-                      <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10">
-                        <span className="material-symbols-outlined text-white text-3xl">rocket_launch</span>
-                      </div>
-                      <span className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-label font-bold uppercase tracking-widest text-white border border-white/10">Featured</span>
-                    </div>
-                    <h3 className="font-headline text-2xl font-bold text-white mb-4 leading-tight relative z-10">{group.name}</h3>
-                    <p className="text-base font-body text-on-primary-container leading-relaxed mb-10 flex-grow relative z-10">{group.description}</p>
-                    <div className="flex items-center justify-between mt-auto relative z-10">
-                      <div className="flex items-center gap-2 text-white/70">
-                        <span className="material-symbols-outlined text-xl">group</span>
-                        <span className="text-sm font-bold">{group.memberCount || 0} members</span>
-                      </div>
-                      <button className="bg-white text-primary px-8 py-3.5 rounded-full font-headline text-sm font-bold hover:bg-surface-bright transition-all active:scale-95 shadow-lg">View</button>
-                    </div>
-                  </Link>
-                );
-              }
-
-              return (
-                <Link key={group._id} to={`/groups/${group._id}`} className="group bg-surface-container-lowest p-10 rounded-2xl flex flex-col h-full transition-all duration-300 hover:shadow-[0px_24px_48px_rgba(31,27,24,0.06)] hover:-translate-y-1">
-                  <div className="flex justify-between items-start mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-tertiary-fixed flex items-center justify-center">
-                      <span className="material-symbols-outlined text-on-tertiary-fixed text-3xl">code</span>
-                    </div>
-                    <span className="px-4 py-1.5 rounded-full bg-surface-container-low text-[10px] font-label font-bold uppercase tracking-widest text-secondary border border-outline-variant/10">{group.category || 'General'}</span>
-                  </div>
-                  <h3 className="font-headline text-2xl font-bold text-primary mb-4 leading-tight">{group.name}</h3>
-                  <p className="text-base font-body text-on-surface-variant leading-relaxed mb-10 flex-grow">{group.description}</p>
-                  <div className="flex items-center justify-between mt-auto">
-                    <div className="flex items-center gap-2 text-outline">
-                      <span className="material-symbols-outlined text-xl">group</span>
-                      <span className="text-sm font-bold">{group.memberCount || 0} members</span>
-                    </div>
-                    <button className="bg-primary text-white px-8 py-3.5 rounded-full font-headline text-sm font-bold hover:bg-primary-container transition-all active:scale-95 shadow-md">View</button>
-                  </div>
-                </Link>
-              );
-            })
+      {/* Discovery Grid */}
+      <section className="px-12 pb-24 flex-grow bg-surface">
+        <div className="max-w-[1920px] mx-auto">
+          {error && <div className="p-4 mb-8 text-error bg-error-container rounded-xl">{error}</div>}
+          
+          {loading ? (
+            <div className="text-center p-12 text-outline font-medium">Loading communities...</div>
           ) : (
-            <div className="col-span-full p-12 text-center text-outline bg-surface-container-lowest rounded-2xl">No groups matched your search bounds.</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {filteredGroups.length > 0 ? (
+                filteredGroups.map((group, index) => {
+                  const images = [
+                    "https://lh3.googleusercontent.com/aida-public/AB6AXuD5KC0dUs5i3tJk2shLxcZs5tPXAcKMUcgy4GiPVYjhCxcgfnnblKbGZvn274Qq9qJKuKCvWiP18tGb0L4JmtP3orPbSBSFrzQhRbtm5liuWmS_mnK7tR-4QSR_yNtLAnvEUnq7PsEHsyAbA5XP5hyPmjbxG7JRjSiNNmMkHrFEBTWdU6XntSHaCP4l7GQyCVWaZYEEVz8n2o2D4XdC9fuuc6D88pB72Ab1lhCTKZHUpApcATKjh-svwzNgFjmxSHCO8f4PrGQ_3bU",
+                    "https://lh3.googleusercontent.com/aida-public/AB6AXuDhliaPq87ZyhwVBHJ4sl1da_P8MG37TTQYw2vIcZF9ptd0RemzokCAEjWszdyw051t65IICNcyYz9eVJkk1UtZwf0km-_OoXu4ynYDtuI7xFMOML1TKeFH6fMtx23BylovA_31g5h8V70u0ZTOt85lPyKl316d9xiL5hIqxDtq0nF1JG48WCK6D944ToZASd3kp9Vm1taGgdC-SxeVkXSnZH-P9JV8zqRYy2WsojWfImHXrdTN_54JoC1MJ32dfHJ-__ALwY6RFdY",
+                    "https://lh3.googleusercontent.com/aida-public/AB6AXuAjSgAkA8dKDDbP2JJXumd5IF_CKAmkNywZaaqAnIvPwq_pmL6TF4H2t-Ckl3tJz-G6fxQJ_7yna2CmpNkSkSKTp6hEeD1wxXVwojOWjdbNcdi2wCUs_kUERO3gFzJOgmvlpwp6PN_7wKaRh47bySvIDI0CRNJNKi80KHI5I0cUxTQCAkyZM3hiZuhpSiwA_PNseZHSk7rgAE5mJKLjvix-Q6T_HkbpGEcM2TdvdIpEiIPpTukYziJMxQjY0bkk9A2_CzY8rsBjcQs",
+                    "https://lh3.googleusercontent.com/aida-public/AB6AXuDuHonVp-CfEVuopgZ-JUCIR0ixvyRJTMflZ5GiR9xjz3o5X0HpiPr5fY_h_w3U5zJp90dnYzJCshKQNby9raD8G0AHqlgrd1lgxwH3Z6oVBDKh9UH2aXIf4yk__okslhz50EIAAvEZkBAs9pei-nA99iejSWBXY7wSXy4_PCyzhIWr3mq41nKr7lBritBEXXJwnDQOqgtkRURLPyoOulEIuGPbHFtEycLi2NZO7XYv7mzT32GC33xAwACv26csrhKJ2oK6tkAYI5Q"
+                  ];
+                  const imgSrc = images[index % images.length];
+
+                  return (
+                    <Link key={group._id} to={`/groups/${group._id}`} className="group relative flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0px_20px_40px_rgba(31,27,24,0.06)] transition-all duration-500 transform hover:-translate-y-1">
+                      <div className="h-48 overflow-hidden relative">
+                        <img alt={group.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src={imgSrc}/>
+                        <div className="absolute top-4 left-4">
+                          <span className="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">{group.category || 'General'}</span>
+                        </div>
+                      </div>
+                      <div className="p-8 flex flex-col flex-grow">
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="font-headline text-xl font-bold text-primary group-hover:text-tertiary-container transition-colors truncate pr-2">{group.name}</h3>
+                          <div className="flex items-center gap-1 text-on-surface-variant flex-shrink-0">
+                            <span className="material-symbols-outlined text-sm">groups</span>
+                            <span className="text-xs font-semibold">{group.memberCount || 0}</span>
+                          </div>
+                        </div>
+                        <p className="text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow line-clamp-3">
+                            {group.description}
+                        </p>
+                        <div className="flex items-center justify-between mt-auto">
+                          <div className="flex -space-x-2">
+                            <div className="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center font-bold text-[10px] text-primary">{(group.memberCount || 0) > 0 ? `+${group.memberCount}` : '0'}</div>
+                          </div>
+                          <button className="text-primary font-bold text-sm flex items-center gap-1 group/btn">
+                              View <span className="material-symbols-outlined text-lg transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+                          </button>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })
+              ) : (
+                <div className="col-span-full p-12 text-center text-outline bg-surface-container-lowest rounded-2xl">No groups matched your search bounds.</div>
+              )}
+            </div>
+          )}
+
+          {filteredGroups.length > 0 && (
+            <div className="mt-20 flex flex-col items-center">
+              <div className="w-full h-px bg-outline-variant/20 mb-12"></div>
+              <button className="px-12 py-5 rounded-xl font-bold border-2 border-primary text-primary hover:bg-primary hover:!text-white transition-all duration-300">
+                  Explore More Communities
+              </button>
+              <p className="mt-6 text-on-surface-variant text-xs font-medium uppercase tracking-widest">Showing {filteredGroups.length} verified groups</p>
+            </div>
           )}
         </div>
-      )}
-    </div>
+      </section>
+
+      {/* Footer Accent */}
+      <footer className="bg-surface-container-low py-12 px-12 mt-auto">
+        <div className="max-w-[1920px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-2">
+            <span className="font-headline font-black text-2xl tracking-tighter text-primary">SkillPilot.</span>
+            <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest bg-white px-2 py-0.5 rounded">Navigator</span>
+          </div>
+          <div className="flex gap-8">
+            <Link to="#" className="text-xs font-bold text-on-surface-variant uppercase hover:text-primary transition-colors">Privacy</Link>
+            <Link to="#" className="text-xs font-bold text-on-surface-variant uppercase hover:text-primary transition-colors">Guidelines</Link>
+            <Link to="#" className="text-xs font-bold text-on-surface-variant uppercase hover:text-primary transition-colors">Support</Link>
+          </div>
+          <p className="text-xs text-on-surface-variant/60 font-medium">© 2024 Strategic Career Ecosystems Inc.</p>
+        </div>
+      </footer>
+    </main>
   );
 }

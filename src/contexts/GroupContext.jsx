@@ -4,7 +4,7 @@ const GroupContext = createContext();
 
 // Helper function to get API base URL from environment
 const getApiBase = () => {
-  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  return import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 };
 
 export const GroupProvider = ({ children }) => {
