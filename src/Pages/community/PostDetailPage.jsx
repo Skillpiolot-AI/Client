@@ -266,7 +266,7 @@ export default function PostDetailPage() {
         <span className="material-symbols-outlined text-xs">chevron_right</span>
         <Link to={`/groups/${groupId}`} className="hover:text-primary transition-colors">{post.group?.name || 'Community'}</Link>
         <span className="material-symbols-outlined text-xs">chevron_right</span>
-        <span className="text-on-surface font-semibold truncate max-w-xs">{post.title}</span>
+        <span className="text-on-surface font-semibold">Post</span>
       </nav>
 
       {/* Post Card */}
@@ -292,14 +292,8 @@ export default function PostDetailPage() {
             {post.flair && <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold">{post.flair}</span>}
           </div>
 
-          <h1 className="font-headline font-extrabold text-2xl mb-4">{post.title}</h1>
+          <h1 className="font-headline font-extrabold text-xl mb-4 leading-relaxed text-on-surface whitespace-pre-line">{post.body}</h1>
 
-          {post.body && <p className="text-on-surface-variant leading-relaxed whitespace-pre-line mb-4">{post.body}</p>}
-          {post.type === 'link' && post.url && (
-            <a href={post.url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-sm flex items-center gap-1 mb-4">
-              <span className="material-symbols-outlined text-sm">link</span>{post.url}
-            </a>
-          )}
 
           <div className="flex items-center gap-2">
             <button onClick={() => { navigator.clipboard.writeText(window.location.href); }}

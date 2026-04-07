@@ -2,14 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGroupContext } from '../../contexts/GroupContext';
 
+function timeSince(date) {
+  const sec = Math.floor((Date.now() - new Date(date)) / 1000);
+  if (sec < 60) return `${sec}s ago`;
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  return `${Math.floor(hr / 24)}d ago`;
+}
+
 export default function GroupDiscoveryPage() {
-  const { fetchGroups, groups, loading, error } = useGroupContext();
+  const { fetchGroups, groups, loading, error, getLatestPosts } = useGroupContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [filteredGroups, setFilteredGroups] = useState([]);
+  const [latestPosts, setLatestPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
 
   useEffect(() => {
     fetchGroups();
+    // Fetch latest posts across all public groups
+    setPostsLoading(true);
+    getLatestPosts(10).then(data => {
+      setLatestPosts(data.posts || []);
+      setPostsLoading(false);
+    }).catch(() => setPostsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -165,6 +183,60 @@ export default function GroupDiscoveryPage() {
               <p className="mt-6 text-on-surface-variant text-xs font-medium uppercase tracking-widest">Showing {filteredGroups.length} verified groups</p>
             </div>
           )}
+
+          {/* ── Latest Posts Section ── */}
+          <div className="mt-20">
+            <div className="flex items-center gap-3 mb-8">
+              <span className="material-symbols-outlined text-primary text-2xl">schedule</span>
+              <h2 className="font-headline text-2xl font-extrabold tracking-tight">Latest Posts</h2>
+              <span className="text-xs text-on-surface-variant uppercase tracking-widest font-bold ml-2">Across all communities</span>
+            </div>
+            {postsLoading ? (
+              <div className="flex justify-center py-10">
+                <div className="w-7 h-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : latestPosts.length === 0 ? (
+              <div className="p-10 text-center text-outline bg-surface-container-lowest rounded-2xl">No posts yet. Be the first to post!</div>
+            ) : (
+              <div className="space-y-3">
+                {latestPosts.map(post => (
+                  <Link
+                    key={post._id}
+                    to={`/groups/${post.group?._id}/post/${post._id}`}
+                    className="flex gap-4 bg-surface-container-lowest rounded-2xl p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
+                  >
+                    {/* Group avatar */}
+                    <div className="w-10 h-10 rounded-xl bg-primary flex-shrink-0 flex items-center justify-center font-headline font-black text-white text-lg">
+                      {post.group?.name?.charAt(0)?.toUpperCase() || 'G'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 text-xs text-on-surface-variant mb-1 flex-wrap">
+                        <span className="font-bold text-primary group-hover:underline">{post.group?.name}</span>
+                        <span>·</span>
+                        <span>{post.author?.name || 'Anonymous'}</span>
+                        <span>·</span>
+                        <span>{timeSince(post.createdAt)}</span>
+                        {post.subGroup && (
+                          <><span>·</span><span className="font-semibold text-primary">/{post.subGroup.slug}</span></>
+                        )}
+                      </div>
+                      <p className="text-sm text-on-surface leading-relaxed line-clamp-2">{post.body}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-on-surface-variant">
+                        <span className="flex items-center gap-1">
+                          <span className="material-symbols-outlined text-sm">arrow_upward</span>
+                          {post.score || 0}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="material-symbols-outlined text-sm">chat_bubble</span>
+                          {post.commentsCount || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </section>
 

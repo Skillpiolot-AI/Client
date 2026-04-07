@@ -2,10 +2,11 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 
 const GroupContext = createContext();
 
-// Helper function to get API base URL from environment
 const getApiBase = () => {
   return import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 };
+
+const tok = () => localStorage.getItem('token');
 
 export const GroupProvider = ({ children }) => {
   const [groups, setGroups] = useState([]);
@@ -320,6 +321,55 @@ export const GroupProvider = ({ children }) => {
     }
   }, [fetchMyGroups]);
 
+  // ─── Report Group ──────────────────────────────────────────
+  const reportGroup = useCallback(async (groupId, reason) => {
+    const response = await fetch(`${getApiBase()}/groups/${groupId}/report`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tok()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason }),
+    });
+    if (!response.ok) throw new Error('Failed to report group');
+    return await response.json();
+  }, []);
+
+  // ─── Mute Self (toggle notification dot) ───────────────────
+  const muteSelfGroup = useCallback(async (groupId) => {
+    const response = await fetch(`${getApiBase()}/groups/${groupId}/mute-self`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tok()}`, 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) throw new Error('Failed to toggle mute');
+    return await response.json();
+  }, []);
+
+  // ─── Announcements ─────────────────────────────────────────
+  const getAnnouncements = useCallback(async (groupId) => {
+    const response = await fetch(`${getApiBase()}/groups/${groupId}/announcements`, {
+      headers: { Authorization: `Bearer ${tok()}`, 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) throw new Error('Failed to fetch announcements');
+    return await response.json();
+  }, []);
+
+  const createAnnouncement = useCallback(async (groupId, message) => {
+    const response = await fetch(`${getApiBase()}/groups/${groupId}/announcements`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tok()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message }),
+    });
+    if (!response.ok) throw new Error('Failed to create announcement');
+    return await response.json();
+  }, []);
+
+  // ─── Latest Posts (for Discovery page) ─────────────────────
+  const getLatestPosts = useCallback(async (limit = 10) => {
+    const response = await fetch(`${getApiBase()}/groups/latest-posts?limit=${limit}`, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) throw new Error('Failed to fetch latest posts');
+    return await response.json();
+  }, []);
+
   const value = {
     groups,
     myGroups,
@@ -339,6 +389,11 @@ export const GroupProvider = ({ children }) => {
     muteUser,
     validateInviteCode,
     joinGroupWithInviteCode,
+    reportGroup,
+    muteSelfGroup,
+    getAnnouncements,
+    createAnnouncement,
+    getLatestPosts,
   };
 
   return (
