@@ -124,6 +124,7 @@ const JoinGroupPage = lazy(() => import('./Pages/community/JoinGroupPage'));
 const CollegeList = lazy(() => import('./Pages/Colleges/CollegeList'));
 const AIlandingpage = lazy(() => import("./AILandingpage/AILandingPage"));
 const DocsPage = lazy(() => import('./Pages/Docs/DocsPage'));
+const AboutPage = lazy(() => import('./Pages/About/AboutPage'));
 
 // 🌐 Global Components
 import Navbar from "./homepage/landing/Navbar"
@@ -181,6 +182,7 @@ function App() {
           <Route path="/view-books" element={<ViewBooksPage />} />
           <Route path="/userFeedback" element={<MentorFeedback />} />
           <Route path="/community" element={<ModernCommunityPage />} />
+          <Route path="/about" element={<AboutPage />} />
           
           {/* 👥 Group & Community Routes */}
           <Route path="/groups" element={<CommunityLayout />}>
