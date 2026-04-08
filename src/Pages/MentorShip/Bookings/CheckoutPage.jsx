@@ -57,9 +57,6 @@ export default function CheckoutPage() {
         setDayMessage(data.message || 'Mentor is unavailable on this date');
       } else {
         setSlots(data.slots || []);
-        if (data.availableCount === 0) {
-          setDayMessage('All slots are booked for this date');
-        }
       }
     } catch (error) {
       setSlotsError('Failed to load available slots');

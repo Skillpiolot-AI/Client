@@ -1,1 +1,0 @@
-import{h as a,b as u,j as t,N as s,O as n}from"./index-CvWGhghW.js";const i=({allowedRoles:o})=>{const{user:e}=a(),r=u();return e?o.includes(e.role)?t.jsx(n,{}):t.jsx(s,{to:"/",replace:!0}):t.jsx(s,{to:"/login",state:{from:r.pathname},replace:!0})};export{i as default};
