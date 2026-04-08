@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DollarSign, GraduationCap, MapPin, ArrowRight } from 'lucide-react';
+import { IndianRupee, GraduationCap, MapPin, ArrowRight } from 'lucide-react';
 
 const CareerRecommendations = ({ careers }) => {
   const [filter, setFilter] = useState('all');
@@ -11,7 +11,7 @@ const CareerRecommendations = ({ careers }) => {
   const formatSalary = (range) => {
     if (!range || !range['0_2']) return 'N/A';
     const { salary_from, salary_to } = range['0_2'];
-    return `₹${(salary_from / 100000).toFixed(1)}L - ₹${(salary_to / 100000).toFixed(1)}L`;
+    return `${(salary_from / 100000).toFixed(1)}L - ${(salary_to / 100000).toFixed(1)}L`;
   };
 
   const getMatchLabel = (value) => {
@@ -64,7 +64,7 @@ const CareerRecommendations = ({ careers }) => {
               </div>
 
               <div className="flex items-center gap-4 text-xs font-medium text-[#515f74] pt-4 border-t border-[#eae1dc]/50 mt-auto">
-                <span className="flex items-center gap-1.5"><DollarSign size={14} className="text-[#1d2b3e]" />{formatSalary(career.salary_range)}</span>
+                <span className="flex items-center gap-1.5"><IndianRupee size={14} className="text-[#1d2b3e]" />{formatSalary(career.salary_range)}</span>
                 <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#1d2b3e]" />Flexible</span>
               </div>
 
