@@ -128,7 +128,7 @@ export default function SuccessPage() {
               <p className="text-[#44474c] text-sm">You can change your booking up to 24 hours before the session start time without any fees.</p>
             </div>
             <div className="flex gap-4">
-              <button className="text-[#1d2b3e] font-bold text-sm border-b-2 border-[#1d2b3e]/20 hover:border-[#1d2b3e] transition-all pb-1">Manage Booking</button>
+              <Link to="/my-bookings" className="text-[#1d2b3e] font-bold text-sm border-b-2 border-[#1d2b3e]/20 hover:border-[#1d2b3e] transition-all pb-1">Manage Booking</Link>
               <button className="text-[#1d2b3e] font-bold text-sm border-b-2 border-[#1d2b3e]/20 hover:border-[#1d2b3e] transition-all pb-1">Contact Support</button>
             </div>
           </div>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import config from '../config';
 
 export default function ChatBot() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,38 +40,24 @@ export default function ChatBot() {
 
   const handleSend = async () => {
     if (input.trim()) {
-      setMessages(prevMessages => [...prevMessages, { text: input, sender: 'user' }]);
+      const userMessage = { text: input, sender: 'user' };
+      setMessages(prevMessages => [...prevMessages, userMessage]);
+      const currentInput = input;
       setInput('');
       
-      const payload = {
-        contents: [
-          {
-            parts: [
-              {
-                text: input+"give me only in 20 words.If anyone ask who are you tell i am skill-pilot",
-              },
-            ],
-          },
-        ],
-      };
-    
       try {
         const response = await axios.post(
-          'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyAfptFu8AVW_0jFnqyefjWE7jYeZnRzVIk',
-          payload,
+          `${config.API_BASE_URL}/chatbot/chat`,
           {
-            headers: {
-              "Content-Type": "application/json",
-            },
+            messages: [...messages, userMessage],
+            mode: 'default'
           }
         );
     
-        const content = response.data.candidates && response.data.candidates[0] && response.data.candidates[0].content;
-        
-        if (content && content.parts && content.parts[0] && content.parts[0].text) {
-          setMessages(prevMessages => [...prevMessages, { text: content.parts[0].text, sender: 'bot' }]);
+        if (response.data.success && response.data.message) {
+          setMessages(prevMessages => [...prevMessages, { text: response.data.message, sender: 'bot' }]);
         } else {
-          throw new Error("Content not found in API response");
+          throw new Error("Invalid response from backend");
         }
       } catch (error) {
         console.error("Error making API request:", error.message);

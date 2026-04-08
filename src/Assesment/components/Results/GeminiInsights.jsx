@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Bolt } from 'lucide-react';
+import config from '../../../config';
 
 const DOMAIN_NAMES = {
   R: 'Realistic', I: 'Investigative', A: 'Artistic',
   S: 'Social', E: 'Enterprising', C: 'Conventional',
 };
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY ;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+// Removed direct Gemini API constants for security. Now using backend proxy.
 
 function buildPrompt(results) {
   const { hollandCode, sorted } = results;
@@ -46,14 +46,21 @@ const GeminiInsights = ({ results }) => {
   const fetchInsight = async () => {
     setLoading(true); setError(null); setInsight('');
     try {
-      const res = await fetch(GEMINI_URL, {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${config.API_BASE_URL}/ai/generate`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: buildPrompt(results) }] }] }),
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          contents: [{ parts: [{ text: buildPrompt(results) }] }],
+          model: 'gemini-2.5-flash'
+        }),
       });
       if (!res.ok) throw new Error(`API error ${res.status}`);
       const data = await res.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const text = data?.text || '';
       setInsight(text.trim());
     } catch (err) {
       console.error('Gemini error:', err);

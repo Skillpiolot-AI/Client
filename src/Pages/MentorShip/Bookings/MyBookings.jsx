@@ -24,8 +24,7 @@ import {
     Loader2
 } from 'lucide-react';
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY ;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+// Removed direct Gemini API constants for security. Now using backend proxy.
 
 const SERVICE_TYPE_LABELS = {
     one_on_one: '1:1 Session',
@@ -184,7 +183,7 @@ const MyBookings = () => {
     };
 
     const fetchGeminiSuggestion = async (bookingId, feedbackText) => {
-        if (!GEMINI_API_KEY || geminiSuggestions[bookingId]) return;
+        if (geminiSuggestions[bookingId]) return;
 
         setGeminiLoading(prev => ({ ...prev, [bookingId]: true }));
         try {
@@ -200,18 +199,21 @@ Based on this feedback, provide a concise, actionable improvement plan for the s
 
 Keep the entire response under 200 words. Be encouraging and specific.`;
 
-            const res = await fetch(GEMINI_URL, {
+            const res = await fetch(`${config.API_BASE_URL}/ai/generate`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 1000 },
+                    model: 'gemini-2.5-flash'
                 }),
             });
 
             if (!res.ok) throw new Error('API error');
             const data = await res.json();
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const text = data?.text || '';
             setGeminiSuggestions(prev => ({ ...prev, [bookingId]: text.trim() }));
         } catch (err) {
             console.error('Gemini error:', err);
@@ -581,7 +583,7 @@ Keep the entire response under 200 words. Be encouraging and specific.`;
                                             </p>
 
                                             {/* AI Suggestion Flow */}
-                                            {GEMINI_API_KEY && !geminiSuggestions[booking._id] && !geminiLoading[booking._id] && (
+                                            {!geminiSuggestions[booking._id] && !geminiLoading[booking._id] && (
                                                 <button
                                                     onClick={() => fetchGeminiSuggestion(booking._id, booking.mentorFeedback.text)}
                                                     className="flex items-center gap-2 bg-white border border-indigo-200 text-indigo-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-50 transition-colors shadow-sm"

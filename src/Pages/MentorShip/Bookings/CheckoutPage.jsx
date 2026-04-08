@@ -45,6 +45,7 @@ export default function CheckoutPage() {
   const fetchAvailableSlots = async (dateStr) => {
     setSlotsLoading(true);
     setSlotsError(null);
+    setDayMessage(''); // Reset any previous availability messages
     try {
       const profileId = mentorProfileId || mentor._id || mentor.id;
       const response = await axios.get(

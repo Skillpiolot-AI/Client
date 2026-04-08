@@ -244,7 +244,7 @@ const CombinedCareerAdvisor = () => {
     }));
   
     try {
-      const response = await fetch(`${config.API_BASE_URL}/gemini-suggestion`, {
+      const response = await fetch(`${config.API_BASE_URL}/ai/career-prediction`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
