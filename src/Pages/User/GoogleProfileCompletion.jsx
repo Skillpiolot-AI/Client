@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Lock, CheckCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import config from '../../config';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = config.API_BASE_URL;
 
 export default function GoogleProfileCompletion() {
   const navigate = useNavigate();
@@ -42,7 +41,7 @@ export default function GoogleProfileCompletion() {
     setUsernameStatus({ checking: true, available: null, message: '' });
 
     try {
-      const { data } = await axios.post(`${API_URL}/api/auth/check-username`, { username });
+      const { data } = await axios.post(`${API_URL}/auth/check-username`, { username });
 
       setUsernameStatus({
         checking: false,
@@ -90,7 +89,7 @@ export default function GoogleProfileCompletion() {
     setLoading(true);
 
     try {
-      const { data } = await axios.post(`${API_URL}/api/auth/google/complete-profile`, {
+      const { data } = await axios.post(`${API_URL}/auth/google/complete-profile`, {
         googleData,
         username: formData.username,
         newsletter: formData.newsletter,

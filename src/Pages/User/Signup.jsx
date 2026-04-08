@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { Eye, EyeOff, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import config from '../../config';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = config.API_BASE_URL;
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -81,7 +80,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/api/auth/signup`, {
+      const response = await axios.post(`${API_URL}/auth/signup`, {
         name: formData.name,
         email: formData.email,
         username: formData.username,
@@ -117,7 +116,7 @@ export default function SignupPage() {
     try {
       console.log('🔐 Google credential received');
 
-      const response = await axios.post(`${API_URL}/api/auth/google`, {
+      const response = await axios.post(`${API_URL}/auth/google`, {
         credential: credentialResponse.credential
       });
 
