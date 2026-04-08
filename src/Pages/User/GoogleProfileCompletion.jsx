@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Lock, CheckCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import config from '../../config';
 
 const API_URL = config.API_BASE_URL;

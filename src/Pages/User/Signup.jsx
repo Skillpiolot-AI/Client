@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { Eye, EyeOff, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import config from '../../config';
 
 const API_URL = config.API_BASE_URL;
