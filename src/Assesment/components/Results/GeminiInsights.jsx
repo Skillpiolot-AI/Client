@@ -7,8 +7,6 @@ const DOMAIN_NAMES = {
   S: 'Social', E: 'Enterprising', C: 'Conventional',
 };
 
-// Removed direct Gemini API constants for security. Now using backend proxy.
-
 function buildPrompt(results) {
   const { hollandCode, sorted } = results;
   const scoreLines = sorted.map(s => `  • ${DOMAIN_NAMES[s.domain]} (${s.domain}): ${Math.round(s.score)}%`).join('\n');

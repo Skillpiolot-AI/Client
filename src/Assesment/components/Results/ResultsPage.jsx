@@ -4,6 +4,7 @@ import ChartsSection from './ChartsSection';
 import CareerRecommendations from './CareerRecommendations';
 import DomainInsights from './DomainInsights';
 import GeminiInsights from './GeminiInsights';
+import MatchedMentors from './MatchedMentors';
 
 const ResultsPage = ({ assessmentData, onStartNew, onViewHistory }) => {
   // Extract data from the backend response
@@ -159,6 +160,9 @@ const ResultsPage = ({ assessmentData, onStartNew, onViewHistory }) => {
         {results.recommendedCareers.length > 0 && (
           <CareerRecommendations careers={results.recommendedCareers} />
         )}
+
+        {/* Section 6: RIASEC-Matched Mentors — AI to Human Handoff */}
+        <MatchedMentors careers={results.recommendedCareers} />
         
       </main>
     </div>
