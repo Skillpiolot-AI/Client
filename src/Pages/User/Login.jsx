@@ -380,32 +380,53 @@ export default function LoginPage() {
                         </p>
 
                         
-                        {/* Quick Login Shortcuts for Development */}
-                        {import.meta.env.DEV && (
-                            <div className="mt-8 pt-4 border-t border-[#c5c6cd]/30 hidden md:block">
-                            <p className="text-[10px] text-[#75777d] text-center font-bold uppercase tracking-widest mb-3">
-                                ⚡ Dev Quick Login
-                            </p>
-                            <div className="flex flex-col gap-2 opacity-60 hover:opacity-100 transition-opacity">
-                                <button
-                                    type="button"
-                                    onClick={() => setForm({ username: 'admin@skillpilot.dev', password: 'Admin@Skill2024!' })}
-                                    className="w-full bg-[#fbf2ed] text-left px-3 py-2 border border-[#eae1dc] text-[#93000a] text-xs rounded-lg hover:bg-white transition-colors font-medium flex justify-between"
-                                >
-                                    <span>🛡️ Super Admin</span>
-                                    <span>admin@skillpilot.dev</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setForm({ username: 'ravi.gupta@user.dev', password: 'User@1234' })}
-                                    className="w-full bg-[#fbf2ed] text-left px-3 py-2 border border-[#eae1dc] text-[#00504a] text-xs rounded-lg hover:bg-white transition-colors font-medium flex justify-between"
-                                >
-                                    <span>👤 User (Ravi)</span>
-                                    <span>ravi.gupta@user.dev</span>
-                                </button>
+                        {/* Demo Credentials Section */}
+                        <div className="mt-10 pt-6 border-t border-[#c5c6cd]/30">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-serif font-bold text-sm text-[#1f1b18]">Demo Credentials</h3>
+                                <div className="flex gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                    <span className="text-[10px] text-[#75777d] font-bold uppercase tracking-widest">Live Preview</span>
+                                </div>
                             </div>
+                            
+                            <div className="grid grid-cols-1 gap-3">
+                                {[
+                                    { role: 'Super Admin', email: 'admin@skillpilot.dev', pass: 'Admin@Skill2024!', icon: 'shield_person', color: '#93000a', bg: '#ffdad6' },
+                                    { role: 'University Admin', email: 'uniadmin@sput.skillpilot.dev', pass: 'UniAdmin@2024!', icon: 'account_balance', color: '#006a6a', bg: '#9cf2e8' },
+                                    { role: 'University Teacher', email: 'uniteach@sput.skillpilot.dev', pass: 'UniTeach@2024!', icon: 'school', color: '#004944', bg: '#b2f0e8' },
+                                    { role: 'Expert Mentor', email: 'arjun.sharma@skillpilot.dev', pass: 'Mentor@1234', icon: 'psychology', color: '#1d2b3e', bg: '#e0e2ed' },
+                                    { role: 'Student (Demo)', email: 'ravi.gupta@user.dev', pass: 'User@1234', icon: 'person', color: '#44474c', bg: '#eae1dc' }
+                                ].map((demo) => (
+                                    <button
+                                        key={demo.role}
+                                        type="button"
+                                        onClick={() => {
+                                            setForm({ username: demo.email, password: demo.pass });
+                                            toast.success(`Filled as ${demo.role}`);
+                                            // Optional: auto-submit after a brief visual feedback
+                                            setTimeout(() => {
+                                                const formElement = document.querySelector('form');
+                                                if (formElement) formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                                            }, 800);
+                                        }}
+                                        className="group relative flex items-center gap-3 p-3 rounded-2xl border border-[#c5c6cd]/20 hover:border-[#1d2b3e]/30 hover:bg-white transition-all duration-300 hover:shadow-md text-left"
+                                    >
+                                        <div 
+                                            className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110"
+                                            style={{ backgroundColor: demo.bg, color: demo.color }}
+                                        >
+                                            <span className="material-symbols-outlined text-xl">{demo.icon}</span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-bold text-[#1f1b18] mb-0.5">{demo.role}</p>
+                                            <p className="text-[10px] text-[#75777d] truncate">{demo.email}</p>
+                                        </div>
+                                        <span className="material-symbols-outlined text-sm text-[#c5c6cd] group-hover:text-[#1d2b3e] group-hover:translate-x-1 transition-all">login</span>
+                                    </button>
+                                ))}
                             </div>
-                        )}
+                        </div>
 
                     </div>
                 </div>
