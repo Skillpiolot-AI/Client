@@ -31,10 +31,6 @@ export default function FooterSection() {
     "Portals & Account": [
       { name: "My Profile", path: "/profile" },
       { name: "My Applications", path: "/my-applications" },
-      { name: "Mentor Dashboard", path: "/mentor-dashboard" },
-      { name: "Admin Dashboard", path: "/dashboardAdmin" },
-      { name: "University Admin", path: "/uniAdminPortal" },
-      { name: "Teacher Dashboard", path: "/teacher/dashboard" },
     ],
     "Company": [
       { name: "About Us", path: "/about" },

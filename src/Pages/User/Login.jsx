@@ -395,7 +395,8 @@ export default function LoginPage() {
                                     { role: 'Super Admin', email: 'admin@skillpilot.dev', pass: 'Admin@Skill2024!', icon: 'shield_person', color: '#93000a', bg: '#ffdad6' },
                                     { role: 'University Admin', email: 'uniadmin@sput.skillpilot.dev', pass: 'UniAdmin@2024!', icon: 'account_balance', color: '#006a6a', bg: '#9cf2e8' },
                                     { role: 'University Teacher', email: 'uniteach@sput.skillpilot.dev', pass: 'UniTeach@2024!', icon: 'school', color: '#004944', bg: '#b2f0e8' },
-                                    { role: 'Expert Mentor', email: 'arjun.sharma@skillpilot.dev', pass: 'Mentor@1234', icon: 'psychology', color: '#1d2b3e', bg: '#e0e2ed' },
+                                    { role: 'Star Mentor (Rahul)', email: 'rahul.kapoor@skillpilot.dev', pass: 'FullMentor@2024!', icon: 'star', color: '#854d0e', bg: '#fef9c3' },
+                                    { role: 'Expert Mentor (Arjun)', email: 'arjun.sharma@skillpilot.dev', pass: 'Mentor@1234', icon: 'psychology', color: '#1d2b3e', bg: '#e0e2ed' },
                                     { role: 'Student (Demo)', email: 'ravi.gupta@user.dev', pass: 'User@1234', icon: 'person', color: '#44474c', bg: '#eae1dc' }
                                 ].map((demo) => (
                                     <button

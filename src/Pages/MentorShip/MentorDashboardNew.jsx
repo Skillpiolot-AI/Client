@@ -655,10 +655,10 @@ export default function MentorDashboardNew() {
   );
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] bg-slate-50/50 font-sans">
+    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-slate-50/50 font-sans">
       
       {/* Sidebar Navigation */}
-      <aside className={`sticky top-16 h-[calc(100vh-64px)] bg-slate-50 border-r border-slate-200/50 z-30 flex flex-col transition-all duration-300 ${
+      <aside className={`h-full bg-slate-50 border-r border-slate-200/50 z-30 flex flex-col flex-shrink-0 transition-all duration-300 overflow-y-auto ${
         sidebarExpanded ? 'w-64 flex' : 'w-0 overflow-hidden md:w-16 flex'
       }`}>
         <div className="flex flex-col h-full py-8 px-4">
@@ -721,7 +721,7 @@ export default function MentorDashboardNew() {
       <div className="flex-1 flex flex-col min-h-full overflow-hidden">
         
         {/* Top App Bar Header */}
-        <header className="sticky top-16 right-0 h-16 z-20 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 w-full border-b border-slate-200/20 shadow-sm flex-shrink-0">
+        <header className="h-16 z-20 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 border-b border-slate-200/20 shadow-sm flex-shrink-0">
           <div className="flex items-center gap-4">
             <button onClick={() => setSidebarExpanded(!sidebarExpanded)} className="p-2 hover:bg-slate-100 rounded-xl text-slate-500 transition-all flex items-center justify-center border border-slate-200/50 shadow-sm bg-white cursor-pointer" title="Toggle Sidebar">
               <Menu size={18} className="text-slate-600" />
@@ -749,7 +749,7 @@ export default function MentorDashboardNew() {
         </header>
 
         {/* Scrollable Main Workspace */}
-        <main className="flex-1 p-8 max-w-7xl w-full">
+        <main className="flex-1 p-8 max-w-7xl w-full overflow-y-auto">
           {tab === 'overview' && <OverviewTab profile={profile} handle={handle} />}
           {tab === 'services' && <ServicesTab mentorId={user?._id || user?.id} />}
           {tab === 'inbox' && <DMInbox />}
