@@ -34,16 +34,19 @@ export default function Navbar() {
         User: [
             { name: "👤 My Profile", path: "/profile" },
             { name: "📅 Upcoming Sessions", path: "/my-bookings" },
+            { name: "🧾 Payment History", path: "/payment-history" },
             { name: "💬 My DMs", path: "/my-dms" },
         ],
         Mentor: [
             { name: "📊 Mentor Dashboard", path: "/mentor-dashboard" },
             { name: "📅 Upcoming Sessions", path: "/mentor-sessions" },
+            { name: "💰 Earnings History", path: "/payment-history" },
             { name: "👤 My Profile", path: "/mentor-profile" },
             { name: "📥 Student DMs", path: "/mentor-dms" },
         ],
         Admin: [
             { name: "📊 Dashboard", path: "/dashboard" },
+            { name: "🏦 Payment Ledger", path: "/admin/payment-history" },
             { name: "💬 My DMs", path: "/my-dms" },
         ],
         UniTeach: [

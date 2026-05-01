@@ -21,7 +21,8 @@ import {
     RefreshCw,
     Sparkles,
     History as HistoryIcon,
-    Loader2
+    Loader2,
+    Download
 } from 'lucide-react';
 
 // Removed direct Gemini API constants for security. Now using backend proxy.
@@ -141,6 +142,23 @@ const MyBookings = () => {
             fetchBookings();
         } catch (error) {
             toast.error(error.response?.data?.error || 'Failed to cancel');
+        }
+    };
+
+    const handleDownloadInvoice = async (booking) => {
+        try {
+            const res = await axios.get(
+                `${config.API_BASE_URL}/payments/invoice/${booking.bookingId || booking._id}`,
+                { headers: { Authorization: `Bearer ${getToken()}` }, responseType: 'blob' }
+            );
+            const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoice-${booking.bookingId || booking._id}.pdf`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch {
+            toast.error('Failed to download invoice');
         }
     };
 
@@ -566,6 +584,16 @@ Keep the entire response under 200 words. Be encouraging and specific.`;
                                                     <Star size={14} fill="#059669" className="text-emerald-700" />
                                                     Rated {booking.rating.score}.0
                                                 </div>
+                                            )}
+
+                                            {booking.paymentStatus === 'paid' && (
+                                                <button
+                                                    onClick={() => handleDownloadInvoice(booking)}
+                                                    className="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-200 transition-all flex items-center justify-center gap-1 flex-1 md:flex-none"
+                                                    title="Download Invoice"
+                                                >
+                                                    <Download size={13} /> Invoice
+                                                </button>
                                             )}
 
                                         </div>

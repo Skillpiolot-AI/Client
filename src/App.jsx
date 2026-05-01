@@ -43,6 +43,7 @@ const MentorDashboardModern = lazy(() => import('./Pages/DashBoard/MentorDashboa
 const AMDashboard = lazy(() => import('./Pages/DashBoard/AdminMento'));
 const Profile = lazy(() => import('./Pages/Profile'));
 const MyBookings = lazy(() => import('./Pages/MentorShip/Bookings/MyBookings'));
+const PaymentHistory = lazy(() => import('./Pages/MentorShip/Bookings/PaymentHistory'));
 const MentorSessions = lazy(() => import('./Pages/MentorShip/Bookings/MentorSessions'));
 const RateSession = lazy(() => import('./Pages/MentorShip/RateSession'));
 const MentorSearchPage = lazy(() => import('./Pages/MentorShip/MentorSearchPage'));
@@ -251,6 +252,7 @@ function App() {
             {/* Mentee routes */}
             <Route path="/my-dms" element={<MenteeDMInbox />} />
             <Route path="/my-bookings" element={<MyBookings />} />
+            <Route path="/payment-history" element={<PaymentHistory />} />
             <Route path="/dm/:threadId" element={<ChatThread />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/change-password" element={<Changepassword />} />
@@ -260,6 +262,7 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['Mentor', 'Admin']} />}>
             <Route path="/my-sessions" element={<MentorAppointments />} />
             <Route path="/mentor-sessions" element={<MentorSessions />} />
+            <Route path="/payment-history" element={<PaymentHistory />} />
             <Route path="/mentor-dms" element={<MentorDMInbox />} />
             <Route path="/mentor-profile" element={<MentorProfilePage />} />
             <Route path="/interestForm" element={<InterestManagement />} />
@@ -287,6 +290,7 @@ function App() {
             <Route path="/admin/announcements" element={<AnnouncementsDashboard />} />
             <Route path="/admin/profile-reviews" element={<MentorProfileReview />} />
             <Route path="/admin/bookings" element={<SessionBookings />} />
+            <Route path="/admin/payment-history" element={<PaymentHistory />} />
           </Route>
 
           {/* 🏫 University Admin Routes */}

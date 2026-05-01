@@ -1,56 +1,93 @@
+# SkillPilot – Client Frontend
 
-### 🧠 **Frontend – Career Guidance Platform**
+Welcome to the frontend repository for **SkillPilot**, a comprehensive career guidance and mentorship platform built as a MERN-stack application.
 
-**Repo:** [MentorShip-FrontEnd](https://github.com/ujjwaljha1/MentorShip-FrontEnd)
-**Live:** [mentorshipsih.netlify.app](https://mentorshipsih.netlify.app/)
+## 🚀 Overview
 
-# 🎓 Career Guidance Platform (Frontend)
+SkillPilot bridges the gap between students, aspiring professionals, and experienced mentors by providing tools for self-assessment, mentorship discovery, real-time communication, and AI-driven career guidance.
 
-🚀 **Your digital career compass is here!**  
-Explore careers, connect with mentors, join workshops, and navigate your professional journey—all from a single, sleek React-powered platform.
+This frontend is built with **React 18** and **Vite**, offering a fast, responsive, and highly interactive user experience.
 
-## 🌟 Features
+## 🛠 Technology Stack
 
-- 🧭 **Explore Careers** — With visuals and structured info, pick your path like a pro.
-- 🤖 **AI Career Matchmaker** — Uses Gemini API to suggest careers you were *born* to pursue.
-- 🧙 **Find a Mentor** — Book sessions with career wizards from your industry.
-- 📚 **Resource Library** — A stash of PDFs and resources to level up.
-- 🧩 **Workshops & Events** — Know what’s happening, where, and why you should attend.
-- 📨 **Job Applications** — Apply, track, and win opportunities.
+- **Framework:** React 18 (via Vite)
+- **Routing:** React Router v6 (60+ defined routes)
+- **HTTP Client:** Axios (with global interceptors for automatic JWT handling)
+- **Styling:** Vanilla CSS + TailwindCSS
+- **State Management:** React Context API (`AuthContext`, `GroupContext`, `CurrencyContext`)
+- **Real-time:** WebSockets (for live admin server logs)
 
-## 🛠️ Tech Stack
+## ✨ Key Features
 
-- React (Create React App)
-- Axios
-- React Router
-- Tailwind CSS (for stylish speed)
-- Toastify (for those sassy alerts)
-- Context API for auth and state
-- Netlify (because we like our deployments like our careers: fast and global 🌍)
+- **RIASEC Career Assessment:** A standalone multi-step psychometric assessment module that calculates Holland Code (RIASEC) scores and recommends careers.
+- **Topmate-style Mentor Marketplace:** Discover mentors, view rich profiles (`/mentor/:handle`), and book 1:1 sessions, mock interviews, or resume reviews.
+- **Role-Based Dashboards:** 
+  - **Mentee/Student:** Track bookings, priority DMs, and profile completion.
+  - **Mentor:** Manage services, discount coupons, availability slots, and session earnings.
+  - **University Admin & Teacher:** Bulk onboard and manage students.
+  - **System Admin:** Access analytics, approve mentors, manage users, and view real-time server logs.
+- **AI Career Advisor Chatbot:** A persistent, floating AI widget powered by the Google Gemini API to assist with interview prep and resume tips.
+- **Priority Direct Messaging:** An asynchronous thread-based DM system for direct mentee-mentor communication.
+- **Integrated Payments:** Seamless checkout flow for booking paid mentorship sessions (via Stripe/Razorpay).
 
-## 🖥️ How to Run Locally
+## 📁 Project Structure
 
-```bash
-git clone https://github.com/ujjwaljha1/MentorShip-FrontEnd.git
-cd MentorShip-FrontEnd
-npm install
-npm start
-````
+```text
+src/
+├── App.jsx                    # Root component defining all application routes
+├── main.jsx                   # Entry point wrapping App with Context Providers
+├── AuthContext.jsx            # Global auth state + Axios interceptors
+├── config.jsx                 # API configuration settings
+│
+├── Assesment/                 # RIASEC Career Assessment module
+├── Pages/
+│   ├── User/                  # Auth flows (Login, Signup, Verify, etc.)
+│   ├── Profile/               # Dynamic user profile builder
+│   ├── MentorShip/            # Mentor search, profiles, bookings, and DMs
+│   ├── Admin/                 # Admin control panel, analytics, user management
+│   ├── University/            # UniAdmin and Teacher portals
+│   ├── Quiz/                  # Career quizzes and AI prediction pages
+│   ├── Roadmap/               # AI-generated career roadmaps
+│   └── updates/               # Platform announcements and updates
+│
+├── chatbot/                   # Floating ChatBot widget components
+└── homepage/                  # Landing page and promotional sections
+```
 
-> Open [http://localhost:3000](http://localhost:3000) to ruin indecision with confident career moves.
+## 🔒 Routing & Security
 
----
+The frontend enforces Role-Based Access Control (RBAC) heavily:
+- **`ProtectedRoute`**: Wraps secure routes, checking `localStorage` for valid JWTs.
+- **`RoleGuard`**: Used inline to render UI elements conditionally based on `['User', 'Mentor', 'Admin', 'UniAdmin']`.
 
-## ⚡ Bonus
+## ⚙️ Getting Started
 
-* 🌈 Fully responsive UI
-* 🔐 JWT-based auth with role-awareness (users vs mentors)
-* 💬 Intuitive and friendly UX
+### Prerequisites
+- Node.js (v16+)
+- npm or yarn
 
----
+### Installation
 
-🎯 **Live Site:** [mentorshipsih.netlify.app](https://mentorshipsih.netlify.app/)
-📦 **Backend:** [Mentorship-server](https://github.com/ujjwaljha1/Mentorship-server.git)
+1. Clone the repository and navigate to the frontend directory:
+   ```bash
+   cd Client-landing-page
+   ```
 
----
-# Client
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   Create a `.env` file in the root directory:
+   ```env
+   VITE_API_BASE_URL=http://localhost:3001
+   VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+   ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+The application will be available at `http://localhost:5173`.

@@ -14,8 +14,9 @@ import {
   TrendingUp, Plus, Edit2, Trash2, Power, Eye, ExternalLink,
   ChevronDown, ChevronUp, Copy, Check, Loader2, Settings,
   DollarSign, Users, Award, X, GripVertical, Inbox, Type,
-  Search, Bell, HelpCircle, Clock, Menu
+  Search, Bell, HelpCircle, Clock, Menu, ArrowUp, ArrowDown
 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import DMInbox from './DMInbox';
 import CustomSectionsTab from './CustomSectionsTab';
 
@@ -480,6 +481,97 @@ function CouponsTab() {
   );
 }
 
+// ─── Earnings Analytics Section ──────────────────────────────────────────────
+const PIE_COLORS = ['#4F46E5', '#004944', '#0891B2', '#D97706', '#7C3AED', '#DC2626', '#059669'];
+
+function EarningsAnalytics() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`${API}/payments/earnings`, { headers: authHeader() })
+      .then(r => setData(r.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="flex justify-center p-8"><Loader2 size={28} className="animate-spin text-indigo-500" /></div>;
+  if (!data) return null;
+
+  const growth = data.growthPercent;
+  const isPositive = growth > 0;
+
+  return (
+    <section className="space-y-6">
+      <div className="flex items-baseline justify-between">
+        <h3 className="text-xl font-bold text-slate-800">Earnings Analytics</h3>
+        <span className="text-xs text-slate-400 font-medium">Last 6 months · {data.platformFeePct}% platform fee</span>
+      </div>
+
+      {/* KPI Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/40 shadow-sm">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Earnings</p>
+          <p className="text-2xl font-extrabold text-slate-800">₹{(data.totalEarnings || 0).toLocaleString('en-IN')}</p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/40 shadow-sm">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">This Month</p>
+          <p className="text-2xl font-extrabold text-slate-800">₹{(data.thisMonth || 0).toLocaleString('en-IN')}</p>
+          {growth !== null && (
+            <div className={`flex items-center gap-1 mt-1 text-xs font-bold ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
+              {isPositive ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
+              {Math.abs(growth)}% vs last month
+            </div>
+          )}
+        </div>
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/40 shadow-sm">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Last Month</p>
+          <p className="text-2xl font-extrabold text-slate-800">₹{(data.lastMonth || 0).toLocaleString('en-IN')}</p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/40 shadow-sm">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Pending Payouts</p>
+          <p className="text-2xl font-extrabold text-amber-600">{data.pendingPayouts || 0}</p>
+          <p className="text-xs text-slate-400 mt-1">confirmed, not yet done</p>
+        </div>
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Monthly Bar Chart */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/40 shadow-sm">
+          <p className="text-sm font-bold text-slate-700 mb-4">Monthly Revenue</p>
+          {data.monthlyData?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={data.monthlyData} barSize={28}>
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v}`} />
+                <Tooltip formatter={(v) => [`₹${v}`, 'Earnings']} contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                <Bar dataKey="amount" fill="#4F46E5" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : <p className="text-slate-400 text-sm text-center py-10">No paid bookings yet</p>}
+        </div>
+
+        {/* Pie Chart */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-200/40 shadow-sm">
+          <p className="text-sm font-bold text-slate-700 mb-4">By Service Type</p>
+          {data.serviceData?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={180}>
+              <PieChart>
+                <Pie data={data.serviceData} dataKey="amount" nameKey="name" cx="50%" cy="50%" outerRadius={65} innerRadius={35}>
+                  {data.serviceData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                </Pie>
+                <Tooltip formatter={(v) => [`₹${v}`, '']} contentStyle={{ borderRadius: 10, border: 'none' }} />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : <p className="text-slate-400 text-sm text-center py-10">No data yet</p>}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Overview Tab ─────────────────────────────────────────────────────────────
 function OverviewTab({ profile, handle }) {
   const navigate = useNavigate();
@@ -597,6 +689,9 @@ function OverviewTab({ profile, handle }) {
         </div>
       </section>
 
+      {/* Live Earnings Analytics */}
+      <EarningsAnalytics />
+
     </div>
   );
 }
@@ -609,6 +704,7 @@ const TABS = [
   { key: 'coupons', label: 'Coupons', icon: Tag },
   { key: 'custom_sections', label: 'Custom Sections', icon: Type },
   { key: 'schedule', label: 'Schedule & Profile', icon: Calendar },
+  { key: 'payments', label: 'Earnings History', icon: DollarSign },
 ];
 
 
@@ -764,6 +860,20 @@ export default function MentorDashboardNew() {
               <button onClick={() => navigate('/mentor-profile')} className="mt-4 bg-indigo-600 text-white rounded-xl px-5 py-2.5 text-sm font-bold hover:bg-indigo-700 shadow-sm hover:shadow transition-all">
                 Open Full Profile Editor →
               </button>
+            </div>
+          )}
+          {tab === 'payments' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Earnings History</h2>
+                  <p className="text-slate-500 text-sm mt-1">All payments received for your mentorship sessions</p>
+                </div>
+                <button onClick={() => navigate('/payment-history')} className="text-sm font-bold text-indigo-600 hover:underline flex items-center gap-1">
+                  Open Full Page →
+                </button>
+              </div>
+              <iframe src="/payment-history" className="w-full border-0 rounded-2xl" style={{ height: 'calc(100vh - 180px)' }} title="Payment History" />
             </div>
           )}
         </main>
