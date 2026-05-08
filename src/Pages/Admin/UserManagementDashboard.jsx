@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, Search, Filter, Edit, Trash2, CheckCircle, XCircle, 
-  MoreVertical, Shield, Mail, Calendar, Activity, AlertCircle,
-  RefreshCw, Download, Upload, Lock, Eye, ChevronLeft, ChevronRight,
-  Loader2, Check, X, UserCheck, UserX
+import {
+  Users, Search, Edit, Trash2, CheckCircle, XCircle,
+  Shield, Mail, Calendar, AlertCircle, RefreshCw,
+  Lock, ChevronLeft, ChevronRight, Loader2, Check, X,
+  UserCheck, UserX
 } from 'lucide-react';
 import config from '../../config';
 
@@ -13,17 +13,8 @@ const UserManagementDashboard = () => {
   const [stats, setStats] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
-    role: '',
-    isVerified: '',
-    isActive: '',
-    isSuspended: ''
-  });
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    perPage: 10
-  });
+  const [filters, setFilters] = useState({ role: '', isVerified: '', isActive: '', isSuspended: '' });
+  const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, perPage: 10 });
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [showEditModal, setShowEditModal] = useState(false);
@@ -49,176 +40,87 @@ const UserManagementDashboard = () => {
     setLoading(true);
     try {
       const queryParams = new URLSearchParams({
-        page: pagination.currentPage,
-        limit: pagination.perPage,
-        sortBy,
-        sortOrder,
+        page: pagination.currentPage, limit: pagination.perPage, sortBy, sortOrder,
         ...(searchTerm && { search: searchTerm }),
         ...(filters.role && { role: filters.role }),
         ...(filters.isVerified && { isVerified: filters.isVerified }),
         ...(filters.isActive && { isActive: filters.isActive }),
-        ...(filters.isSuspended && { isSuspended: filters.isSuspended })
+        ...(filters.isSuspended && { isSuspended: filters.isSuspended }),
       });
-
       const response = await fetch(`${config.API_BASE_URL}/user-data/users?${queryParams}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-
       const data = await response.json();
-
-      if (response.ok) {
-        setUsers(data.users);
-        setPagination(data.pagination);
-      } else {
-        showNotification('error', data.message || 'Failed to fetch users');
-      }
-    } catch (error) {
-      showNotification('error', 'Network error. Please try again.');
-      console.error('Error fetching users:', error);
-    } finally {
-      setLoading(false);
-    }
+      if (response.ok) { setUsers(data.users); setPagination(data.pagination); }
+      else showNotification('error', data.message || 'Failed to fetch users');
+    } catch { showNotification('error', 'Network error. Please try again.'); }
+    finally { setLoading(false); }
   };
 
   const fetchStatistics = async () => {
     try {
       const response = await fetch(`${config.API_BASE_URL}/user-data/statistics`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-
       const data = await response.json();
-      if (response.ok) {
-        setStats(data.stats);
-      }
-    } catch (error) {
-      console.error('Error fetching statistics:', error);
-    }
+      if (response.ok) setStats(data.stats);
+    } catch { /* silent */ }
   };
 
-  const handleSelectUser = (userId) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    );
-  };
+  const handleSelectUser = (userId) =>
+    setSelectedUsers(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]);
 
-  const handleSelectAll = () => {
-    if (selectedUsers.length === users.length) {
-      setSelectedUsers([]);
-    } else {
-      setSelectedUsers(users.map(user => user._id));
-    }
-  };
+  const handleSelectAll = () =>
+    setSelectedUsers(selectedUsers.length === users.length ? [] : users.map(u => u._id));
 
-  const handleEdit = (user) => {
-    setEditingUser({...user});
-    setShowEditModal(true);
-  };
+  const handleEdit = (user) => { setEditingUser({ ...user }); setShowEditModal(true); };
 
   const handleUpdateUser = async () => {
     setActionLoading(true);
     try {
       const response = await fetch(`${config.API_BASE_URL}/user-data/users/${editingUser._id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(editingUser)
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+        body: JSON.stringify(editingUser),
       });
-
       const data = await response.json();
-
-      if (response.ok) {
-        showNotification('success', 'User updated successfully');
-        setShowEditModal(false);
-        fetchUsers();
-      } else {
-        showNotification('error', data.message || 'Failed to update user');
-      }
-    } catch (error) {
-      showNotification('error', 'Network error. Please try again.');
-      console.error('Error updating user:', error);
-    } finally {
-      setActionLoading(false);
-    }
+      if (response.ok) { showNotification('success', 'User updated successfully'); setShowEditModal(false); fetchUsers(); }
+      else showNotification('error', data.message || 'Failed to update user');
+    } catch { showNotification('error', 'Network error.'); }
+    finally { setActionLoading(false); }
   };
 
-  const handleDelete = (user) => {
-    setDeletingUser(user);
-    setShowDeleteModal(true);
-  };
+  const handleDelete = (user) => { setDeletingUser(user); setShowDeleteModal(true); };
 
   const confirmDelete = async () => {
     setActionLoading(true);
     try {
       const response = await fetch(`${config.API_BASE_URL}/user-data/users/${deletingUser._id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-
       const data = await response.json();
-
-      if (response.ok) {
-        showNotification('success', `User ${deletingUser.name} deleted successfully`);
-        setShowDeleteModal(false);
-        fetchUsers();
-        fetchStatistics();
-      } else {
-        showNotification('error', data.message || 'Failed to delete user');
-      }
-    } catch (error) {
-      showNotification('error', 'Network error. Please try again.');
-      console.error('Error deleting user:', error);
-    } finally {
-      setActionLoading(false);
-    }
+      if (response.ok) { showNotification('success', `User ${deletingUser.name} deleted`); setShowDeleteModal(false); fetchUsers(); fetchStatistics(); }
+      else showNotification('error', data.message || 'Failed to delete user');
+    } catch { showNotification('error', 'Network error.'); }
+    finally { setActionLoading(false); }
   };
 
   const handleBulkDelete = async () => {
-    if (selectedUsers.length === 0) {
-      showNotification('error', 'Please select users to delete');
-      return;
-    }
-
-    if (!window.confirm(`Are you sure you want to delete ${selectedUsers.length} users?`)) {
-      return;
-    }
-
+    if (!selectedUsers.length) return showNotification('error', 'Select users first');
+    if (!window.confirm(`Delete ${selectedUsers.length} users?`)) return;
     setActionLoading(true);
     try {
       const response = await fetch(`${config.API_BASE_URL}/user-data/users/bulk-delete`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ userIds: selectedUsers })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+        body: JSON.stringify({ userIds: selectedUsers }),
       });
-
       const data = await response.json();
-
-      if (response.ok) {
-        showNotification('success', `Successfully deleted ${data.deletedCount} users`);
-        setSelectedUsers([]);
-        fetchUsers();
-        fetchStatistics();
-      } else {
-        showNotification('error', data.message || 'Failed to delete users');
-      }
-    } catch (error) {
-      showNotification('error', 'Network error. Please try again.');
-      console.error('Error bulk deleting users:', error);
-    } finally {
-      setActionLoading(false);
-    }
+      if (response.ok) { showNotification('success', `Deleted ${data.deletedCount} users`); setSelectedUsers([]); fetchUsers(); fetchStatistics(); }
+      else showNotification('error', data.message || 'Failed');
+    } catch { showNotification('error', 'Network error.'); }
+    finally { setActionLoading(false); }
   };
 
   const handleToggleStatus = async (userId, currentStatus) => {
@@ -226,362 +128,195 @@ const UserManagementDashboard = () => {
     try {
       const response = await fetch(`${config.API_BASE_URL}/user-data/users/${userId}/toggle-status`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ isActive: !currentStatus })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+        body: JSON.stringify({ isActive: !currentStatus }),
       });
-
       const data = await response.json();
-
-      if (response.ok) {
-        showNotification('success', `User ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
-        fetchUsers();
-      } else {
-        showNotification('error', data.message || 'Failed to update user status');
-      }
-    } catch (error) {
-      showNotification('error', 'Network error. Please try again.');
-      console.error('Error toggling status:', error);
-    } finally {
-      setActionLoading(false);
-    }
+      if (response.ok) { showNotification('success', `User ${!currentStatus ? 'activated' : 'deactivated'}`); fetchUsers(); }
+      else showNotification('error', data.message || 'Failed');
+    } catch { showNotification('error', 'Network error.'); }
+    finally { setActionLoading(false); }
   };
 
   const handleResetPassword = async (userId) => {
     const newPassword = prompt('Enter new password (min 6 characters):');
-    if (!newPassword || newPassword.length < 6) {
-      showNotification('error', 'Password must be at least 6 characters');
-      return;
-    }
-
+    if (!newPassword || newPassword.length < 6) return showNotification('error', 'Password must be at least 6 characters');
     setActionLoading(true);
     try {
       const response = await fetch(`${config.API_BASE_URL}/user-data/users/${userId}/reset-password`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ newPassword, sendEmail: true })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+        body: JSON.stringify({ newPassword, sendEmail: true }),
       });
-
       const data = await response.json();
-
-      if (response.ok) {
-        showNotification('success', 'Password reset successfully. Email sent to user.');
-      } else {
-        showNotification('error', data.message || 'Failed to reset password');
-      }
-    } catch (error) {
-      showNotification('error', 'Network error. Please try again.');
-      console.error('Error resetting password:', error);
-    } finally {
-      setActionLoading(false);
-    }
+      if (response.ok) showNotification('success', 'Password reset. Email sent to user.');
+      else showNotification('error', data.message || 'Failed');
+    } catch { showNotification('error', 'Network error.'); }
+    finally { setActionLoading(false); }
   };
 
-  const getRoleBadgeColor = (role) => {
-    const colors = {
-      Admin: 'bg-red-500',
-      Mentor: 'bg-purple-500',
-      User: 'bg-blue-500',
-      UniAdmin: 'bg-green-500',
-      UniTeach: 'bg-yellow-500',
-      Student: 'bg-cyan-500'
-    };
-    return colors[role] || 'bg-gray-500';
+  const roleBadge = (role) => {
+    const map = { Admin: 'bg-red-100 text-red-700', Mentor: 'bg-purple-100 text-purple-700', User: 'bg-blue-100 text-blue-700', UniAdmin: 'bg-green-100 text-green-700', UniTeach: 'bg-yellow-100 text-yellow-800', Student: 'bg-cyan-100 text-cyan-700' };
+    return map[role] || 'bg-gray-100 text-gray-600';
   };
 
-  const safeString = (value, fallback = '') => {
-    if (value === null || value === undefined) return fallback;
-    try {
-      return String(value);
-    } catch (e) {
-      return fallback;
-    }
-  };
+  const safeStr = (v, fb = '') => { try { return v != null ? String(v) : fb; } catch { return fb; } };
+  const fmtDate = (d) => { if (!d) return '—'; const dt = new Date(d); return isNaN(dt) ? '—' : dt.toLocaleDateString(); };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '—';
-    const d = new Date(dateString);
-    if (isNaN(d)) return '—';
-    return d.toLocaleDateString();
-  };
+  const statCards = stats ? [
+    { label: 'Total Users', value: stats.overview.total, icon: <Users className="w-6 h-6 text-blue-500" />, color: 'bg-blue-50 border-blue-100' },
+    { label: 'Active', value: stats.overview.active, icon: <UserCheck className="w-6 h-6 text-green-500" />, color: 'bg-green-50 border-green-100' },
+    { label: 'Verified', value: stats.overview.verified, icon: <CheckCircle className="w-6 h-6 text-indigo-500" />, color: 'bg-indigo-50 border-indigo-100' },
+    { label: 'Suspended', value: stats.overview.suspended, icon: <UserX className="w-6 h-6 text-red-500" />, color: 'bg-red-50 border-red-100' },
+  ] : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
-      {/* Notification */}
+    <div className="min-h-screen bg-gray-50 font-body">
+      {/* Toast */}
       {notification.show && (
-        <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-lg shadow-2xl transform transition-all duration-300 ${
-          notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-        }`}>
-          <div className="flex items-center space-x-3">
-            {notification.type === 'success' ? <CheckCircle className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
-            <span className="font-medium">{notification.message}</span>
-          </div>
+        <div className={`fixed top-6 right-6 z-50 px-5 py-3.5 rounded-xl shadow-lg flex items-center gap-3 text-white text-sm font-medium ${notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {notification.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+          {notification.message}
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
-                <Users className="w-10 h-10 mr-3" />
-                User Management Dashboard
-              </h1>
-              <p className="text-purple-300">Manage all users, roles, and permissions</p>
-            </div>
-            <button
-              onClick={fetchUsers}
-              className="px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-xl hover:bg-white/20 transition-all flex items-center space-x-2"
-            >
-              <RefreshCw className="w-5 h-5" />
-              <span>Refresh</span>
-            </button>
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Users className="w-8 h-8 text-primary" />
+              User Management
+            </h1>
+            <p className="text-gray-500 mt-1">Manage all platform users, roles, and permissions</p>
           </div>
-
-          {/* Statistics Cards */}
-          {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-300 text-sm mb-1">Total Users</p>
-                    <p className="text-3xl font-bold text-white">{stats.overview.total}</p>
-                  </div>
-                  <Users className="w-12 h-12 text-blue-400" />
-                </div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-300 text-sm mb-1">Active</p>
-                    <p className="text-3xl font-bold text-green-400">{stats.overview.active}</p>
-                  </div>
-                  <UserCheck className="w-12 h-12 text-green-400" />
-                </div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-300 text-sm mb-1">Verified</p>
-                    <p className="text-3xl font-bold text-cyan-400">{stats.overview.verified}</p>
-                  </div>
-                  <CheckCircle className="w-12 h-12 text-cyan-400" />
-                </div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-300 text-sm mb-1">Suspended</p>
-                    <p className="text-3xl font-bold text-red-400">{stats.overview.suspended}</p>
-                  </div>
-                  <UserX className="w-12 h-12 text-red-400" />
-                </div>
-              </div>
-            </div>
-          )}
+          <button onClick={fetchUsers} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-all shadow-sm text-sm font-medium">
+            <RefreshCw className="w-4 h-4" /> Refresh
+          </button>
         </div>
 
-        {/* Filters and Search */}
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 mb-6 border border-white/20">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-            {/* Search */}
-            <div className="md:col-span-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300" />
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
+        {/* Stat Cards */}
+        {stats && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {statCards.map((s) => (
+              <div key={s.label} className={`${s.color} border rounded-2xl p-5 flex items-center justify-between`}>
+                <div>
+                  <p className="text-xs text-gray-500 font-medium mb-1">{s.label}</p>
+                  <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+                </div>
+                {s.icon}
               </div>
+            ))}
+          </div>
+        )}
+
+        {/* Filters */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input type="text" placeholder="Search by name, email, or username..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
-
-            {/* Role Filter */}
-            <select
-              value={filters.role}
-              onChange={(e) => setFilters({...filters, role: e.target.value})}
-              className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="" className="bg-slate-800">All Roles</option>
-              {roles.map(role => (
-                <option key={role} value={role} className="bg-slate-800">{role}</option>
-              ))}
-            </select>
-
-            {/* Verified Filter */}
-            <select
-              value={filters.isVerified}
-              onChange={(e) => setFilters({...filters, isVerified: e.target.value})}
-              className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="" className="bg-slate-800">All Status</option>
-              <option value="true" className="bg-slate-800">Verified</option>
-              <option value="false" className="bg-slate-800">Unverified</option>
-            </select>
-
-            {/* Active Filter */}
-            <select
-              value={filters.isActive}
-              onChange={(e) => setFilters({...filters, isActive: e.target.value})}
-              className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="" className="bg-slate-800">All Users</option>
-              <option value="true" className="bg-slate-800">Active</option>
-              <option value="false" className="bg-slate-800">Inactive</option>
-            </select>
-
-            {/* Bulk Actions */}
+            {[
+              { label: 'All Roles', val: filters.role, key: 'role', opts: roles.map(r => ({ v: r, l: r })) },
+              { label: 'All Status', val: filters.isVerified, key: 'isVerified', opts: [{ v: 'true', l: 'Verified' }, { v: 'false', l: 'Unverified' }] },
+              { label: 'All Users', val: filters.isActive, key: 'isActive', opts: [{ v: 'true', l: 'Active' }, { v: 'false', l: 'Inactive' }] },
+            ].map(f => (
+              <select key={f.key} value={f.val} onChange={e => setFilters({ ...filters, [f.key]: e.target.value })}
+                className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20">
+                <option value="">{f.label}</option>
+                {f.opts.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+              </select>
+            ))}
             {selectedUsers.length > 0 && (
-              <button
-                onClick={handleBulkDelete}
-                disabled={actionLoading}
-                className="px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
-              >
-                <Trash2 className="w-5 h-5" />
-                <span>Delete ({selectedUsers.length})</span>
+              <button onClick={handleBulkDelete} disabled={actionLoading}
+                className="flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50">
+                <Trash2 className="w-4 h-4" /> Delete ({selectedUsers.length})
               </button>
             )}
           </div>
         </div>
 
-        {/* Users Table */}
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
+        {/* Table */}
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
+            <div className="flex items-center justify-center py-24">
+              <Loader2 className="w-10 h-10 text-primary animate-spin" />
             </div>
           ) : users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Users className="w-16 h-16 text-purple-300 mb-4" />
-              <p className="text-white text-xl">No users found</p>
+            <div className="flex flex-col items-center justify-center py-24 text-gray-400">
+              <Users className="w-14 h-14 mb-4" />
+              <p className="text-lg font-medium">No users found</p>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-white/5">
-                    <tr>
-                      <th className="px-6 py-4 text-left">
-                        <input
-                          type="checkbox"
-                          checked={selectedUsers.length === users.length}
-                          onChange={handleSelectAll}
-                          className="w-5 h-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-purple-500"
-                        />
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-100">
+                      <th className="px-5 py-3 text-left">
+                        <input type="checkbox" checked={selectedUsers.length === users.length && users.length > 0} onChange={handleSelectAll}
+                          className="w-4 h-4 rounded border-gray-300 text-primary" />
                       </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-purple-300">User</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-purple-300">Email</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-purple-300">Role</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-purple-300">Status</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-purple-300">Joined</th>
-                      <th className="px-6 py-4 text-right text-sm font-semibold text-purple-300">Actions</th>
+                      {['User', 'Email', 'Role', 'Status', 'Joined', 'Actions'].map(h => (
+                        <th key={h} className={`px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide ${h === 'Actions' ? 'text-right' : 'text-left'}`}>{h}</th>
+                      ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {users.map((user) => (
-                      <tr key={user._id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-6 py-4">
-                          <input
-                            type="checkbox"
-                            checked={selectedUsers.includes(user._id)}
-                            onChange={() => handleSelectUser(user._id)}
-                            className="w-5 h-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-purple-500"
-                          />
+                  <tbody className="divide-y divide-gray-50">
+                    {users.map(user => (
+                      <tr key={user._id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-5 py-4">
+                          <input type="checkbox" checked={selectedUsers.includes(user._id)} onChange={() => handleSelectUser(user._id)}
+                            className="w-4 h-4 rounded border-gray-300 text-primary" />
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                              {safeString(user.name).charAt(0).toUpperCase()}
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                              {safeStr(user.name).charAt(0).toUpperCase() || '?'}
                             </div>
                             <div>
-                                <p className="text-white font-medium">{safeString(user.name) || 'Unknown User'}</p>
-                                <p className="text-purple-300 text-sm">@{safeString(user.username)}</p>
+                              <p className="font-semibold text-gray-900">{safeStr(user.name) || 'Unknown'}</p>
+                              <p className="text-gray-400 text-xs">@{safeStr(user.username)}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            <Mail className="w-4 h-4 text-purple-300" />
-                              <span className="text-white">{safeString(user.email)}</span>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Mail className="w-3.5 h-3.5 text-gray-400" />
+                            <span className="truncate max-w-[200px]">{safeStr(user.email)}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getRoleBadgeColor(user.role)}`}>
-                            {user.role}
-                          </span>
+                        <td className="px-5 py-4">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${roleBadge(user.role)}`}>{user.role}</span>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col space-y-1">
-                            <div className="flex items-center space-x-2">
-                              {user.isActive ? (
-                                <CheckCircle className="w-4 h-4 text-green-400" />
-                              ) : (
-                                <XCircle className="w-4 h-4 text-red-400" />
-                              )}
-                              <span className={`text-sm ${user.isActive ? 'text-green-400' : 'text-red-400'}`}>
-                                {user.isActive ? 'Active' : 'Inactive'}
-                              </span>
+                        <td className="px-5 py-4">
+                          <div className="space-y-1">
+                            <div className={`flex items-center gap-1.5 text-xs ${user.isActive ? 'text-green-600' : 'text-red-500'}`}>
+                              {user.isActive ? <CheckCircle className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                              {user.isActive ? 'Active' : 'Inactive'}
                             </div>
-                            <div className="flex items-center space-x-2">
-                              {user.isVerified ? (
-                                <CheckCircle className="w-4 h-4 text-cyan-400" />
-                              ) : (
-                                <AlertCircle className="w-4 h-4 text-yellow-400" />
-                              )}
-                              <span className={`text-sm ${user.isVerified ? 'text-cyan-400' : 'text-yellow-400'}`}>
-                                {user.isVerified ? 'Verified' : 'Unverified'}
-                              </span>
+                            <div className={`flex items-center gap-1.5 text-xs ${user.isVerified ? 'text-indigo-600' : 'text-amber-500'}`}>
+                              {user.isVerified ? <CheckCircle className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                              {user.isVerified ? 'Verified' : 'Unverified'}
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2 text-purple-300">
-                            <Calendar className="w-4 h-4" />
-                            <span className="text-sm">{formatDate(user.createdAt)}</span>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+                            <Calendar className="w-3.5 h-3.5" />{fmtDate(user.createdAt)}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-end space-x-2">
-                            <button
-                              onClick={() => handleEdit(user)}
-                              className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-all"
-                              title="Edit user"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleToggleStatus(user._id, user.isActive)}
-                              className={`p-2 rounded-lg transition-all ${
-                                user.isActive 
-                                  ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30' 
-                                  : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                              }`}
-                              title={user.isActive ? 'Deactivate' : 'Activate'}
-                            >
+                        <td className="px-5 py-4">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button onClick={() => handleEdit(user)} title="Edit" className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"><Edit className="w-4 h-4" /></button>
+                            <button onClick={() => handleToggleStatus(user._id, user.isActive)} title={user.isActive ? 'Deactivate' : 'Activate'}
+                              className={`p-1.5 rounded-lg transition-colors ${user.isActive ? 'text-amber-500 hover:bg-amber-50' : 'text-green-500 hover:bg-green-50'}`}>
                               {user.isActive ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                             </button>
-                            <button
-                              onClick={() => handleResetPassword(user._id)}
-                              className="p-2 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-all"
-                              title="Reset password"
-                            >
-                              <Lock className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(user)}
-                              className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all"
-                              title="Delete user"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <button onClick={() => handleResetPassword(user._id)} title="Reset password" className="p-1.5 rounded-lg text-purple-500 hover:bg-purple-50 transition-colors"><Lock className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete(user)} title="Delete" className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>
@@ -591,27 +326,21 @@ const UserManagementDashboard = () => {
               </div>
 
               {/* Pagination */}
-              <div className="px-6 py-4 bg-white/5 flex items-center justify-between">
-                <div className="text-purple-300 text-sm">
-                  Showing {((pagination.currentPage - 1) * pagination.perPage) + 1} to {Math.min(pagination.currentPage * pagination.perPage, pagination.total)} of {pagination.total} users
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setPagination({...pagination, currentPage: pagination.currentPage - 1})}
-                    disabled={pagination.currentPage === 1}
-                    className="p-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
+              <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
+                <p className="text-sm text-gray-500">
+                  Showing {((pagination.currentPage - 1) * pagination.perPage) + 1}–{Math.min(pagination.currentPage * pagination.perPage, pagination.total)} of {pagination.total} users
+                </p>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setPagination({ ...pagination, currentPage: pagination.currentPage - 1 })} disabled={pagination.currentPage === 1}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <span className="px-4 py-2 bg-white/10 text-white rounded-lg">
-                    Page {pagination.currentPage} of {pagination.totalPages}
+                  <span className="px-4 py-1.5 text-sm bg-white border border-gray-200 rounded-lg text-gray-700 font-medium">
+                    {pagination.currentPage} / {pagination.totalPages}
                   </span>
-                  <button
-                    onClick={() => setPagination({...pagination, currentPage: pagination.currentPage + 1})}
-                    disabled={pagination.currentPage === pagination.totalPages}
-                    className="p-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronRight className="w-5 h-5" />
+                  <button onClick={() => setPagination({ ...pagination, currentPage: pagination.currentPage + 1 })} disabled={pagination.currentPage === pagination.totalPages}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                    <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -622,154 +351,79 @@ const UserManagementDashboard = () => {
 
       {/* Edit Modal */}
       {showEditModal && editingUser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-white/10">
-              <h2 className="text-2xl font-bold text-white flex items-center">
-                <Edit className="w-6 h-6 mr-2" />
-                Edit User
-              </h2>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2"><Edit className="w-5 h-5 text-primary" /> Edit User</h2>
+              <button onClick={() => setShowEditModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
             </div>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-purple-300 text-sm mb-2">Name</label>
-                  <input
-                    type="text"
-                    value={editingUser.name}
-                    onChange={(e) => setEditingUser({...editingUser, name: e.target.value})}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-purple-300 text-sm mb-2">Username</label>
-                  <input
-                    type="text"
-                    value={editingUser.username}
-                    onChange={(e) => setEditingUser({...editingUser, username: e.target.value})}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
+                {[['Name', 'name', 'text'], ['Username', 'username', 'text']].map(([lbl, key, type]) => (
+                  <div key={key}>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{lbl}</label>
+                    <input type={type} value={editingUser[key] || ''} onChange={e => setEditingUser({ ...editingUser, [key]: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                  </div>
+                ))}
               </div>
               <div>
-                <label className="block text-purple-300 text-sm mb-2">Email</label>
-                <input
-                  type="email"
-                  value={editingUser.email}
-                  onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                <input type="email" value={editingUser.email || ''} onChange={e => setEditingUser({ ...editingUser, email: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-purple-300 text-sm mb-2">Role</label>
-                  <select
-                    value={editingUser.role}
-                    onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    {roles.map(role => (
-                      <option key={role} value={role} className="bg-slate-800">{role}</option>
-                    ))}
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
+                  <select value={editingUser.role} onChange={e => setEditingUser({ ...editingUser, role: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    {roles.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-purple-300 text-sm mb-2">Phone Number</label>
-                  <input
-                    type="text"
-                    value={editingUser.phoneNumber || ''}
-                    onChange={(e) => setEditingUser({...editingUser, phoneNumber: e.target.value})}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
+                  <input type="text" value={editingUser.phoneNumber || ''} onChange={e => setEditingUser({ ...editingUser, phoneNumber: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
                 </div>
               </div>
-              <div className="flex items-center space-x-6">
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={editingUser.isActive}
-                    onChange={(e) => setEditingUser({...editingUser, isActive: e.target.checked})}
-                    className="w-5 h-5 rounded border-white/20 bg-white/10 text-purple-500"
-                  />
-                  <span className="text-white">Active</span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={editingUser.isVerified}
-                    onChange={(e) => setEditingUser({...editingUser, isVerified: e.target.checked})}
-                    className="w-5 h-5 rounded border-white/20 bg-white/10 text-purple-500"
-                  />
-                  <span className="text-white">Verified</span>
-                </label>
+              <div className="flex items-center gap-6">
+                {[['isActive', 'Active'], ['isVerified', 'Verified']].map(([key, lbl]) => (
+                  <label key={key} className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={editingUser[key]} onChange={e => setEditingUser({ ...editingUser, [key]: e.target.checked })}
+                      className="w-4 h-4 rounded border-gray-300 text-primary" />
+                    <span className="text-sm text-gray-700">{lbl}</span>
+                  </label>
+                ))}
               </div>
             </div>
-            <div className="p-6 border-t border-white/10 flex justify-end space-x-4">
-              <button
-                onClick={() => setShowEditModal(false)}
-                disabled={actionLoading}
-                className="px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdateUser}
-                disabled={actionLoading}
-                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all flex items-center space-x-2 disabled:opacity-50"
-              >
-                {actionLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Updating...</span>
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-5 h-5" />
-                    <span>Update User</span>
-                  </>
-                )}
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setShowEditModal(false)} className="px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50">Cancel</button>
+              <button onClick={handleUpdateUser} disabled={actionLoading}
+                className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 flex items-center gap-2 disabled:opacity-50">
+                {actionLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Saving…</> : <><Check className="w-4 h-4" />Save Changes</>}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Modal */}
       {showDeleteModal && deletingUser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="bg-slate-800 rounded-2xl max-w-md w-full">
-            <div className="p-6">
-              <div className="flex items-center justify-center w-16 h-16 bg-red-500/20 rounded-full mx-auto mb-4">
-                <AlertCircle className="w-8 h-8 text-red-400" />
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl">
+            <div className="p-6 text-center">
+              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-7 h-7 text-red-500" />
               </div>
-              <h2 className="text-2xl font-bold text-white text-center mb-2">Delete User?</h2>
-                <p className="text-purple-300 text-center mb-6">
-                Are you sure you want to delete <strong className="text-white">{safeString(deletingUser.name) || 'this user'}</strong>? This action cannot be undone.
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Delete User?</h2>
+              <p className="text-gray-500 text-sm mb-6">
+                You are about to permanently delete <strong className="text-gray-900">{safeStr(deletingUser.name) || 'this user'}</strong>. This cannot be undone.
               </p>
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={actionLoading}
-                  className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmDelete}
-                  disabled={actionLoading}
-                  className="flex-1 px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
-                >
-                  {actionLoading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Deleting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 className="w-5 h-5" />
-                      <span>Delete</span>
-                    </>
-                  )}
+              <div className="flex gap-3">
+                <button onClick={() => setShowDeleteModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50">Cancel</button>
+                <button onClick={confirmDelete} disabled={actionLoading}
+                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 flex items-center justify-center gap-2 disabled:opacity-50">
+                  {actionLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Deleting…</> : <><Trash2 className="w-4 h-4" />Delete</>}
                 </button>
               </div>
             </div>

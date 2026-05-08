@@ -11,34 +11,47 @@ const DashboardCard = ({ title, path, description, badge, iconColor, bgColor }) 
     UniTeach: 'bg-surface-container-highest text-primary',
   };
 
+  const getIcon = () => {
+    if (description.includes('Auth') || description.includes('Log') || description.includes('Sign')) return 'lock';
+    if (description.includes('Analytics')) return 'analytics';
+    if (description.includes('User') || description.includes('Profile')) return 'person';
+    if (description.includes('Career') || description.includes('Job')) return 'work';
+    if (description.includes('Mentor')) return 'groups';
+    if (description.includes('University') || description.includes('Teacher')) return 'school';
+    if (description.includes('Community') || description.includes('Group')) return 'diversity_3';
+    if (description.includes('Video') || description.includes('Resource') || description.includes('Workshop')) return 'library_books';
+    if (description.includes('Update') || description.includes('Doc')) return 'newspaper';
+    if (description.includes('Roadmap') || description.includes('Path')) return 'route';
+    return 'dashboard';
+  };
+
   const badgeText = badge === 'UniAdmin' || badge === 'UniTeach' ? 'University' : badge;
 
   return (
-    <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col justify-between">
+    <a
+      href={path}
+      className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col justify-between group"
+    >
       <div>
         <div className="flex justify-between items-start mb-4">
           <span className={`material-symbols-outlined ${iconColor || 'text-primary'} p-2 ${bgColor || 'bg-surface-container-low'} rounded-lg`}>
-            {description.includes('Auth') || description.includes('Log') || description.includes('Sign') ? 'lock' : 
-             description.includes('Analytics') ? 'analytics' :
-             description.includes('User') || description.includes('Profile') ? 'person' :
-             description.includes('Career') || description.includes('Job') ? 'work' :
-             description.includes('Mentor') ? 'groups' :
-             description.includes('University') || description.includes('Teacher') ? 'school' : 'dashboard'}
+            {getIcon()}
           </span>
           <span className={`px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded ${badgeStyles[badge] || 'bg-surface-container-highest'}`}>
             {badgeText}
           </span>
         </div>
-        <h3 className="font-headline font-bold text-lg text-primary mb-1">{title}</h3>
+        <h3 className="font-headline font-bold text-lg text-primary mb-1 group-hover:underline">{title}</h3>
+        <p className="text-xs text-secondary mb-1 line-clamp-2">{description}</p>
         <code className="text-xs text-secondary bg-surface-container-low px-2 py-1 rounded truncate block">
           {path}
         </code>
       </div>
-      <a href={path} className="mt-4 text-xs font-bold text-primary hover:underline inline-flex items-center gap-1">
+      <div className="mt-4 text-xs font-bold text-primary inline-flex items-center gap-1">
         Go to Page
         <span className="material-symbols-outlined text-sm">arrow_forward</span>
-      </a>
-    </div>
+      </div>
+    </a>
   );
 };
 
@@ -175,26 +188,26 @@ const Dashboard = () => {
 
   return (
     <div className="bg-surface font-body text-on-surface min-h-screen">
-      <main class="pt-24 pb-20 px-8 max-w-[1440px] mx-auto">
+      <main className="pt-24 pb-20 px-8 max-w-[1440px] mx-auto">
         {/* Hero Section */}
-        <section class="mb-16 mt-8">
-          <h1 class="font-headline font-extrabold text-5xl md:text-6xl text-primary tracking-tight mb-6">Master Directory</h1>
-          <p class="text-secondary max-w-2xl text-lg leading-relaxed">
+        <section className="mb-16 mt-8">
+          <h1 className="font-headline font-extrabold text-5xl md:text-6xl text-primary tracking-tight mb-6">Master Directory</h1>
+          <p className="text-secondary max-w-2xl text-lg leading-relaxed">
             A unified roadmap of the SkillPilot ecosystem. Navigate through core services, administrative controls, and community resources from a single strategic view.
           </p>
         </section>
 
         {/* Search & Filter Bar */}
-        <div class="sticky top-[72px] z-40 py-6 mb-12 bg-surface/90 backdrop-blur-md">
-          <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
-            <div class="flex flex-wrap gap-2">
+        <div className="sticky top-[72px] z-40 py-6 mb-12 bg-surface/90 backdrop-blur-md">
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+            <div className="flex flex-wrap gap-2">
               {badges.map(badge => (
                 <button
                   key={badge}
-                  onClick={() => setSelectedBadge(badge)}
+                  onClick={() => setSelectedBadge(selectedBadge === badge ? 'All' : badge)}
                   className={`px-4 py-1.5 rounded-full font-label text-xs tracking-wider uppercase transition-colors ${
                     selectedBadge === badge
-                      ? 'bg-primary text-white'
+                      ? 'bg-primary text-white shadow-md'
                       : 'bg-surface-container-highest text-on-surface hover:bg-surface-container-high'
                   }`}
                 >
@@ -202,8 +215,8 @@ const Dashboard = () => {
                 </button>
               ))}
             </div>
-            <div class="w-full md:w-96 relative">
-              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">search</span>
+            <div className="w-full md:w-96 relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">search</span>
               <input
                 type="text"
                 placeholder="Find a specific page or path..."
@@ -213,17 +226,32 @@ const Dashboard = () => {
               />
             </div>
           </div>
+          {/* Active filter indicator */}
+          {(selectedBadge !== 'All' || searchTerm) && (
+            <div className="mt-3 flex items-center gap-3 text-sm text-secondary">
+              <span>Showing <strong className="text-primary">{filteredPages}</strong> of {totalPages} pages</span>
+              {selectedBadge !== 'All' && (
+                <button
+                  onClick={() => setSelectedBadge('All')}
+                  className="text-xs px-2 py-0.5 bg-surface-container-high rounded-full hover:bg-surface-container-highest transition-colors"
+                >
+                  Clear filter ×
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Directory Grid */}
-        <div class="space-y-16">
+        <div className="space-y-16">
           {Object.entries(filteredSections).map(([key, cards]) => (
             <div key={key} className={key === 'admin' ? 'bg-surface-container-low p-8 rounded-3xl' : ''}>
-              <div class="flex items-center gap-4 mb-8">
-                <h2 class="font-headline font-bold text-2xl text-primary tracking-tight">{sectionTitles[key]}</h2>
-                <div class={`h-[1px] flex-grow ${key === 'admin' ? 'bg-outline-variant/40' : 'bg-outline-variant/20'}`}></div>
+              <div className="flex items-center gap-4 mb-8">
+                <h2 className="font-headline font-bold text-2xl text-primary tracking-tight">{sectionTitles[key]}</h2>
+                <div className={`h-[1px] flex-grow ${key === 'admin' ? 'bg-outline-variant/40' : 'bg-outline-variant/20'}`}></div>
+                <span className="text-xs text-secondary">{cards.length} pages</span>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {cards.map((card, index) => (
                   <DashboardCard key={index} {...card} />
                 ))}
