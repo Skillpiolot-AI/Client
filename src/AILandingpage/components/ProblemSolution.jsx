@@ -36,10 +36,6 @@ export default function ProblemSolution() {
               </p>
               <p className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                Explore 1000+ careers with detailed O*NET data and salary insights
-              </p>
-              <p className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                 Discover colleges in India that match your career goals
               </p>
               <p className="flex items-start gap-3">

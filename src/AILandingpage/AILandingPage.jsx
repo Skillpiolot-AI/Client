@@ -17,11 +17,8 @@ export default function AILandingPage() {
       <Hero />
       <ProblemSolution />
       <RiasecSection />
-      <FeaturesSection />
-      <TestimonialsSection />
       <BenefitsSection />
       {/* <PricingSection /> */}
-      <ProcessSection />
       <CTASection />
   
     </div>

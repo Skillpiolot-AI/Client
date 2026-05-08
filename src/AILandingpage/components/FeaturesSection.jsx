@@ -9,13 +9,6 @@ const features = [
     cta: "Take Assessment",
   },
   {
-    title: "O*NET Career Explorer",
-    icon: Compass,
-    description:
-      "Explore 1000+ careers with detailed O*NET data including job descriptions, required skills, salary ranges, and growth projections.",
-    cta: "Explore Careers",
-  },
-  {
     title: "College Finder (India)",
     icon: GraduationCap,
     description:
