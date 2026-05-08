@@ -90,8 +90,13 @@ const MyBookings = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const [bookings, setBookings] = useState([]);
+    const [upcomingBookings, setUpcomingBookings] = useState([]);
+    const [pastBookings, setPastBookings] = useState([]);
+    const [pastPage, setPastPage] = useState(1);
+    const [hasMorePast, setHasMorePast] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingPast, setIsLoadingPast] = useState(false);
+    
     const [ratingModal, setRatingModal] = useState({ open: false, booking: null });
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
@@ -100,34 +105,69 @@ const MyBookings = () => {
     const [geminiSuggestions, setGeminiSuggestions] = useState({});
     const [geminiLoading, setGeminiLoading] = useState({});
 
+    const getToken = () => localStorage.getItem('token');
+
+    const fetchUpcomingBookings = async () => {
+        try {
+            const response = await axios.get(
+                `${config.API_BASE_URL}/bookings/my-bookings?upcoming=true&limit=100`,
+                { headers: { Authorization: `Bearer ${getToken()}` } }
+            );
+            setUpcomingBookings(response.data.bookings || []);
+        } catch (error) {
+            console.error('Error fetching upcoming bookings:', error);
+        }
+    };
+
+    const fetchPastBookings = async (page = 1, append = false) => {
+        try {
+            if (append) setIsLoadingPast(true);
+            else setIsLoading(true);
+            
+            const response = await axios.get(
+                `${config.API_BASE_URL}/bookings/my-bookings?past=true&page=${page}&limit=10`,
+                { headers: { Authorization: `Bearer ${getToken()}` } }
+            );
+            
+            const fetched = response.data.bookings || [];
+            if (append) {
+                setPastBookings(prev => {
+                    const existingIds = new Set(prev.map(b => b._id));
+                    const newBookings = fetched.filter(b => !existingIds.has(b._id));
+                    return [...prev, ...newBookings];
+                });
+            } else {
+                setPastBookings(fetched);
+            }
+            setHasMorePast(response.data.pagination.page < response.data.pagination.pages);
+        } catch (error) {
+            console.error('Error fetching past bookings:', error);
+            if (!append) toast.error('Failed to load bookings');
+        } finally {
+            setIsLoading(false);
+            setIsLoadingPast(false);
+        }
+    };
+
     useEffect(() => {
         if (!user) {
             navigate('/login', { state: { from: '/my-bookings' } });
             return;
         }
-        fetchBookings();
+        Promise.all([fetchUpcomingBookings(), fetchPastBookings(1)]);
     }, [user]);
 
-    const getToken = () => localStorage.getItem('token');
+    const handleLoadMorePast = () => {
+        const nextPage = pastPage + 1;
+        setPastPage(nextPage);
+        fetchPastBookings(nextPage, true);
+    };
 
-    const fetchBookings = async () => {
-        try {
-            setIsLoading(true);
-            const response = await axios.get(
-                `${config.API_BASE_URL}/bookings/my-bookings`,
-                { headers: { Authorization: `Bearer ${getToken()}` } }
-            );
-            
-            // Sort bookings by date: upcoming nearest first, past latest first
-            const fetched = response.data.bookings || [];
-            
-            setBookings(fetched);
-        } catch (error) {
-            console.error('Error fetching bookings:', error);
-            toast.error('Failed to load bookings');
-        } finally {
-            setIsLoading(false);
-        }
+    // Keep fetchBookings for backward compatibility in child functions
+    const fetchBookings = () => {
+        fetchUpcomingBookings();
+        fetchPastBookings(1);
+        setPastPage(1);
     };
 
     const handleCancelBooking = async (bookingId) => {
@@ -259,23 +299,15 @@ Keep the entire response under 200 words. Be encouraging and specific.`;
             }
             return <p key={i} className="text-[13px] text-slate-700 my-1 leading-relaxed">{clean}</p>;
         });
+      };
+      const isExpiredSession = (booking) => {
+        if (!['pending', 'confirmed'].includes(booking.status)) return false;
+        const endTime = new Date(new Date(booking.scheduledAt).getTime() + (booking.duration || 60) * 60000);
+        return endTime < new Date();
     };
-
-    const isExpiredSession = (booking) => ['pending', 'confirmed'].includes(booking.status) && new Date(booking.scheduledAt) < new Date();
-    const isUpcomingStatus = (booking) => ['pending', 'confirmed', 'in-progress'].includes(booking.status) && !isExpiredSession(booking);
     
-    // Derived collections
-    // Sort upcoming by soonest first
-    const upcomingBookings = bookings
-        .filter(isUpcomingStatus)
-        .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt));
-        
-    // Sort past by most recent first
-    const pastBookings = bookings
-        .filter(b => !isUpcomingStatus(b))
-        .sort((a, b) => new Date(b.scheduledAt) - new Date(a.scheduledAt));
-
-    const nearestSession = upcomingBookings[0];
+    // Nearest session
+    const nearestSession = upcomingBookings.length > 0 ? upcomingBookings[0] : null;
     const otherUpcoming = upcomingBookings.slice(1);
 
     if (isLoading) {
@@ -642,6 +674,22 @@ Keep the entire response under 200 words. Be encouraging and specific.`;
                                     )}
                                 </div>
                             ))
+                        )}
+                        
+                        {hasMorePast && (
+                            <div className="flex justify-center mt-6 pt-4">
+                                <button
+                                    onClick={handleLoadMorePast}
+                                    disabled={isLoadingPast}
+                                    className="px-6 py-2.5 bg-white border border-outline-variant/30 text-primary font-bold text-sm rounded-full shadow-sm hover:bg-surface-container-lowest transition-all disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    {isLoadingPast ? (
+                                        <><Loader2 size={16} className="animate-spin" /> Loading...</>
+                                    ) : (
+                                        'Load More Bookings'
+                                    )}
+                                </button>
+                            </div>
                         )}
                     </div>
                 </section>

@@ -50,7 +50,10 @@ const MentorSessions = () => {
     const navigate = useNavigate();
 
     const [bookings, setBookings] = useState([]);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [activeTab, setActiveTab] = useState('upcoming');
     const [notesModal, setNotesModal] = useState({ open: false, booking: null });
     const [notes, setNotes] = useState('');
@@ -70,26 +73,51 @@ const MentorSessions = () => {
     const [feedbackModal, setFeedbackModal] = useState({ open: false, booking: null });
     const [feedbackText, setFeedbackText] = useState('');
 
-    useEffect(() => {
-        if (user) fetchBookings();
-    }, [user]);
-
     const getToken = () => localStorage.getItem('token');
 
-    const fetchBookings = async () => {
+    const fetchBookings = async (pageNum = 1, append = false) => {
         try {
-            setIsLoading(true);
-            const response = await axios.get(
-                `${config.API_BASE_URL}/bookings/mentor/sessions`,
-                { headers: { Authorization: `Bearer ${getToken()}` } }
-            );
-            setBookings(response.data.bookings || []);
+            if (append) setIsLoadingMore(true);
+            else setIsLoading(true);
+            
+            const isUpcoming = activeTab === 'upcoming';
+            // Upcoming doesn't typically need pagination, but we support it
+            const limit = isUpcoming ? 100 : 10;
+            const endpoint = `${config.API_BASE_URL}/bookings/mentor/sessions?${isUpcoming ? 'upcoming=true' : 'past=true'}&page=${pageNum}&limit=${limit}`;
+            
+            const response = await axios.get(endpoint, { headers: { Authorization: `Bearer ${getToken()}` } });
+            
+            const fetched = response.data.bookings || [];
+            if (append) {
+                setBookings(prev => {
+                    const existingIds = new Set(prev.map(b => b._id));
+                    const newBookings = fetched.filter(b => !existingIds.has(b._id));
+                    return [...prev, ...newBookings];
+                });
+            } else {
+                setBookings(fetched);
+            }
+            setHasMore(response.data.pagination.page < response.data.pagination.pages);
         } catch (error) {
             console.error('Error fetching sessions:', error);
-            toast.error('Failed to load sessions');
+            if (!append) toast.error('Failed to load sessions');
         } finally {
             setIsLoading(false);
+            setIsLoadingMore(false);
         }
+    };
+
+    useEffect(() => {
+        if (user) {
+            setPage(1);
+            fetchBookings(1);
+        }
+    }, [user, activeTab]);
+
+    const handleLoadMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchBookings(nextPage, true);
     };
 
     const handleCompleteSession = (booking) => {
@@ -235,12 +263,12 @@ const MentorSessions = () => {
     };
 
     const isExpiredSession = (booking) => {
-        return ['pending', 'confirmed'].includes(booking.status) && new Date(booking.scheduledAt) < new Date();
+        if (!['pending', 'confirmed'].includes(booking.status)) return false;
+        const endTime = new Date(new Date(booking.scheduledAt).getTime() + (booking.duration || 60) * 60000);
+        return endTime < new Date();
     };
 
     const isUpcoming = (booking) => ['pending', 'confirmed', 'in-progress'].includes(booking.status) && !isExpiredSession(booking);
-    const isPast = (booking) => ['completed', 'cancelled', 'no-show'].includes(booking.status) || isExpiredSession(booking);
-    const filteredBookings = bookings.filter(b => activeTab === 'upcoming' ? isUpcoming(b) : isPast(b));
 
     if (isLoading) {
         return (
@@ -254,60 +282,36 @@ const MentorSessions = () => {
     }
 
     return (
-        <div className="mentor-sessions-container">
-            <div className="mentor-sessions-content">
-                {/* Header */}
+        <>
+            <ToastContainer position="bottom-right" />
+            <div className="mentor-sessions-container">
                 <div className="sessions-header">
                     <div>
-                        <h1>👨‍🏫 My Mentoring Sessions</h1>
-                        <p>Manage your mentorship sessions and connect with students</p>
-                    </div>
-                    <button className="refresh-btn" onClick={fetchBookings}>
-                        <RefreshCw size={18} />
-                        Refresh
-                    </button>
-                </div>
-
-                {/* Stats Cards */}
-                <div className="session-stats">
-                    <div className="stat-card">
-                        <div className="stat-value">{bookings.filter(b => isUpcoming(b)).length}</div>
-                        <div className="stat-label">Upcoming</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-value">{bookings.filter(b => b.status === 'completed').length}</div>
-                        <div className="stat-label">Completed</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-value">{bookings.filter(b => isExpiredSession(b)).length}</div>
-                        <div className="stat-label">Expired</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-value">{bookings.length}</div>
-                        <div className="stat-label">Total</div>
+                        <h2>Mentor Sessions</h2>
+                        <p>Manage your upcoming mentorship sessions and booking history.</p>
                     </div>
                 </div>
 
                 {/* Tabs */}
                 <div className="sessions-tabs">
-                    <button className={`tab ${activeTab === 'upcoming' ? 'active' : ''}`} onClick={() => setActiveTab('upcoming')}>
-                        Upcoming Sessions <span className="count">{bookings.filter(isUpcoming).length}</span>
+                    <button className={`tab ${activeTab === 'upcoming' ? 'active' : ''}`} onClick={() => { setActiveTab('upcoming'); setPage(1); }}>
+                        Upcoming Sessions
                     </button>
                     <button className={`tab ${activeTab === 'past' ? 'active' : ''}`} onClick={() => setActiveTab('past')}>
-                        Completed / Expired / Cancelled <span className="count">{bookings.filter(isPast).length}</span>
+                        Completed / Expired / Cancelled
                     </button>
                 </div>
 
                 {/* Sessions List */}
                 <div className="sessions-list">
-                    {filteredBookings.length === 0 ? (
+                    {bookings.length === 0 ? (
                         <div className="empty-state">
                             <Calendar size={48} />
                             <h3>No {activeTab} sessions</h3>
                             <p>{activeTab === 'upcoming' ? 'You have no upcoming sessions at the moment.' : 'Your completed sessions will appear here.'}</p>
                         </div>
                     ) : (
-                        filteredBookings.map(booking => (
+                        bookings.map(booking => (
                             <div key={booking._id} className="session-card">
                                 <div className="session-card-header">
                                     <div className="student-info">
@@ -427,6 +431,31 @@ const MentorSessions = () => {
                                 <div className="session-id">Booking ID: {booking.bookingId}</div>
                             </div>
                         ))
+                    )}
+                    
+                    {hasMore && (
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', padding: '10px' }}>
+                            <button
+                                onClick={handleLoadMore}
+                                disabled={isLoadingMore}
+                                style={{
+                                    padding: '10px 24px',
+                                    background: '#fff',
+                                    border: '1px solid #E2E8F0',
+                                    color: '#1E293B',
+                                    fontWeight: 'bold',
+                                    fontSize: '14px',
+                                    borderRadius: '50px',
+                                    cursor: isLoadingMore ? 'not-allowed' : 'pointer',
+                                    opacity: isLoadingMore ? 0.7 : 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px'
+                                }}
+                            >
+                                {isLoadingMore ? 'Loading...' : 'Load More Sessions'}
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -623,8 +652,9 @@ const MentorSessions = () => {
             )}
 
             <ToastContainer position="bottom-right" />
-        </div>
+        </>
     );
 };
 
 export default MentorSessions;
+

@@ -84,51 +84,7 @@ export default function FeatureShowcase() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full max-w-[960px] pt-4 pb-10 px-6 lg:px-11 flex flex-col justify-center items-center gap-2 my-16 mb-0 lg:pb-0">
-        <div className="w-full h-[450px] lg:h-[695.55px] bg-white shadow-[0px_0px_0px_0.9056603908538818px_rgba(0,0,0,0.08)] overflow-hidden rounded-lg flex flex-col justify-start items-start">
-          <div className="self-stretch flex-1 flex justify-start items-start">
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="relative w-full h-full overflow-hidden">
-                <div
-                  className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                    activeCard === 0 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                  }`}
-                >
-                  <img
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dsadsadsa.jpg-xTHS4hGwCWp2H5bTj8np6DXZUyrxX7.jpeg"
-                    alt="Mentor Booking Dashboard"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
 
-                <div
-                  className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                    activeCard === 1 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                  }`}
-                >
-                  <img
-                    src="/analytics-dashboard-with-charts-graphs-and-data-vi.jpg"
-                    alt="RIASEC Assessment Dashboard"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                <div
-                  className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                    activeCard === 2 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
-                  }`}
-                >
-                  <img
-                    src="/data-visualization-dashboard-with-interactive-char.jpg"
-                    alt="Learning & Workshops Dashboard"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div className="w-full border-t border-[#E0DEDB] border-b border-[#E0DEDB] flex justify-center items-start">
         <div className="w-12 self-stretch relative overflow-hidden">

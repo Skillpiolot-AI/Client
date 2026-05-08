@@ -123,8 +123,6 @@ export default function LandingPage() {
       <HeroSection />
       <FeatureShowcase />
       <ThreeFeatureCards />
-      <SocialProof />
-      <FAQSection />
       <CTASection />
     </div>
   )
