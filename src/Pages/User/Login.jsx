@@ -41,7 +41,7 @@ export default function LoginPage() {
   }
 
   const redirectBasedOnRole = (userRole) => {
-    console.log("Redirecting user with role:", userRole)
+    console.log('Redirecting user with role:', userRole)
 
     if (from) {
       console.log("Redirecting to previous page:", from)
@@ -101,10 +101,10 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      console.log('🔐 Attempting login...')
+      console.log('Attempting login...')
       const { data } = await axios.post(`${config.API_BASE_URL}/auth/login`, form)
 
-      console.log("✅ Login response:", data)
+      console.log('Login response:', data)
 
       localStorage.setItem("token", data.token)
       localStorage.setItem("role", data.role)
@@ -123,7 +123,7 @@ export default function LoginPage() {
         redirectBasedOnRole(data.role)
       }, 100)
     } catch (error) {
-      console.error("❌ Login error:", error.response?.data || error.message)
+      console.error('Login error:', error.response?.data || error.message)
 
       const errorResponse = error.response?.data
 
@@ -171,7 +171,7 @@ export default function LoginPage() {
 
   // Handle Google Login Success
   const handleGoogleSuccess = async (credentialResponse) => {
-    console.log('🔐 Google login initiated')
+      console.log('Google login initiated')
 
     try {
       setIsLoading(true)
@@ -180,7 +180,7 @@ export default function LoginPage() {
         credential: credentialResponse.credential
       })
 
-      console.log("✅ Google login response:", data)
+      console.log('Google login response:', data)
 
       if (data.success) {
         localStorage.setItem("token", data.token)
@@ -197,7 +197,7 @@ export default function LoginPage() {
         }, 100)
       }
     } catch (error) {
-      console.error("❌ Google login error:", error)
+      console.error('Google login error:', error)
 
       const errorMessage = error.response?.data?.message || "Google login failed. Please try again."
       setErrors({
@@ -213,7 +213,7 @@ export default function LoginPage() {
 
   // Handle Google Login Error
   const handleGoogleError = () => {
-    console.error('❌ Google login failed')
+    console.error('Google login failed')
     toast.error('Google login failed. Please try again.')
   }
 
