@@ -1,10 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Users, Search, Edit, Trash2, CheckCircle, XCircle,
-  Shield, Mail, Calendar, AlertCircle, RefreshCw,
-  Lock, ChevronLeft, ChevronRight, Loader2, Check, X,
-  UserCheck, UserX
-} from 'lucide-react';
+// Removed lucide-react imports
 import config from '../../config';
 
 const UserManagementDashboard = () => {
@@ -164,18 +158,18 @@ const UserManagementDashboard = () => {
   const fmtDate = (d) => { if (!d) return '—'; const dt = new Date(d); return isNaN(dt) ? '—' : dt.toLocaleDateString(); };
 
   const statCards = stats ? [
-    { label: 'Total Users', value: stats.overview.total, icon: <Users className="w-6 h-6 text-blue-500" />, color: 'bg-blue-50 border-blue-100' },
-    { label: 'Active', value: stats.overview.active, icon: <UserCheck className="w-6 h-6 text-green-500" />, color: 'bg-green-50 border-green-100' },
-    { label: 'Verified', value: stats.overview.verified, icon: <CheckCircle className="w-6 h-6 text-indigo-500" />, color: 'bg-indigo-50 border-indigo-100' },
-    { label: 'Suspended', value: stats.overview.suspended, icon: <UserX className="w-6 h-6 text-red-500" />, color: 'bg-red-50 border-red-100' },
+    { label: 'Total Users', value: stats.overview.total, icon: 'groups', color: 'text-primary', bgColor: 'bg-primary-container/20' },
+    { label: 'Active', value: stats.overview.active, icon: 'person_check', color: 'text-green-500', bgColor: 'bg-green-100/50' },
+    { label: 'Verified', value: stats.overview.verified, icon: 'verified', color: 'text-indigo-500', bgColor: 'bg-indigo-100/50' },
+    { label: 'Suspended', value: stats.overview.suspended, icon: 'person_off', color: 'text-error', bgColor: 'bg-error-container/20' },
   ] : [];
 
   return (
-    <div className="min-h-screen bg-gray-50 font-body">
+    <div className="min-h-screen bg-surface font-body text-on-surface">
       {/* Toast */}
       {notification.show && (
-        <div className={`fixed top-6 right-6 z-50 px-5 py-3.5 rounded-xl shadow-lg flex items-center gap-3 text-white text-sm font-medium ${notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
-          {notification.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+        <div className={`fixed top-6 right-6 z-50 px-5 py-3.5 rounded-xl shadow-lg flex items-center gap-3 text-white text-sm font-medium ${notification.type === 'success' ? 'bg-green-600' : 'bg-error'}`}>
+          <span className="material-symbols-outlined">{notification.type === 'success' ? 'check_circle' : 'error'}</span>
           {notification.message}
         </div>
       )}
@@ -184,14 +178,14 @@ const UserManagementDashboard = () => {
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Users className="w-8 h-8 text-primary" />
+            <h1 className="text-3xl font-headline font-extrabold text-primary flex items-center gap-3 tracking-tight">
+              <span className="material-symbols-outlined text-4xl">groups</span>
               User Management
             </h1>
-            <p className="text-gray-500 mt-1">Manage all platform users, roles, and permissions</p>
+            <p className="text-secondary mt-1">Manage all platform users, roles, and permissions</p>
           </div>
-          <button onClick={fetchUsers} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-all shadow-sm text-sm font-medium">
-            <RefreshCw className="w-4 h-4" /> Refresh
+          <button onClick={fetchUsers} className="flex items-center gap-2 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-high transition-all shadow-sm text-sm font-medium">
+            <span className="material-symbols-outlined text-sm">refresh</span> Refresh
           </button>
         </div>
 
@@ -199,24 +193,24 @@ const UserManagementDashboard = () => {
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {statCards.map((s) => (
-              <div key={s.label} className={`${s.color} border rounded-2xl p-5 flex items-center justify-between`}>
+              <div key={s.label} className={`${s.bgColor} rounded-2xl p-5 flex items-center justify-between border border-outline-variant/10 hover:shadow-md transition-shadow`}>
                 <div>
-                  <p className="text-xs text-gray-500 font-medium mb-1">{s.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+                  <p className="text-[10px] text-secondary font-label tracking-widest uppercase mb-1">{s.label}</p>
+                  <p className="text-2xl font-headline font-bold text-on-surface">{s.value}</p>
                 </div>
-                {s.icon}
+                <span className={`material-symbols-outlined text-3xl ${s.color}`}>{s.icon}</span>
               </div>
             ))}
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+        <div className="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-5 mb-6 shadow-sm">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-lg">search</span>
               <input type="text" placeholder="Search by name, email, or username..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                className="w-full pl-10 pr-4 py-2.5 bg-surface border border-outline-variant/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
             </div>
             {[
               { label: 'All Roles', val: filters.role, key: 'role', opts: roles.map(r => ({ v: r, l: r })) },
@@ -224,99 +218,100 @@ const UserManagementDashboard = () => {
               { label: 'All Users', val: filters.isActive, key: 'isActive', opts: [{ v: 'true', l: 'Active' }, { v: 'false', l: 'Inactive' }] },
             ].map(f => (
               <select key={f.key} value={f.val} onChange={e => setFilters({ ...filters, [f.key]: e.target.value })}
-                className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20">
+                className="px-3 py-2.5 bg-surface border border-outline-variant/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                 <option value="">{f.label}</option>
                 {f.opts.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
               </select>
             ))}
             {selectedUsers.length > 0 && (
               <button onClick={handleBulkDelete} disabled={actionLoading}
-                className="flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50">
-                <Trash2 className="w-4 h-4" /> Delete ({selectedUsers.length})
+                className="flex items-center gap-2 px-4 py-2.5 bg-error text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-all shadow-md">
+                <span className="material-symbols-outlined text-sm">delete</span> Delete ({selectedUsers.length})
               </button>
             )}
           </div>
         </div>
 
         {/* Table */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl shadow-lg overflow-hidden transition-all">
           {loading ? (
             <div className="flex items-center justify-center py-24">
-              <Loader2 className="w-10 h-10 text-primary animate-spin" />
+              <span className="material-symbols-outlined text-4xl text-primary animate-spin">progress_activity</span>
             </div>
           ) : users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-              <Users className="w-14 h-14 mb-4" />
-              <p className="text-lg font-medium">No users found</p>
+            <div className="flex flex-col items-center justify-center py-24 text-secondary opacity-60">
+              <span className="material-symbols-outlined text-6xl mb-4">search_off</span>
+              <p className="text-lg font-headline font-medium tracking-tight">No users found</p>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100">
-                      <th className="px-5 py-3 text-left">
+                    <tr className="bg-surface-container-low/50 border-b border-outline-variant/20">
+                      <th className="px-5 py-4 text-left">
                         <input type="checkbox" checked={selectedUsers.length === users.length && users.length > 0} onChange={handleSelectAll}
-                          className="w-4 h-4 rounded border-gray-300 text-primary" />
+                          className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all" />
                       </th>
                       {['User', 'Email', 'Role', 'Status', 'Joined', 'Actions'].map(h => (
-                        <th key={h} className={`px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide ${h === 'Actions' ? 'text-right' : 'text-left'}`}>{h}</th>
+                        <th key={h} className={`px-5 py-4 font-label font-bold text-secondary text-[10px] uppercase tracking-widest ${h === 'Actions' ? 'text-right' : 'text-left'}`}>{h}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-outline-variant/10">
                     {users.map(user => (
-                      <tr key={user._id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={user._id} className="hover:bg-surface-container-low/30 transition-colors group">
                         <td className="px-5 py-4">
                           <input type="checkbox" checked={selectedUsers.includes(user._id)} onChange={() => handleSelectUser(user._id)}
-                            className="w-4 h-4 rounded border-gray-300 text-primary" />
+                            className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all" />
                         </td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-headline font-bold text-sm shadow-sm">
                               {safeStr(user.name).charAt(0).toUpperCase() || '?'}
                             </div>
                             <div>
-                              <p className="font-semibold text-gray-900">{safeStr(user.name) || 'Unknown'}</p>
-                              <p className="text-gray-400 text-xs">@{safeStr(user.username)}</p>
+                              <p className="font-headline font-bold text-on-surface group-hover:text-primary transition-colors">{safeStr(user.name) || 'Unknown'}</p>
+                              <p className="text-secondary text-[10px] tracking-wider uppercase font-label">@{safeStr(user.username)}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-5 py-4">
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <Mail className="w-3.5 h-3.5 text-gray-400" />
-                            <span className="truncate max-w-[200px]">{safeStr(user.email)}</span>
+                          <div className="flex items-center gap-2 text-secondary">
+                            <span className="material-symbols-outlined text-sm opacity-50">mail</span>
+                            <span className="truncate max-w-[200px] font-body">{safeStr(user.email)}</span>
                           </div>
                         </td>
                         <td className="px-5 py-4">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${roleBadge(user.role)}`}>{user.role}</span>
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase ${roleBadge(user.role)}`}>{user.role}</span>
                         </td>
                         <td className="px-5 py-4">
                           <div className="space-y-1">
-                            <div className={`flex items-center gap-1.5 text-xs ${user.isActive ? 'text-green-600' : 'text-red-500'}`}>
-                              {user.isActive ? <CheckCircle className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                            <div className={`flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase ${user.isActive ? 'text-green-600' : 'text-error'}`}>
+                              <span className="material-symbols-outlined text-[14px] leading-none">{user.isActive ? 'check_circle' : 'cancel'}</span>
                               {user.isActive ? 'Active' : 'Inactive'}
                             </div>
-                            <div className={`flex items-center gap-1.5 text-xs ${user.isVerified ? 'text-indigo-600' : 'text-amber-500'}`}>
-                              {user.isVerified ? <CheckCircle className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                            <div className={`flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase ${user.isVerified ? 'text-primary' : 'text-amber-500'}`}>
+                              <span className="material-symbols-outlined text-[14px] leading-none">{user.isVerified ? 'verified' : 'pending'}</span>
                               {user.isVerified ? 'Verified' : 'Unverified'}
                             </div>
                           </div>
                         </td>
                         <td className="px-5 py-4">
-                          <div className="flex items-center gap-1.5 text-gray-400 text-xs">
-                            <Calendar className="w-3.5 h-3.5" />{fmtDate(user.createdAt)}
+                          <div className="flex items-center gap-1.5 text-secondary text-xs">
+                            <span className="material-symbols-outlined text-sm opacity-50">calendar_today</span>
+                            {fmtDate(user.createdAt)}
                           </div>
                         </td>
-                        <td className="px-5 py-4">
-                          <div className="flex items-center justify-end gap-1.5">
-                            <button onClick={() => handleEdit(user)} title="Edit" className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"><Edit className="w-4 h-4" /></button>
+                        <td className="px-5 py-4 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <button onClick={() => handleEdit(user)} title="Edit" className="p-2 rounded-xl text-primary hover:bg-primary/10 transition-all"><span className="material-symbols-outlined text-xl">edit</span></button>
                             <button onClick={() => handleToggleStatus(user._id, user.isActive)} title={user.isActive ? 'Deactivate' : 'Activate'}
-                              className={`p-1.5 rounded-lg transition-colors ${user.isActive ? 'text-amber-500 hover:bg-amber-50' : 'text-green-500 hover:bg-green-50'}`}>
-                              {user.isActive ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                              className={`p-2 rounded-xl transition-all ${user.isActive ? 'text-amber-500 hover:bg-amber-50' : 'text-green-500 hover:bg-green-50'}`}>
+                              <span className="material-symbols-outlined text-xl">{user.isActive ? 'lock_person' : 'lock_open'}</span>
                             </button>
-                            <button onClick={() => handleResetPassword(user._id)} title="Reset password" className="p-1.5 rounded-lg text-purple-500 hover:bg-purple-50 transition-colors"><Lock className="w-4 h-4" /></button>
-                            <button onClick={() => handleDelete(user)} title="Delete" className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                            <button onClick={() => handleResetPassword(user._id)} title="Reset password" className="p-2 rounded-xl text-tertiary hover:bg-tertiary/10 transition-all"><span className="material-symbols-outlined text-xl">password</span></button>
+                            <button onClick={() => handleDelete(user)} title="Delete" className="p-2 rounded-xl text-error hover:bg-error/10 transition-all"><span className="material-symbols-outlined text-xl">delete</span></button>
                           </div>
                         </td>
                       </tr>
@@ -326,21 +321,21 @@ const UserManagementDashboard = () => {
               </div>
 
               {/* Pagination */}
-              <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
-                <p className="text-sm text-gray-500">
-                  Showing {((pagination.currentPage - 1) * pagination.perPage) + 1}–{Math.min(pagination.currentPage * pagination.perPage, pagination.total)} of {pagination.total} users
+              <div className="px-6 py-5 border-t border-outline-variant/10 flex items-center justify-between bg-surface-container-low/30 backdrop-blur-sm">
+                <p className="text-xs font-label text-secondary tracking-wide uppercase">
+                  Showing <strong className="text-primary">{((pagination.currentPage - 1) * pagination.perPage) + 1}–{Math.min(pagination.currentPage * pagination.perPage, pagination.total)}</strong> of {pagination.total} users
                 </p>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <button onClick={() => setPagination({ ...pagination, currentPage: pagination.currentPage - 1 })} disabled={pagination.currentPage === 1}
-                    className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                    <ChevronLeft className="w-4 h-4" />
+                    className="p-2.5 rounded-xl border border-outline-variant text-secondary hover:bg-surface-container-high hover:text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    <span className="material-symbols-outlined leading-none">chevron_left</span>
                   </button>
-                  <span className="px-4 py-1.5 text-sm bg-white border border-gray-200 rounded-lg text-gray-700 font-medium">
-                    {pagination.currentPage} / {pagination.totalPages}
+                  <span className="px-4 py-2 text-xs font-headline font-bold bg-surface-container-high/50 border border-outline-variant rounded-xl text-on-surface">
+                    {pagination.currentPage} <span className="mx-1 opacity-40">/</span> {pagination.totalPages}
                   </span>
                   <button onClick={() => setPagination({ ...pagination, currentPage: pagination.currentPage + 1 })} disabled={pagination.currentPage === pagination.totalPages}
-                    className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                    <ChevronRight className="w-4 h-4" />
+                    className="p-2.5 rounded-xl border border-outline-variant text-secondary hover:bg-surface-container-high hover:text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    <span className="material-symbols-outlined leading-none">chevron_right</span>
                   </button>
                 </div>
               </div>
@@ -351,56 +346,58 @@ const UserManagementDashboard = () => {
 
       {/* Edit Modal */}
       {showEditModal && editingUser && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2"><Edit className="w-5 h-5 text-primary" /> Edit User</h2>
-              <button onClick={() => setShowEditModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 bg-surface-container-highest/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-surface rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-outline-variant/30 animate-in fade-in zoom-in duration-300">
+            <div className="px-8 py-6 border-b border-outline-variant/10 flex items-center justify-between">
+              <h2 className="text-2xl font-headline font-extrabold text-primary flex items-center gap-3 tracking-tight">
+                <span className="material-symbols-outlined text-3xl">edit_square</span> Edit User Account
+              </h2>
+              <button onClick={() => setShowEditModal(false)} className="p-2 text-secondary hover:text-error hover:bg-error/10 rounded-xl transition-all"><span className="material-symbols-outlined">close</span></button>
             </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {[['Name', 'name', 'text'], ['Username', 'username', 'text']].map(([lbl, key, type]) => (
+            <div className="p-8 space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                {[['Full Name', 'name', 'text'], ['User Identifier', 'username', 'text']].map(([lbl, key, type]) => (
                   <div key={key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{lbl}</label>
+                    <label className="block text-xs font-label font-bold tracking-widest uppercase text-secondary mb-2">{lbl}</label>
                     <input type={type} value={editingUser[key] || ''} onChange={e => setEditingUser({ ...editingUser, [key]: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                      className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                   </div>
                 ))}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                <label className="block text-xs font-label font-bold tracking-widest uppercase text-secondary mb-2">Electronic Mail</label>
                 <input type="email" value={editingUser.email || ''} onChange={e => setEditingUser({ ...editingUser, email: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                  className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
+                  <label className="block text-xs font-label font-bold tracking-widest uppercase text-secondary mb-2">Assigned Role</label>
                   <select value={editingUser.role} onChange={e => setEditingUser({ ...editingUser, role: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                     {roles.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
+                  <label className="block text-xs font-label font-bold tracking-widest uppercase text-secondary mb-2">Phone Number</label>
                   <input type="text" value={editingUser.phoneNumber || ''} onChange={e => setEditingUser({ ...editingUser, phoneNumber: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-2xl text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                 </div>
               </div>
-              <div className="flex items-center gap-6">
-                {[['isActive', 'Active'], ['isVerified', 'Verified']].map(([key, lbl]) => (
-                  <label key={key} className="flex items-center gap-2 cursor-pointer">
+              <div className="flex items-center gap-8 pt-2">
+                {[['isActive', 'Active Status'], ['isVerified', 'Verified Account']].map(([key, lbl]) => (
+                  <label key={key} className="flex items-center gap-3 cursor-pointer group">
                     <input type="checkbox" checked={editingUser[key]} onChange={e => setEditingUser({ ...editingUser, [key]: e.target.checked })}
-                      className="w-4 h-4 rounded border-gray-300 text-primary" />
-                    <span className="text-sm text-gray-700">{lbl}</span>
+                      className="w-5 h-5 rounded-lg border-outline-variant/30 text-primary focus:ring-primary/20 transition-all" />
+                    <span className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">{lbl}</span>
                   </label>
                 ))}
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
-              <button onClick={() => setShowEditModal(false)} className="px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50">Cancel</button>
+            <div className="px-8 py-6 bg-surface-container-low/50 border-t border-outline-variant/10 flex justify-end gap-3">
+              <button onClick={() => setShowEditModal(false)} className="px-6 py-3 border border-outline-variant text-secondary rounded-2xl text-sm font-semibold hover:bg-surface-container-high transition-all">Discard</button>
               <button onClick={handleUpdateUser} disabled={actionLoading}
-                className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 flex items-center gap-2 disabled:opacity-50">
-                {actionLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Saving…</> : <><Check className="w-4 h-4" />Save Changes</>}
+                className="px-8 py-3 bg-primary text-white rounded-2xl text-sm font-extrabold shadow-lg hover:opacity-90 flex items-center gap-2 transition-all disabled:opacity-50">
+                {actionLoading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span> Updating...</> : <><span className="material-symbols-outlined text-lg">check</span> Commit Changes</>}
               </button>
             </div>
           </div>
@@ -409,21 +406,21 @@ const UserManagementDashboard = () => {
 
       {/* Delete Modal */}
       {showDeleteModal && deletingUser && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl">
-            <div className="p-6 text-center">
-              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="w-7 h-7 text-red-500" />
+        <div className="fixed inset-0 bg-surface-container-highest/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-surface rounded-3xl max-w-md w-full shadow-2xl border border-outline-variant/30 animate-in fade-in zoom-in duration-300">
+            <div className="p-8 text-center">
+              <div className="w-20 h-20 bg-error-container/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="material-symbols-outlined text-5xl text-error">warning</span>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Delete User?</h2>
-              <p className="text-gray-500 text-sm mb-6">
-                You are about to permanently delete <strong className="text-gray-900">{safeStr(deletingUser.name) || 'this user'}</strong>. This cannot be undone.
+              <h2 className="text-2xl font-headline font-extrabold text-on-surface mb-3 tracking-tight">Delete User Account?</h2>
+              <p className="text-secondary text-sm leading-relaxed mb-8">
+                You are about to permanently delete <strong className="text-on-surface">{safeStr(deletingUser.name) || 'this user'}</strong>. This operation is irreversible and all associated data will be purged.
               </p>
-              <div className="flex gap-3">
-                <button onClick={() => setShowDeleteModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50">Cancel</button>
+              <div className="flex gap-4">
+                <button onClick={() => setShowDeleteModal(false)} className="flex-1 px-4 py-3 border border-outline-variant text-secondary rounded-2xl text-sm font-semibold hover:bg-surface-container-high transition-all">Cancel</button>
                 <button onClick={confirmDelete} disabled={actionLoading}
-                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 flex items-center justify-center gap-2 disabled:opacity-50">
-                  {actionLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Deleting…</> : <><Trash2 className="w-4 h-4" />Delete</>}
+                  className="flex-1 px-4 py-3 bg-error text-white rounded-2xl text-sm font-extrabold shadow-lg hover:opacity-90 flex items-center justify-center gap-2 transition-all disabled:opacity-50">
+                  {actionLoading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span> Purging...</> : <><span className="material-symbols-outlined text-lg">delete_forever</span> Confirm Delete</>}
                 </button>
               </div>
             </div>

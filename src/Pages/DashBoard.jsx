@@ -174,8 +174,24 @@ const Dashboard = () => {
       const matchesSearch = card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         card.description.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const badgeText = card.badge === 'UniAdmin' || card.badge === 'UniTeach' ? 'University' : card.badge;
-      const matchesBadge = selectedBadge === 'All' || badgeText === selectedBadge;
+      const cardBadge = card.badge === 'UniAdmin' || card.badge === 'UniTeach' ? 'University' : card.badge;
+      
+      // Hierarchical filtering: Show what the role can access
+      let matchesBadge = selectedBadge === 'All';
+      if (!matchesBadge) {
+        if (selectedBadge === 'Admin') {
+          matchesBadge = true; // Admin sees everything
+        } else if (selectedBadge === 'Mentor') {
+          matchesBadge = ['Public', 'User', 'Mentor'].includes(cardBadge);
+        } else if (selectedBadge === 'User') {
+          matchesBadge = ['Public', 'User'].includes(cardBadge);
+        } else if (selectedBadge === 'University') {
+          matchesBadge = ['Public', 'University'].includes(cardBadge);
+        } else if (selectedBadge === 'Public') {
+          matchesBadge = cardBadge === 'Public';
+        }
+      }
+
       return matchesSearch && matchesBadge;
     });
     if (filtered.length > 0) {

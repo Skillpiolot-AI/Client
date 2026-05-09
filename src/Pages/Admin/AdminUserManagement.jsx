@@ -1,8 +1,4 @@
-import React, { useState } from 'react';
-import {
-  UserPlus, Mail, Lock, User, Shield, CheckCircle,
-  XCircle, Send, Eye, EyeOff, AlertCircle, Loader2
-} from 'lucide-react';
+// Removed lucide-react imports
 import config from '../../config';
 
 const AdminUserManagement = () => {
@@ -95,124 +91,134 @@ const AdminUserManagement = () => {
   const selectedRole = roles.find(r => r.value === formData.role);
 
   return (
-    <div className="min-h-screen bg-gray-50 font-body">
+    <div className="min-h-screen bg-surface font-body text-on-surface">
       {/* Toast */}
       {notification.show && (
-        <div className={`fixed top-6 right-6 z-50 px-5 py-3.5 rounded-xl shadow-lg flex items-center gap-3 text-white text-sm font-medium ${notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
-          {notification.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+        <div className={`fixed top-6 right-6 z-50 px-5 py-3.5 rounded-xl shadow-lg flex items-center gap-3 text-white text-sm font-medium ${notification.type === 'success' ? 'bg-green-600' : 'bg-error'}`}>
+          <span className="material-symbols-outlined">{notification.type === 'success' ? 'check_circle' : 'error'}</span>
           {notification.message}
         </div>
       )}
 
       <div className="max-w-3xl mx-auto px-6 py-10">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-3">
-            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
-              <UserPlus className="w-6 h-6 text-primary" />
+        <div className="mb-10">
+          <div className="flex items-center gap-5 mb-4">
+            <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center shadow-inner">
+              <span className="material-symbols-outlined text-3xl text-primary">person_add</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Create New User</h1>
-              <p className="text-gray-500 text-sm">Add a user account and send a welcome or verification email</p>
+              <h1 className="text-3xl font-headline font-extrabold text-primary tracking-tight">Create New User</h1>
+              <p className="text-secondary text-sm mt-1">Add a user account and send a welcome or verification email</p>
             </div>
           </div>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        <div className="bg-surface-container-low border border-outline-variant/20 rounded-3xl shadow-xl p-8 mb-8 overflow-hidden relative group transition-all">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {[
-              { id: 'name', label: 'Full Name', icon: <User className="w-4 h-4 text-gray-400" />, type: 'text', placeholder: 'John Doe' },
-              { id: 'username', label: 'Username', icon: <User className="w-4 h-4 text-gray-400" />, type: 'text', placeholder: 'johndoe' },
-              { id: 'email', label: 'Email Address', icon: <Mail className="w-4 h-4 text-gray-400" />, type: 'email', placeholder: 'john@example.com' },
+              { id: 'name', label: 'Full Name', icon: 'person', type: 'text', placeholder: 'John Doe' },
+              { id: 'username', label: 'Unique Username', icon: 'alternate_email', type: 'text', placeholder: 'johndoe' },
+              { id: 'email', label: 'Primary Email Address', icon: 'mail', type: 'email', placeholder: 'john@example.com' },
             ].map(f => (
               <div key={f.id} className={f.id === 'email' ? 'md:col-span-2' : ''}>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">{f.label}</label>
+                <label className="block text-xs font-label font-bold tracking-widest uppercase text-secondary mb-2.5">{f.label}</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2">{f.icon}</span>
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-60">{f.icon}</span>
                   <input type={f.type} name={f.id} value={formData[f.id]} onChange={handleInputChange} placeholder={f.placeholder}
-                    className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    className="w-full pl-12 pr-4 py-3.5 bg-surface border border-outline-variant/30 rounded-2xl text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all placeholder:opacity-40" />
                 </div>
               </div>
             ))}
 
             {/* Role */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
-                <Shield className="w-4 h-4 text-gray-400" /> User Role
+            <div className="md:col-span-2 pt-2">
+              <label className="block text-xs font-label font-bold tracking-widest uppercase text-secondary mb-3 flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm">shield</span> Platform Permissions Role
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
                 {roles.map(role => (
                   <button key={role.value} type="button" onClick={() => setFormData(prev => ({ ...prev, role: role.value }))}
-                    className={`py-2 px-3 rounded-xl border-2 text-sm font-medium transition-all text-center ${formData.role === role.value ? `border-primary ${role.color}` : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}>
+                    className={`py-3 px-3 rounded-2xl border-2 text-[10px] font-bold tracking-widest uppercase transition-all text-center ${formData.role === role.value ? `border-primary bg-primary text-white shadow-md scale-105` : 'border-outline-variant/30 text-secondary hover:border-primary/30 bg-surface'}`}>
                     {role.label}
                   </button>
                 ))}
               </div>
               {selectedRole && (
-                <p className="mt-2 text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
-                  <strong>{selectedRole.label}:</strong> {roleDescriptions[selectedRole.value]}
-                </p>
+                <div className="mt-4 p-4 bg-surface-container-high/50 rounded-2xl border border-outline-variant/10 flex gap-3 animate-in fade-in slide-in-from-top-1">
+                  <span className="material-symbols-outlined text-primary text-xl">info</span>
+                  <p className="text-xs text-on-surface leading-relaxed font-body">
+                    <strong className="text-primary font-headline tracking-wide">{selectedRole.label}:</strong> {roleDescriptions[selectedRole.value]}
+                  </p>
+                </div>
               )}
             </div>
           </div>
 
           {/* Password */}
-          <div className="mb-5">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
-              <Lock className="w-4 h-4 text-gray-400" /> Generated Password
+          <div className="mb-8">
+            <label className="block text-xs font-label font-bold tracking-widest uppercase text-secondary mb-2.5 flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-sm">lock</span> Secure Access Credentials
             </label>
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <div className="flex-1 relative">
-                <input type={showPassword ? 'text' : 'password'} value={generatedPassword} readOnly placeholder="Click Generate Password"
-                  className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:outline-none font-mono" />
+                <input type={showPassword ? 'text' : 'password'} value={generatedPassword} readOnly placeholder="Click Generate to create password"
+                  className="w-full pl-4 pr-12 py-3.5 bg-surface-container-high border border-outline-variant/30 rounded-2xl text-sm font-mono tracking-widest focus:outline-none" />
                 {generatedPassword && (
-                  <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <button onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors">
+                    <span className="material-symbols-outlined text-xl">{showPassword ? 'visibility_off' : 'visibility'}</span>
                   </button>
                 )}
               </div>
-              <button onClick={generatePassword} className="px-5 py-2.5 bg-primary text-white font-medium rounded-xl text-sm hover:opacity-90 transition-all">
+              <button onClick={generatePassword} className="px-8 py-3.5 bg-tertiary text-white font-extrabold rounded-2xl text-xs uppercase tracking-widest shadow-lg hover:opacity-90 active:scale-95 transition-all">
                 Generate
               </button>
             </div>
           </div>
 
           {/* Verified Toggle */}
-          <div className="mb-6">
-            <label className="flex items-center gap-3 cursor-pointer group">
+          <div className="mb-8 p-4 bg-surface-container-low border border-outline-variant/20 rounded-2xl">
+            <label className="flex items-center gap-4 cursor-pointer group select-none">
               <div className="relative">
                 <input type="checkbox" name="isVerified" checked={formData.isVerified} onChange={handleInputChange} className="sr-only" />
-                <div className={`w-11 h-6 rounded-full transition-colors ${formData.isVerified ? 'bg-green-500' : 'bg-gray-200'}`}>
-                  <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${formData.isVerified ? 'translate-x-5' : ''}`} />
+                <div className={`w-14 h-7 rounded-full transition-all duration-300 ${formData.isVerified ? 'bg-primary shadow-inner shadow-primary-container' : 'bg-outline-variant/40'}`}>
+                  <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-300 ${formData.isVerified ? 'translate-x-7' : ''} flex items-center justify-center`}>
+                     {formData.isVerified && <span className="material-symbols-outlined text-[12px] text-primary font-bold">check</span>}
+                  </div>
                 </div>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-700">Pre-verify email</span>
-                <span className="ml-2 text-xs text-gray-400">({formData.isVerified ? 'Welcome email will be sent' : 'Verification email will be sent'})</span>
+                <span className="text-sm font-headline font-bold text-on-surface group-hover:text-primary transition-colors tracking-tight">Pre-verify User Account</span>
+                <p className="text-[10px] text-secondary font-label tracking-widest uppercase mt-0.5 opacity-60">
+                  {formData.isVerified ? 'A welcome email will be dispatched immediately' : 'User will receive a mandatory verification request'}
+                </p>
               </div>
             </label>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-4">
             <button onClick={handleCreateUser} disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-green-600 text-white font-semibold rounded-xl text-sm hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" />Creating…</> : <><UserPlus className="w-4 h-4" />Create User & Send Email</>}
+              className="flex-1 flex items-center justify-center gap-3 py-4 bg-primary text-white font-extrabold rounded-2xl text-xs uppercase tracking-widest shadow-xl hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span> Provisioning...</> : <><span className="material-symbols-outlined">person_add</span> Create & Dispatch</>}
             </button>
             <button onClick={handleTestEmail} disabled={testEmailLoading}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-600 text-white font-semibold rounded-xl text-sm hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-              {testEmailLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Sending…</> : <><Send className="w-4 h-4" />Send Test Email</>}
+              className="flex-1 flex items-center justify-center gap-3 py-4 bg-surface-container-highest text-primary font-extrabold rounded-2xl text-xs uppercase tracking-widest border border-outline-variant hover:bg-surface transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              {testEmailLoading ? <><span className="material-symbols-outlined animate-spin text-sm">progress_activity</span> Transmitting...</> : <><span className="material-symbols-outlined text-lg">outgoing_mail</span> Preview Template</>}
             </button>
           </div>
         </div>
 
         {/* Info box */}
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-blue-700">
-            <p className="font-semibold mb-0.5">Test email destination: ujjwaljha744@gmail.com</p>
-            <p className="text-blue-600 text-xs">Use the test button to preview the email template before creating the actual user account.</p>
+        <div className="bg-primary-container/10 border border-primary/20 rounded-3xl p-6 flex items-start gap-4 shadow-sm">
+          <span className="material-symbols-outlined text-primary text-2xl">mail_lock</span>
+          <div className="text-sm leading-relaxed">
+            <p className="font-headline font-bold text-primary tracking-tight text-lg mb-1">Administrative Mail Dispatch</p>
+            <p className="text-secondary font-body">
+              All communications are routed via <strong className="text-on-surface">ujjwaljha744@gmail.com</strong> for internal auditing. 
+              We recommend executing a <span className="text-primary font-bold">Preview Template</span> dispatch to verify content and branding before finalizing user registration.
+            </p>
           </div>
         </div>
       </div>
